@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.neighbors import BallTree
 import time
 
-from kNN_ASMR.HelperFunctions import calc_kNN_CDF
+from ..HelperFunctions.HelperFunctions import calc_kNN_CDF
 
 ####################################################################################################
 
