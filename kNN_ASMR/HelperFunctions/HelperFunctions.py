@@ -484,8 +484,7 @@ def create_smoothed_field_dict(skymap, bins, query_mask, Verbose=False):
         #-------------------------------------------------------------------------------------------
         
         if Verbose: 
-            print('\tdistance scales for {}NN done;
-            time taken: {:.2e} s.'.format(i+1, time.perf_counter()-start))
+            print('\tdistance scales for {}NN done; time taken: {:.2e} s.'.format(i+1, time.perf_counter()-start))
 
     #-----------------------------------------------------------------------------------------------
     
@@ -564,8 +563,7 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
 
         #Check for consistency:
         if len(joint_cdf_list)!=len(k1_k2_list): 
-            raise ValueError('Inconsistent input: shape of "joint_cdf_list" not consistent with 
-            that of "k1_k2_list"')
+            raise ValueError('Inconsistent input: shape of "joint_cdf_list" not consistent with that of "k1_k2_list"')
         for k, (k1, k2) in enumerate(k1_k2_list):
             psi_list.append(joint_cdf_list[k]/(auto_cdf_list_1[k1]*auto_cdf_list_2[k2]))
 
@@ -575,7 +573,7 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
         #Check for consistency:
         if len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2): 
             raise ValueError('Inconsistent input: shapes not compatible with each other')
-        for k in range(len(joint_cdf_list))
+        for k in range(len(joint_cdf_list)):
             psi_list.append(joint_cdf_list[k]/(auto_cdf_list_1[k]*auto_cdf_list_2[k]))
 
     return psi_list
