@@ -16,16 +16,24 @@ import copy
 ####################################################################################################
 
 def cdf_vol_knn(vol):
+
     '''
-    Returns interpolating functions for emperical CDFs of the given \\(k\\)-nearest neighbour distances.
+    Returns interpolating functions for emperical CDFs of the given k-nearest neighbour distances.
+
+    #-----------------------------------------------------------------------------------------------
     
     Parameters
     ----------
-    vol : numpy array of shape (n, l) where 'n' is the number of query points and 'l' is the number of nearest neighbours queried
+    
+    vol: float array of shape (n, l) where 'n' is the number of query points and 'l' is the number
+         of nearest neighbours queried
         Sorted array of nearest neighbour distances.
+        
+    #-----------------------------------------------------------------------------------------------
 
     Returns
     -------
+
     cdf: list
         list of interpolated emperical CDF functions that can be evaluated at desired distance bins.
     '''
@@ -55,7 +63,7 @@ def cdf_vol_knn(vol):
 
 ####################################################################################################
 
-def calc_kNN_CDF(vol, kMax, bins, Flag='list'):
+def calc_kNN_CDF(vol, kMax, bins):
 
     '''
     Returns the kNN-CDFs for the given nearest-neighbour distances, evaluated at the given distance
@@ -88,11 +96,6 @@ def calc_kNN_CDF(vol, kMax, bins, Flag='list'):
     '''
 
     #-----------------------------------------------------------------------------------------------
-
-    if flag == 'int':
-
-    elif flag == 'list':
-        
     
     #Initialising the list of kNN-CDFs
     data = []
