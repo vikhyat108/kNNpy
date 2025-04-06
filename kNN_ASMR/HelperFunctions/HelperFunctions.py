@@ -16,17 +16,17 @@ import copy
 ####################################################################################################
 
 def cdf_vol_knn(vol):
-    '''
-    Returns interpolating functions for emperical CDFs of the given \\(k\\)-nearest neighbour distances.
+    r'''
+    Returns interpolating functions for emperical CDFs of the given $k$-nearest neighbour distances.
     
     Parameters
     ----------
-    vol : numpy array of shape (n, l) where 'n' is the number of query points and 'l' is the number of nearest neighbours queried
-        Sorted array of nearest neighbour distances.
+    vol : numpy float array of shape ``(n_query, n_kNN)``
+        Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
 
     Returns
     -------
-    cdf: list
+    cdf: list of function objects
         list of interpolated emperical CDF functions that can be evaluated at desired distance bins.
     '''
     
@@ -55,45 +55,27 @@ def cdf_vol_knn(vol):
 
 ####################################################################################################
 
-def calc_kNN_CDF(vol, kMax, bins, Flag='list'):
+def calc_kNN_CDF(vol, kList, bins):
+    r'''
+    Returns the kNN-CDFs for the given nearest-neighbour distances, evaluated at the given distance bins.
 
-    '''
-    Returns the kNN-CDFs for the given nearest-neighbour distances, evaluated at the given distance
-    bins.
-
-    #-----------------------------------------------------------------------------------------------
-    
     Parameters
     ----------
-    
-    vol: float array of shape (n, l) where 'n' is the number of query points and 'l' is the number
-         of nearest neighbours queried
-        Sorted array of nearest neighbour distances.
-        
-    kMax: int
-        the number of nearest neighbours to calculate the distances to. For example, if kMax = 3, 
-        the first 3 nearest-neighbour distributions will be computed.
-
-    bins: list of float arrays
-        list of distances for each nearest neighbour. The i^th element of the list should contain a
-        numpy array of the desired distances for the i^th nearest neighbour.
-
-    #-----------------------------------------------------------------------------------------------
+    vol : numpy float array of shape ``(n_query, n_kNN)``
+        Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
+    kList : list of int
+        the nearest neighbours for which the distances have been calculated to. For example, if `kList = [2, 4, 8]`, then `vol` should contain the sorted distances to the $2^{nd}$, $4^{th}$ and $8^{th}$ nearest-neighbours.
+    bins : list of numpy float arrays
+        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
 
     Returns
     -------
-
-    data: list of float arrays, each of shape len(bins[k-1]) for 1<=k<=kMax
+    data : list of numpy float arrays
         kNN-CDFs evaluated at the desired distance bins.
     '''
 
     #-----------------------------------------------------------------------------------------------
 
-    if flag == 'int':
-
-    elif flag == 'list':
-        
-    
     #Initialising the list of kNN-CDFs
     data = []
 
@@ -105,7 +87,7 @@ def calc_kNN_CDF(vol, kMax, bins, Flag='list'):
     #-----------------------------------------------------------------------------------------------
 
     #Looping over the nearest-neighbour indices
-    for i in range(kMax):
+    for i, k in enumerate(kList):
 
         #-------------------------------------------------------------------------------------------
 
@@ -140,27 +122,20 @@ def calc_kNN_CDF(vol, kMax, bins, Flag='list'):
 ####################################################################################################
 
 def bl_th(l, ss):
-    
-    '''
+    r'''
     Computes Legendre expansion coefficients for the top-hat window function in angular coordinates.
 
-    #-----------------------------------------------------------------------------------------------
-    
+
     Parameters
     ----------
-    
-    l: int array
+    l : numpy int array
         array of multipole numbers.
-
-    ss: float
+    ss : float
         angular scale (in radians) at which the field is to be smoothed.
-
-    #-----------------------------------------------------------------------------------------------
 
     Returns
     -------
-
-    num/den: float array of same size as input array 'l'
+    numpy float array of shape ``l.shape``
         array of Legendre expansion coefficients at each input multipole number.
     '''
 
@@ -173,42 +148,41 @@ def bl_th(l, ss):
 ####################################################################################################
 
 def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
-
-    '''
+    r'''
     Smooths the given map at the given scale using the top hat window function in harmonic space.
-    See Devaraju (2015) for a discussion and derivation of expressions used here.
 
-    #-----------------------------------------------------------------------------------------------
-
-    References:
-
-        1. Devaraju (2015):
-        Devaraju B., 2015, doctoralThesis, doi:10.18419/opus-3985, http://elib.uni-stuttgart.de/handle/11682/4002
-
-    #-----------------------------------------------------------------------------------------------
-    
     Parameters
     ----------
-    
-    skymap: float array
-        the healpy map of the continuous field that needs to be smoothed.
-        The values of the masked pixels, if any, should be set to hp.UNSEEN.
-
-    scale: float
-        angular scale (in radians) at which the field is to be smoothed.
-        Please ensure scale is between 0 and 2*pi.
-
-    Verbose: Binary
-        if set to True, the time taken to complete each step of the calculation will be printed.
-        Defaults to False.
-
-    #-----------------------------------------------------------------------------------------------
+    skymap : numpy float array
+        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    scale : float
+        angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.
+    Verbose : bool, optional
+        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
 
     Returns
     -------
-
-    smoothed_map_masked: float array of same size as input array 'skymap'
+    smoothed_map_masked : numpy float array of shape ``skymap.shape``
         the smoothed healpy map, keeping the masked pixels of the original map masked.
+
+    Raises
+    ------
+    ValueError
+        if `scale` is not in `[0, 2*np.pi]`
+
+    Notes
+    -----
+    The following expression is used to compute the the spherical harmonic expansion coefficients $\alpha^{\theta}_{\ell m}$ of the field smoothed at angular scale $\theta$ using a top hat window function (See Devaraju (2015)[^1] and Gupta & Banerjee (2024)[^2] for derivations and a detailed discussion)
+    $$\alpha^{\theta}_{\ell m} = 4\pi\frac{b_{\ell}} {2\ell+1}\alpha_{\ell m},$$
+    where $b_{\ell}$ are the the Legedre expansion coefficients of the top hat function, given by
+    $$b_{\ell} = \frac{1}{4\pi(1-\cos\theta)}\left[P_{\ell-1}(\cos\theta)-P_{\ell+1}(\cos\theta)\right].$$
+    The smoothed field is reconstructed from $\alpha^{\theta}_{\ell m}$ using healpy's `alm2map` method.
+
+
+    References
+    ----------
+    [^1]: Devaraju B., 2015, [doctoralThesis](http://elib.uni-stuttgart.de/handle/11682/4002), doi:10.18419/opus-3985.
+    [^2]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -286,56 +260,49 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
 ####################################################################################################
 
 def create_query(NSIDE_query, mask, tolerance):
-
-    '''
+    r'''
     Computes the usable query points for the given mask (ie., query points at least a user-defined 
     threshold distance away from the mask edge) and returns the same, along with a HEALPix 
-    'query mask' that has the following values:
+    `query mask` that has the following values:
     
         0: pixels outside the observational footprint
         1: pixels inside the footprint but too close to the mask edge (not usable)
         2: usable pixels
 
-    See Gupta & Banerjee (2024) for a detailed discussion. Currently supports only query grids of the same
-    size as the HEALpix grid on which the continuous overdensity field skymap is defined.
-
-    #-----------------------------------------------------------------------------------------------
-
-    References:
-
-        1. Gupta & Banerjee (2024):
-        Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources 
-        with k-nearest neighbour distributions, Monthly Notices of the Royal Astronomical Society, 
-        Volume 531, Issue 4, July 2024, Pages 4619–4639, https://doi.org/10.1093/mnras/stae1424
-    
-    #-----------------------------------------------------------------------------------------------
-    
     Parameters
     ----------
-    
-    NSIDE_query: int
-        the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field
-        and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.)
-
-    mask: int array of shape (12*NSIDE_query**2,)
-        array with 0 and 1 indicating that the corresponding HEALPixel is outside and inside the 
-        observational footprint, respectively.
-
-    tolerance: float
+    NSIDE_query : int
+        the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.)
+    mask : numpy int array of shape ``(12*NSIDE_query**2, )``
+        array with 0 and 1 indicating that the corresponding HEALPixel is outside and inside the observational footprint, respectively.
+    tolerance : float
         the minimum angular distance (in radians) a query point needs to be away from the mask edge
         to be considered usable.
 
-    #-----------------------------------------------------------------------------------------------
-
     Returns
     -------
-
-    query_mask: float array of same size as input array 'mask'
+    query_mask : numpy float array of shape ``mask.shape``
         the HEALPix query mask.
 
-    QueryPositions: float array of shape (N_usable_pix, 3)
-        array of usable query point positions ('N_usable_pix' is the number of pixels that are
-        sufficiently far away from the mask edge).
+    QueryPositions : numpy float array of shape ``(N_usable_pix, 3)``
+        array of usable query point positions, where 'N_usable_pix' is the number of pixels that are sufficiently far away from the mask edge, as determined by this method.
+
+    Raises
+    ------
+    ValueError
+        if `tolerance` is not in `[0, 2*np.pi]`
+    ValueError
+        if `NSIDE_query` is not a power of 2
+    ValueError
+        if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
+
+    Notes
+    -----
+    Please refer to Gupta & Banerjee (2024)[^1] for a detailed discussion on creation of query point in presence of observational footprints that do not cover the full sky. The algorithm currently supports only query grids of the same size as the HEALpix grid on which the continuous overdensity field skymap is defined.
+
+    References
+    ----------
+    [^1]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -402,52 +369,33 @@ def create_query(NSIDE_query, mask, tolerance):
 ####################################################################################################
 
 def create_smoothed_field_dict(skymap, bins, query_mask, Verbose=False):
-
-    '''
+    r'''
     Creates a dictionary containing the continuous field smoothed at various angular distance
     scales.
 
-    #-----------------------------------------------------------------------------------------------
-
-    References:
-
-        1. Gupta & Banerjee (2024):
-        Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources 
-        with k-nearest neighbour distributions, Monthly Notices of the Royal Astronomical Society, 
-        Volume 531, Issue 4, July 2024, Pages 4619–4639, https://doi.org/10.1093/mnras/stae1424
-    
-    #-----------------------------------------------------------------------------------------------
-    
     Parameters
     ----------
-    
-    skymap: float array
-        the healpy map of the continuous field that needs to be smoothed.
-        The values of the masked pixels, if any, should be set to hp.UNSEEN.
-
-    bins: list of float arrays
-        list of distances for each nearest neighbour. The i^th element of the list should contain a
-        numpy array of the desired distances for the i^th nearest neighbour.
-    
-    query_mask: int array of same size as 'skymap'
-        array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask,
-        too close to mask boundary and sufficiently far away from the boundary, respectively.
-        Refer to function 'create_query' defined above for creating the query mask and see 
-        Gupta and Banerjee (2024) for more details).
-
-    Verbose: Binary
-        if set to True, the time taken to complete each step of the calculation will be printed.
-        Defaults to False.
-
-    #-----------------------------------------------------------------------------------------------
+    skymap : numpy float array
+        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    bins : list of numpy float arrays
+        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
+    query_mask : numpy float array of shape ``skymap.shape``
+        the HEALPix query mask.
+    Verbose : bool, optional
+        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
 
     Returns
     -------
+    SmoothedFieldDict : dict
+        dictionary containing the continuous field masked within the observational footprint and smoothed at various angular distance scales. For example, `SmoothedFieldDict['0.215']`  represents the continuous map smoothed at a scale of 0.215 radians.
 
-    SmoothedFieldDict: dictionary
-        dictionary containing the continuous field masked within the observational footprint and 
-        smoothed at various angular distance scales. For example, SmoothedFieldDict['0.215'] 
-        represents the continuous map smoothed at a scale of 0.215 radians.
+    Notes
+    -----
+    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively.Please Refer to the helper function method `create_query` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
+
+    References
+    ----------
+    [^1] Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -492,62 +440,57 @@ def create_smoothed_field_dict(skymap, bins, query_mask, Verbose=False):
 ####################################################################################################
 
 def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k2_list=None):
-
-    '''
-    Computes the excess spatial cross-correlation (Banerjee & Abel 2023) between two tracers 
-    (discrete or continuous) from their joint kNN distributions ('joint_cdf_list') and their 
-    respective kNN-CDFs ('auto_cdf_list_1', 'auto_cdf_list_2').
-
-    #-----------------------------------------------------------------------------------------------
-
-    References:
-
-        1. Banerjee & Abel (2023):
-        Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour 
-        distributions, Monthly Notices of the Royal Astronomical Society, Volume 519, Issue 4, 
-        March 2023, Pages 4856–4868, https://doi.org/10.1093/mnras/stac3813
-
-    #-----------------------------------------------------------------------------------------------
+    r'''
+    Computes the excess spatial cross-correlation (Banerjee & Abel 2023)[^1] between two tracers (discrete or continuous) from their joint kNN distributions (`joint_cdf_list`) and their respective kNN-CDFs (`auto_cdf_list_1`, `auto_cdf_list_2`).
 
     Parameters
     ----------
-
-    auto_cdf_list_1: list of float arrays
-        auto kNN-CDFs of the first set of tracers evaluated.
-        
-    auto_cdf_list_2: list of float arrays
-        auto kNN-CDFs of the second set of tracers evaluated.
-    
-    joint_cdf_list: list of float arrays
+    auto_cdf_list_1 : list of numpy float arrays
+        auto kNN-CDFs of the first set of tracers.
+    auto_cdf_list_2 : list of numpy float arrays
+        auto kNN-CDFs of the second set of tracers.
+    joint_cdf_list : list of numpy float arrays
         joint kNN distributions of the two tracer sets
-
-    k1_k2_list: list of int tuples
-        describes the kind of cross-correlations being computed. Should be None for every scenario 
-        other than tracer-tracer cross-correlation, in which case it should provide the combinations
-        of NN indices in the list of joint CDFs. For example, if you wish to compute the excess 
-        cross correlation for the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set 
-            
-            k1_k2_list = [(1,1), (1,2), (2,1)]
-
-        Note that the tuples should be consistent with the 'joint_cdf_list'. For example, if
-
-            k1_k2_list = [(1,1), (1,2)]
-
-        then
-        
-            joint_cdf_list = 
-
-        must hold.
-        Defaults to None. If None is passed for tracer-tracer cross-correlations, the correlations
-        are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF).
-
-    #-----------------------------------------------------------------------------------------------
+    k1_k2_list : list of int tuples
+        describes the kind of cross-correlations being computed (see notes for more details), by default `None`.
 
     Returns
     -------
+    psi_list : list of numpy float arrays
+        excess spatial cross-correlation between the two tracer sets.
 
-    psi_list: list of float arrays
-        excess spatial cross-correlation between the two tracer sets
+    Raises
+    ------
+    ValueError
+        if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`
+    ValueError
+        if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`
+
+    Notes
+    -----
+    The parameter `k1_k2_list` describes the kind of cross-correlations being computed. It should be set to `None` for every scenario other than tracer-tracer cross-correlation, in which case it should provide the combinations of NN indices for the two tracers sets being cross-correlated. 
+    
+    For example, if you wish to compute the excess cross correlation for the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set
+            
+        k1_k2_list = [(1,1), (1,2), (2,1)]
+
+    Note that the tuples should be consistent with the `joint_cdf_list`. For example, if
+
+        k1_k2_list = [(1,1), (1,2)]
+
+    then
+        
+        len(joint_cdf_list) == 2
+
+    must hold, and the first (second) element of `joint_cdf_list` should be the joint {1,1}NN-CDF ({1,2}NN-CDF).
+        
+    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF), and the following must be `True`
+
+        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2)
+
+    References
+    ----------
+    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868
     '''
 
     #-------------------------------------------------------------------------------------------
