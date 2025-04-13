@@ -142,7 +142,7 @@ def bl_th(l, ss):
     plm1 = scipy.special.eval_legendre(l-1, np.cos(ss))
     plp1 = scipy.special.eval_legendre(l+1, np.cos(ss))
     num = (plm1-plp1)
-    den = (2*l+1)*(1-np.cos(ss))
+    den = 4*np.pi*(1-np.cos(ss))
     return num/den
 
 ####################################################################################################
@@ -234,7 +234,7 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
     for l in range(l_max+1):
         for m in range(l+1):
             ind_lm = hp.Alm.getidx(l_max, l, m)
-            smoothed_alm[ind_lm] = map_alm[ind_lm]*bl[l] 
+            smoothed_alm[ind_lm] = map_alm[ind_lm]*bl[l]*4*np.pi/(2*l+1)
     if Verbose: print('\tdone.')
 
     #-----------------------------------------------------------------------------------------------
@@ -259,7 +259,7 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
 
 ####################################################################################################
 
-def create_query(NSIDE_query, mask, tolerance):
+def create_query_2DA(NSIDE_query, mask, tolerance):
     r'''
     Computes the usable query points for the given mask (ie., query points at least a user-defined 
     threshold distance away from the mask edge) and returns the same, along with a HEALPix 
@@ -368,7 +368,7 @@ def create_query(NSIDE_query, mask, tolerance):
 
 ####################################################################################################
 
-def create_smoothed_field_dict(skymap, bins, query_mask, Verbose=False):
+def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
     r'''
     Creates a dictionary containing the continuous field smoothed at various angular distance
     scales.
@@ -391,7 +391,7 @@ def create_smoothed_field_dict(skymap, bins, query_mask, Verbose=False):
 
     Notes
     -----
-    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively.Please Refer to the helper function method `create_query` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
+    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively.Please Refer to the helper function method `create_query_2DA` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
 
     References
     ----------
