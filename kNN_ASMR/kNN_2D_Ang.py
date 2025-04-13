@@ -5,9 +5,20 @@
 import numpy as np
 from sklearn.neighbors import BallTree
 import time
+import sys
+import os
 
-# from HelperFunctions import calc_kNN_CDF
-# import HelperFunctions
+#Necessary for relative imports (see https://stackoverflow.com/questions/34478398/import-local-function-from-a-module-housed-in-another-directory-with-relative-im)
+module_path = os.path.abspath(os.path.join(''))
+'''
+@private
+'''
+
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+#Importing the required helper function
+from kNN_ASMR.HelperFunctions import calc_kNN_CDF
 
 ####################################################################################################
 
@@ -27,7 +38,7 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
     3. $P_{>k, >{\rm dt}}(\theta)$:
     	the joint probability of finding at least 'k' tracers within a spherical cap of radius $\theta$ AND the overdensity field smoothed at angular scale $\theta$ exceeding the given density threshold
     		
-    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `HelperFunctions.kNN_excess_cross_corr` method to do this)
+    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNN_ASMR.HelperFunctions.kNN_excess_cross_corr()` method to do this)
     	
     $$\psi_{k, {\rm dt}} = P_{>k, >{\rm dt}}/(P_{>k} \times P_{>{\rm dt}})$$
 
@@ -81,11 +92,11 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
     -----
     Measures the angular cross-correlation between a set of discrete tracers and a continuous overdensity field using the k-nearest neighbour (kNN) formalism as defined in Banerjee & Abel (2023)[^1] and Gupta & Banerjee (2024)[^2].
     
-    The field must already be smoothed at the desired angular distance scales using a top-hat filter (see the `HelperFunctions` module for help with smoothing). The smoothed fields need to be provided as a dictionary (`SmoothedFieldDict`), see below for further details.
+    The field must already be smoothed at the desired angular distance scales using a top-hat filter (see the `kNN_ASMR.HelperFunctions` module for help with smoothing). The smoothed fields need to be provided as a dictionary (`SmoothedFieldDict`), see below for further details.
     
     Currently, the algorithm requires a constant percentile overdensity threshold for the continuous field and query points to be defined on a HEALPix grid. Extentions to a constant mass threshold and poisson-sampled query points on the sky may be added in the future. 
     
-    Data with associated observational footprints are supported, in which case, only tracer positions within the footprint should be provided and the field should be masked appropriately.Importantly, in this case, query points need to be within the footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). If the footprints of the tracer set and the field are different, a combined mask representing the intersection of the two footprints should be used (see the `HelperFunctions.create_query` method for help with masking and creating the modified query positions).
+    Data with associated observational footprints are supported, in which case, only tracer positions within the footprint should be provided and the field should be masked appropriately.Importantly, in this case, query points need to be within the footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). If the footprints of the tracer set and the field are different, a combined mask representing the intersection of the two footprints should be used (see the `kNN_ASMR.HelperFunctions.create_query_2DA()` method for help with masking and creating the modified query positions).
 
     References
     ----------
@@ -157,7 +168,7 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
         start_time = time.perf_counter()
         print('\n\tcomputing the tracer auto-CDFs P_{>k} ...')
     kList = range(1, kMax+1)
-    # p_gtr_k_list = HelperFunctions.calc_kNN_CDF(vol, kList, BinsRad)
+    p_gtr_k_list = calc_kNN_CDF(vol, kList, BinsRad)
 
     #-----------------------------------------------------------------------------------------------
     
