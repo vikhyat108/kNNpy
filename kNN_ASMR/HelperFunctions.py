@@ -370,8 +370,7 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
 
 def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
     r'''
-    Creates a dictionary containing the continuous field smoothed at various angular distance
-    scales.
+    Creates a dictionary containing the continuous field smoothed at various angular distance scales.
 
     Parameters
     ----------
