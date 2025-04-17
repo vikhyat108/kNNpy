@@ -8,6 +8,9 @@ from scipy import interpolate
 import healpy as hp
 import time
 import copy
+import pyfftw
+import warnings
+import smoothing_library as SL
 
 #Test comment
 
@@ -258,6 +261,130 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
     if Verbose: print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start_time))
 
     return smoothed_map_masked
+
+####################################################################################################
+
+def smoothing_3d(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thickness=None, Verbose=False):
+    r'''
+    Smooths the given map at the given scale using a window function of choice in real or k-space. 
+    
+    Parameters
+    ----------
+    field : numpy float array
+        the 3D array of the continuous field that needs to be smoothed. 
+    Filter : string
+        the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.
+    grid : int
+        the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
+    BoxSize : float
+        the size of the 3D box of the input density field, in Mpc/h.
+    R : float, optional
+        radial scale (in Mpc/h) at which the field is to be smoothed. Only use this parameter for real space smoothing.
+    kmin : float, optional
+        the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    kmax : float, optional
+        the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    thickness : float, optional
+        the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
+    Verbose : bool, optional
+        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
+
+    Returns
+    -------
+    smoothed_field : numpy float array of shape ``field.shape``
+        the smoothed field.
+
+    Raises
+    ------
+    ValueError
+        If required parameters (like `R`, `kmin`, `kmax`, or `thickness`) are missing for the specified filter type.
+    ValueError
+        If an unknown filter name is provided.
+
+    Notes
+    -----
+    - For real-space filters ('Top-Hat', 'Gaussian', 'Shell'), the radial scale `R` must be specified.
+    - For the 'Shell' filter, `thickness` must also be specified.
+    - For the 'Top-Hat-k' filter in Fourier space, `kmin` and `kmax` must be specified, while `R` and `thickness` are ignored.
+    - Any unused parameters will trigger warnings but not stop execution.
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+    if Verbose:
+        total_start_time = time.perf_counter()
+        print("\nStarting smoothing ...")
+    #-----------------------------------------------------------------------------------------------
+
+    if Filter in ['Top-Hat', 'Gaussian']:
+        if R is None:
+            raise ValueError(f"R must be provided for {Filter} filter.")
+        if kmin is not None or kmax is not None:
+            warnings.warn("kmin and kmax are not used for real-space filters and will be ignored.")
+        if thickness is not None:
+            warnings.warn("thickness is not used for real-space filters and will be ignored.")
+        
+        W_k = SL.FT_filter(BoxSize, R, grid, Filter, threads=1)
+        field_k = pyfftw.interfaces.numpy_fft.rfftn(field)
+        smoothed_field_k = field_k * W_k
+        smoothed_field = pyfftw.interfaces.numpy_fft.irfftn(smoothed_field_k)
+        
+    #-----------------------------------------------------------------------------------------------
+
+    elif Filter == 'Top-Hat-k':
+        if kmin is None or kmax is None:
+            raise ValueError("Both kmin and kmax must be provided for 'Top-Hat-k' filter.")
+        if R is not None:
+            warnings.warn("R is not used for 'Top-Hat-k' filter and will be ignored.")
+        if thickness is not None:
+            warnings.warn("thickness is not used for 'Top-Hat-k' filter and will be ignored.")
+        
+        R = 0.0
+        W_k = SL.FT_filter(BoxSize, R, grid, Filter, kmin=kmin, kmax=kmax, threads=1)
+        field_k = pyfftw.interfaces.numpy_fft.rfftn(field)
+        smoothed_field_k = field_k * W_k
+        smoothed_field = pyfftw.interfaces.numpy_fft.irfftn(smoothed_field_k)
+        
+    #-----------------------------------------------------------------------------------------------
+
+    elif Filter == 'Shell':
+        if R is None or thickness is None:
+            raise ValueError("Both R and thickness must be provided for 'Shell' filter.")
+        if kmin is not None or kmax is not None:
+            warnings.warn("kmin and kmax are not used for 'Shell' filter and will be ignored.")
+        
+        if Verbose:
+            print("\nGenerating shell-smoothed field ...")
+        
+        grid_cell_size = BoxSize / grid
+        field_k = pyfftw.interfaces.numpy_fft.rfftn(field)
+
+        x = np.fft.fftfreq(grid) * grid
+        y = np.fft.fftfreq(grid) * grid
+        z = np.fft.fftfreq(grid) * grid
+        X, Y, Z = np.meshgrid(x, y, z, indexing='ij')
+        r_grid = grid_cell_size * np.sqrt(X**2 + Y**2 + Z**2)
+
+        W = np.zeros((grid, grid, grid), dtype=np.float32)
+        W[(r_grid >= R - thickness/2) & (r_grid <= R + thickness/2)] = 1.0
+        W_k = pyfftw.interfaces.numpy_fft.rfftn(W)
+
+        smoothed_field_k = field_k * W_k
+        smoothed_field = pyfftw.interfaces.numpy_fft.irfftn(smoothed_field_k) / np.sum(W)
+
+    #-----------------------------------------------------------------------------------------------
+
+    else:
+        raise ValueError(f"Unknown filter: {Filter}")
+        
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose:
+        print("Smoothing completed.")
+        print('Total time taken: {:.2e} s.'.format(time.perf_counter() - total_start_time))
+        
+    #-----------------------------------------------------------------------------------------------
+
+    return smoothed_field
 
 ####################################################################################################
 
