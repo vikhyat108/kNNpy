@@ -630,6 +630,42 @@ def smoothing_3d(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
 
 ####################################################################################################
 
+def CIC_3D_Interp(pos, field, Boxsize):
+    r'''
+    Interpolates a 3D field onto particle positions using Cloud-In-Cell (CIC) interpolation.
+
+    Parameters
+    ----------
+    field : numpy.ndarray of shape ``(Ng, Ng, Ng)``
+        The 3D scalar field defined on a cubic grid with resolution 'Ng^3'.
+
+    pos : numpy.ndarray of shape ``(Np, 3)``
+        The positions of 'Np' particles. The columns represent x, y, and z coordinates. Units in Mpc/h
+    
+    Boxsize: float
+            The side length of the cubic volume in the same units as `pos`.
+    Returns
+    -------
+    fieldI : numpy.ndarray of shape ``(Np,)``
+        The interpolated field values at the given particle positions.
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+
+    # define the array containing the value of the density field at positions pos
+    density_interpolated = np.zeros(pos.shape[0], dtype=np.float32)
+
+    #-----------------------------------------------------------------------------------------------
+
+    # find the value of the density field at the positions pos
+    MASL.CIC_interp(field, Boxsize, pos, density_interpolated)
+
+    #-----------------------------------------------------------------------------------------------
+
+    return density_interpolated
+
+####################################################################################################
+
 def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k2_list=None):
     r'''
     Computes the excess spatial cross-correlation (Banerjee & Abel 2023)[^1] between two tracers (discrete or continuous) from their joint kNN distributions (`joint_cdf_list`) and their respective kNN-CDFs (`auto_cdf_list_1`, `auto_cdf_list_2`).
