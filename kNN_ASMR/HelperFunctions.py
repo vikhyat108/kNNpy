@@ -126,6 +126,163 @@ def calc_kNN_CDF(vol, kList, bins):
 
 ####################################################################################################
 
+def create_query_2DA(NSIDE_query, mask, tolerance):
+    r'''
+    Computes the usable query points for the given mask (ie., query points at least a user-defined 
+    threshold distance away from the mask edge) and returns the same, along with a HEALPix 
+    `query mask` that has the following values:
+    
+        0: pixels outside the observational footprint
+        1: pixels inside the footprint but too close to the mask edge (not usable)
+        2: usable pixels
+
+    Parameters
+    ----------
+    NSIDE_query : int
+        the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.)
+    mask : numpy int array of shape ``(12*NSIDE_query**2, )``
+        array with 0 and 1 indicating that the corresponding HEALPixel is outside and inside the observational footprint, respectively.
+    tolerance : float
+        the minimum angular distance (in radians) a query point needs to be away from the mask edge
+        to be considered usable.
+
+    Returns
+    -------
+    query_mask : numpy float array of shape ``mask.shape``
+        the HEALPix query mask.
+
+    QueryPositions : numpy float array of shape ``(N_usable_pix, 2)``
+        array of usable query point positions, where 'N_usable_pix' is the number of pixels that are sufficiently far away from the mask edge, as determined by this method. For each query point in the array, the first (second) coordinate is the declination (right ascension) in radians.
+
+    Raises
+    ------
+    ValueError
+        if `tolerance` is not in `[0, 2*np.pi]`
+    ValueError
+        if `NSIDE_query` is not a power of 2
+    ValueError
+        if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
+
+    Notes
+    -----
+    Please refer to Gupta & Banerjee (2024)[^1] for a detailed discussion on creation of query point in presence of observational footprints that do not cover the full sky. The algorithm currently supports only query grids of the same size as the HEALpix grid on which the continuous overdensity field skymap is defined.
+
+    References
+    ----------
+    [^1]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
+    '''
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Check all inputs are consistent with the function requirement
+
+    #Check if 'tolerance' is a valid angle
+    if tolerance<0 or tolerance>2*np.pi:
+        raise ValueError('Invalid threshold distance: please ensure 0 <= tolerance <= 2*pi.')
+
+    #Check if 'NSIDE_query' is a power of 2
+    if not (NSIDE_query > 0 and (NSIDE_query & (NSIDE_query - 1)) == 0):
+        raise ValueError('Invalid NSIDE for the query grid: please ensure NSIDE is a power of 2')
+
+    #Getting the NSIDE for the original mask
+    NSIDE_mask = hp.get_nside(mask)
+
+    #Check if the NSIDEs match
+    if NSIDE_mask!=NSIDE_query:
+        raise ValueError(f'NSIDE of the query grid ({NSIDE_query}) does not match NSIDE of \
+        the mask ({NSIDE_mask}).')
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Query points are defined on a Healpix grid, points in or close to the mask are removed
+
+    #Getting number of pixels from the NSIDE for the query points
+    NPIX = hp.nside2npix(NSIDE_query)    
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Getting the query mask
+
+    #2 means that the query point is usable
+    query_mask = 2*np.ones(NPIX)
+
+    pixels = np.arange(NPIX)
+    qpos_arr = np.array(hp.pix2vec(NSIDE_query, pixels))
+    #Looping over the initial query pixels
+    for pix_ind, qpos in enumerate(qpos_arr.T):
+        sel_pix_close = hp.query_disc(NSIDE_query, qpos, tolerance)
+        #1 means that the query point is close to the mask edge
+        if np.any(mask[sel_pix_close]==hp.UNSEEN): query_mask[pix_ind] = 1
+
+    pix_inside_arr = hp.vec2pix(NSIDE_query, qpos_arr[0], qpos_arr[1], qpos_arr[2])
+    #0 means that the query point is outside the footprint
+    query_mask[mask[pix_inside_arr]==hp.UNSEEN] = 0
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Getting the query positions
+
+    query_pixels = np.arange(NPIX)[query_mask==2]
+    
+    #Getting the latitudes and longitudes in degrees
+    QueryPositions_Deg = np.transpose(hp.pixelfunc.pix2ang(NSIDE_query, query_pixels, lonlat=True))
+    QueryPositions_Deg[:, [0, 1]] = QueryPositions_Deg[:, [1, 0]]
+    
+    #converting to radians
+    QueryPositions = np.deg2rad(QueryPositions_Deg)
+
+    return query_mask, QueryPositions
+
+####################################################################################################
+
+def create_query_3D(query_type, query_grid, BoxSize):
+    '''
+    Generates an array of query points; can be either randomly drawn from a uniform distribution defined over the box or put on a uniform grid.
+
+    Parameters
+    ----------
+    query_type : str
+        the type of query points to be generated; should be 'grid' for query points defined on a uniform grid and 'random' for query points drawn from a uniform random distribution.
+    query_grid : int
+        the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
+    BoxSize : float
+        the size of the 3D box of the input density field, in Mpc/h.
+
+    Returns
+    -------
+    query_pos : numpy float array of shape ``(query_grid**3, 3)``
+        array of query point positions. For each query point in the array, the first, second and third entries are the x, y and z coordinates respectively, in Mpc/h.
+
+    Raises
+    ------
+    ValueError
+        if an unknown query type is provided.
+    '''
+
+    if query_type == 'grid':
+
+        #Creating a grid of query points
+        x_ = np.linspace(0., BoxSize, query_grid)
+        y_ = np.linspace(0., BoxSize, query_grid)
+        z_ = np.linspace(0., BoxSize, query_grid)
+
+        x, y, z = np.array(np.meshgrid(x_, y_, z_, indexing='xy'))
+
+        query_pos = np.zeros((query_grid**3, 3))
+        query_pos[:, 0] = np.reshape(x, query_grid**3)
+        query_pos[:, 1] = np.reshape(y, query_grid**3)
+        query_pos[:, 2] = np.reshape(z, query_grid**3)
+
+    elif query_type == 'random':
+
+        #Creating a set of randomly distributed query points
+        query_pos = np.random.rand(query_grid**3, 3)*BoxSize
+
+    else:   
+        raise ValueError(f"Unknown query type: {query_type}; please provide a valid query type")
+    
+    return query_pos
+
 def bl_th(l, ss):
     r'''
     Computes Legendre expansion coefficients for the top-hat window function in angular coordinates.
@@ -264,6 +421,76 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
 
 ####################################################################################################
 
+def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
+    r'''
+    Creates a dictionary containing the continuous field smoothed at various angular distance scales.
+
+    Parameters
+    ----------
+    skymap : numpy float array
+        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    bins : list of numpy float arrays
+        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
+    query_mask : numpy float array of shape ``skymap.shape``
+        the HEALPix query mask.
+    Verbose : bool, optional
+        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
+
+    Returns
+    -------
+    SmoothedFieldDict : dict
+        dictionary containing the continuous field masked within the observational footprint and smoothed at various angular distance scales. For example, `SmoothedFieldDict['0.215']`  represents the continuous map smoothed at a scale of 0.215 radians.
+
+    Notes
+    -----
+    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively.Please Refer to the helper function method `create_query_2DA` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
+
+    References
+    ----------
+    [^1] Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
+    '''
+
+    #-----------------------------------------------------------------------------------------------
+    
+    if Verbose: 
+        total_start = time.perf_counter()
+        print(f'\nSmoothing the density field over the given angular distance scales...\n')
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Initializing the dictionary
+    SmoothedFieldDict = {}
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Looping over the nearest neighbour indices as inferred from the length of 'bins'
+    for i in range(len(bins)):
+
+        #-------------------------------------------------------------------------------------------
+        
+        if Verbose: start = time.perf_counter()
+
+        #-------------------------------------------------------------------------------------------
+        
+        for j, ss in enumerate(bins[i]):
+            #Square bracket selects only those pixels that are not close to the mask boundaries
+            #Turning verbose off to avoid too much text output
+            SmoothedFieldDict[str(ss)] = \
+            top_hat_smoothing_2DA(skymap, ss, Verbose=False)[query_mask==2]
+
+        #-------------------------------------------------------------------------------------------
+        
+        if Verbose: 
+            print('\tdistance scales for {}NN done; time taken: {:.2e} s.'.format(i+1, time.perf_counter()-start))
+
+    #-----------------------------------------------------------------------------------------------
+    
+    if Verbose: print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start))
+
+    return SmoothedFieldDict
+
+####################################################################################################
+
 def smoothing_3d(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thickness=None, Verbose=False):
     r'''
     Smooths the given map at the given scale using a window function of choice in real or k-space. 
@@ -385,185 +612,6 @@ def smoothing_3d(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
     #-----------------------------------------------------------------------------------------------
 
     return smoothed_field
-
-####################################################################################################
-
-def create_query_2DA(NSIDE_query, mask, tolerance):
-    r'''
-    Computes the usable query points for the given mask (ie., query points at least a user-defined 
-    threshold distance away from the mask edge) and returns the same, along with a HEALPix 
-    `query mask` that has the following values:
-    
-        0: pixels outside the observational footprint
-        1: pixels inside the footprint but too close to the mask edge (not usable)
-        2: usable pixels
-
-    Parameters
-    ----------
-    NSIDE_query : int
-        the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.)
-    mask : numpy int array of shape ``(12*NSIDE_query**2, )``
-        array with 0 and 1 indicating that the corresponding HEALPixel is outside and inside the observational footprint, respectively.
-    tolerance : float
-        the minimum angular distance (in radians) a query point needs to be away from the mask edge
-        to be considered usable.
-
-    Returns
-    -------
-    query_mask : numpy float array of shape ``mask.shape``
-        the HEALPix query mask.
-
-    QueryPositions : numpy float array of shape ``(N_usable_pix, 3)``
-        array of usable query point positions, where 'N_usable_pix' is the number of pixels that are sufficiently far away from the mask edge, as determined by this method.
-
-    Raises
-    ------
-    ValueError
-        if `tolerance` is not in `[0, 2*np.pi]`
-    ValueError
-        if `NSIDE_query` is not a power of 2
-    ValueError
-        if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
-
-    Notes
-    -----
-    Please refer to Gupta & Banerjee (2024)[^1] for a detailed discussion on creation of query point in presence of observational footprints that do not cover the full sky. The algorithm currently supports only query grids of the same size as the HEALpix grid on which the continuous overdensity field skymap is defined.
-
-    References
-    ----------
-    [^1]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
-    '''
-
-    #-----------------------------------------------------------------------------------------------
-
-    #Check all inputs are consistent with the function requirement
-
-    #Check if 'tolerance' is a valid angle
-    if tolerance<0 or tolerance>2*np.pi:
-        raise ValueError('Invalid threshold distance: please ensure 0 <= tolerance <= 2*pi.')
-
-    #Check if 'NSIDE_query' is a power of 2
-    if not (NSIDE_query > 0 and (NSIDE_query & (NSIDE_query - 1)) == 0):
-        raise ValueError('Invalid NSIDE for the query grid: please ensure NSIDE is a power of 2')
-
-    #Getting the NSIDE for the original mask
-    NSIDE_mask = hp.get_nside(mask)
-
-    #Check if the NSIDEs match
-    if NSIDE_mask!=NSIDE_query:
-        raise ValueError(f'NSIDE of the query grid ({NSIDE_query}) does not match NSIDE of \
-        the mask ({NSIDE_mask}).')
-
-    #-----------------------------------------------------------------------------------------------
-
-    #Query points are defined on a Healpix grid, points in or close to the mask are removed
-
-    #Getting number of pixels from the NSIDE for the query points
-    NPIX = hp.nside2npix(NSIDE_query)    
-
-    #-----------------------------------------------------------------------------------------------
-    
-    #Getting the query mask
-
-    #2 means that the query point is usable
-    query_mask = 2*np.ones(NPIX)
-
-    pixels = np.arange(NPIX)
-    qpos_arr = np.array(hp.pix2vec(NSIDE_query, pixels))
-    #Looping over the initial query pixels
-    for pix_ind, qpos in enumerate(qpos_arr.T):
-        sel_pix_close = hp.query_disc(NSIDE_query, qpos, tolerance)
-        #1 means that the query point is close to the mask edge
-        if np.any(mask[sel_pix_close]==hp.UNSEEN): query_mask[pix_ind] = 1
-
-    pix_inside_arr = hp.vec2pix(NSIDE_query, qpos_arr[0], qpos_arr[1], qpos_arr[2])
-    #0 means that the query point is outside the footprint
-    query_mask[mask[pix_inside_arr]==hp.UNSEEN] = 0
-
-    #-----------------------------------------------------------------------------------------------
-
-    #Getting the query positions
-
-    query_pixels = np.arange(NPIX)[query_mask==2]
-    
-    #Getting the latitudes and longitudes in degrees
-    QueryPositions_Deg = np.transpose(hp.pixelfunc.pix2ang(NSIDE_query, query_pixels, lonlat=True))
-    QueryPositions_Deg[:, [0, 1]] = QueryPositions_Deg[:, [1, 0]]
-    
-    #converting to radians
-    QueryPositions = np.deg2rad(QueryPositions_Deg)
-
-    return query_mask, QueryPositions
-
-####################################################################################################
-
-def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
-    r'''
-    Creates a dictionary containing the continuous field smoothed at various angular distance scales.
-
-    Parameters
-    ----------
-    skymap : numpy float array
-        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
-    bins : list of numpy float arrays
-        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
-    query_mask : numpy float array of shape ``skymap.shape``
-        the HEALPix query mask.
-    Verbose : bool, optional
-        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
-
-    Returns
-    -------
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field masked within the observational footprint and smoothed at various angular distance scales. For example, `SmoothedFieldDict['0.215']`  represents the continuous map smoothed at a scale of 0.215 radians.
-
-    Notes
-    -----
-    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively.Please Refer to the helper function method `create_query_2DA` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
-
-    References
-    ----------
-    [^1] Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
-    '''
-
-    #-----------------------------------------------------------------------------------------------
-    
-    if Verbose: 
-        total_start = time.perf_counter()
-        print(f'\nSmoothing the density field over the given angular distance scales...\n')
-
-    #-----------------------------------------------------------------------------------------------
-
-    #Initializing the dictionary
-    SmoothedFieldDict = {}
-
-    #-----------------------------------------------------------------------------------------------
-    
-    #Looping over the nearest neighbour indices as inferred from the length of 'bins'
-    for i in range(len(bins)):
-
-        #-------------------------------------------------------------------------------------------
-        
-        if Verbose: start = time.perf_counter()
-
-        #-------------------------------------------------------------------------------------------
-        
-        for j, ss in enumerate(bins[i]):
-            #Square bracket selects only those pixels that are not close to the mask boundaries
-            #Turning verbose off to avoid too much text output
-            SmoothedFieldDict[str(ss)] = \
-            top_hat_smoothing_2DA(skymap, ss, Verbose=False)[query_mask==2]
-
-        #-------------------------------------------------------------------------------------------
-        
-        if Verbose: 
-            print('\tdistance scales for {}NN done; time taken: {:.2e} s.'.format(i+1, time.perf_counter()-start))
-
-    #-----------------------------------------------------------------------------------------------
-    
-    if Verbose: print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start))
-
-    return SmoothedFieldDict
 
 ####################################################################################################
 
