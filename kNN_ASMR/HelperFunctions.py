@@ -162,6 +162,10 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
         if `NSIDE_query` is not a power of 2
     ValueError
         if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
+        
+    See Also
+    --------
+    kNN_ASMR.HelperFunctions.create_query_3D : generates query points in 3D.
 
     Notes
     -----
@@ -241,7 +245,7 @@ def create_query_3D(query_type, query_grid, BoxSize):
 
     Parameters
     ----------
-    query_type : str
+    query_type : {'grid', 'random'}, str
         the type of query points to be generated; should be 'grid' for query points defined on a uniform grid and 'random' for query points drawn from a uniform random distribution.
     query_grid : int
         the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
@@ -257,6 +261,10 @@ def create_query_3D(query_type, query_grid, BoxSize):
     ------
     ValueError
         if an unknown query type is provided.
+        
+    See Also
+    --------
+    kNN_ASMR.HelperFunctions.create_query_2DA : generates query points in 2D angular coordinates.
     '''
 
     if query_type == 'grid':
@@ -282,6 +290,8 @@ def create_query_3D(query_type, query_grid, BoxSize):
         raise ValueError(f"Unknown query type: {query_type}; please provide a valid query type")
     
     return query_pos
+    
+####################################################################################################
 
 def bl_th(l, ss):
     r'''
@@ -331,6 +341,10 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
     ------
     ValueError
         if `scale` is not in `[0, 2*np.pi]`
+        
+    See Also
+    --------
+    kNN_ASMR.HelperFunctions.smoothing_3d : performs smoothing operations in 3D.
 
     Notes
     -----
@@ -443,11 +457,11 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
 
     Notes
     -----
-    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively.Please Refer to the helper function method `create_query_2DA` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
+    `query_mask` is a numpy int array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the mask, too close to mask boundary and sufficiently far away from the boundary, respectively. Please Refer to the helper function method `create_query_2DA()` for creating the query mask. See also Gupta and Banerjee (2024)[^1] for a discussion.
 
     References
     ----------
-    [^1] Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
+    [^1]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
     '''
 
     #-----------------------------------------------------------------------------------------------
