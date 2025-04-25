@@ -506,7 +506,7 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
 
 ####################################################################################################
 
-def smoothing_3d(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thickness=None, Verbose=False):
+def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thickness=None, Verbose=False):
     r'''
     Smooths the given map at the given scale using a window function of choice in real or k-space. 
     
