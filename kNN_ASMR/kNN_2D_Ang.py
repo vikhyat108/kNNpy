@@ -152,7 +152,7 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
 def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad_A, MaskedTracerPosRad_B, Verbose=False):
     
     r'''
-    Returns the probabilities $P_{\geq k_A}$, $P_{\geq k_B}$ and $P_{\geq k_A, \geq k_B}$ for ($k_A$, $k_B$) in `kA_kB_list` that quantify the extent of the spatial cross-correlation between the given sets of discrete tracers, `MaskedTracerPosRad_A`, `MaskedTracerPosRad_B'.
+    Returns the probabilities $P_{\geq k_A}$, $P_{\geq k_B}$ and $P_{\geq k_A, \geq k_B}$ for ($k_A$, $k_B$) in `kA_kB_list` that quantify the extent of the spatial cross-correlation between the given sets of discrete tracers, `MaskedTracerPosRad_A`, `MaskedTracerPosRad_B`.
     	
     1. $P_{\geq k_A}(\theta)$: 
     	the $k_A$NN-CDF of the first set of discrete tracers, evaluated at angular distance scale $\theta$
@@ -191,7 +191,7 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
         list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
     
     p_gtr_kA_kB_list: list of numpy float arrays
-        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is represents the joint $\{k_A^i, k_B^i\}$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     Raises
     ------
