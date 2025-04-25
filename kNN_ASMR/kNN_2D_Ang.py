@@ -24,17 +24,17 @@ from kNN_ASMR.HelperFunctions import calc_kNN_CDF
 
 #--------------------------------------  Function Definitions  -------------------------------------
 
-def TracerAuto2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnNNdist=False,Verbose=False):
+def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnNNdist=False,Verbose=False):
     
     r'''
-    Computes the $k$NN-CDFs in 2D angular coordinates (Banerjee & Abel (2021)[^1], Gupta & Banerjee (2024)[^2]) of the provided discrete tracer set (`MaskedTracerPosRad`), evaluated at the provided angular distance scales `BinsRad`, for $1 \leq k \leq$ `kMax`. Each $k$NN-CDF measures the probability $P_{>k}(\theta)$ of finding at least $k$ tracers in a randomly placed spherical cap of radius $\theta$. The $k$NN-CDFs quantify the spatial clustering of the tracers.
+    Computes the $k$NN-CDFs in 2D angular coordinates (Banerjee & Abel (2021)[^1], Gupta & Banerjee (2024)[^2]) of the provided discrete tracer set (`MaskedTracerPosRad`), evaluated at the provided angular distance scales `BinsRad`, for all $k$ in `kList`. Each $k$NN-CDF measures the probability $P_{\geq k}(\theta)$ of finding at least $k$ tracers in a randomly placed spherical cap of radius $\theta$. The $k$NN-CDFs quantify the spatial clustering of the tracers.
     		
     Parameters
     ----------
-    kMax : int
-        the number of nearest neighbours to calculate the distances to. For example, if ``kMax = 3``, the first 3 nearest-neighbour distributions will be computed.
+    kList : int
+        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
     BinsRad : list of numpy float array
-        list of angular distances (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the $i^{th}$ nearest neighbour.
+        list of angular distance arrays (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{th}$ element of `kList`.
     MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
         array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
     MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
@@ -120,7 +120,7 @@ def TracerAuto2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnNN
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
-    vol, _ = xtree.query(MaskedQueryPosRad, k=kMax)
+    vol, _ = xtree.query(MaskedQueryPosRad, k=max(kList))[:, np.array(kList)-1]
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -128,8 +128,7 @@ def TracerAuto2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnNN
     #Calculating the kNN-CDFs
     if Verbose: 
         start_time = time.perf_counter()
-        print('\ncomputing the tracer auto-CDFs P_{>k} ...')
-    kList = range(1, kMax+1)
+        print('\ncomputing the tracer auto-CDFs P_{>=k} ...')
     p_gtr_k_list = calc_kNN_CDF(vol, kList, BinsRad)
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
@@ -150,30 +149,215 @@ def TracerAuto2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnNN
 
 ####################################################################################################
 
-def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, SmoothedFieldDict,  FieldConstPercThreshold, Verbose=False):
+def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad_A, MaskedTracerPosRad_B, Verbose=False):
     
     r'''
-    Returns the probabilities $P_{>k}$, $P_{>{\rm dt}}$ and $P_{>k,>{\rm dt}}$ for $1 \leq k \leq$ `kMax`, that quantify the extent of the spatial cross-correlation between the given discrete tracer positions (`MaskedTracerPosRad`) and the given continuous overdensity field (`SmoothedFieldDict`). 
+    Returns the probabilities $P_{\geq k_A}$, $P_{\geq k_B}$ and $P_{\geq k_A, \geq k_B}$ for ($k_A$, $k_B$) in `kA_kB_list` that quantify the extent of the spatial cross-correlation between the given sets of discrete tracers, `MaskedTracerPosRad_A`, `MaskedTracerPosRad_B'.
     	
-    1. $P_{>k}(\theta)$: 
+    1. $P_{\geq k_A}(\theta)$: 
+    	the $k_A$NN-CDF of the first set of discrete tracers, evaluated at angular distance scale $\theta$
+    		
+    2. $P_{\geq k_B}(\theta)$: 
+    	the $k_B$NN-CDF of the second set of discrete tracers, evaluated at angular distance scale $\theta$
+    		
+    3.  $P_{\geq k_A, \geq k_B}(\theta)$:
+    	the joint probability of finding at least $k_A$ set A tracers and at least $k_B$ set B tracers within a spherical cap of radius $\theta$
+    		
+    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNN_ASMR.HelperFunctions.kNN_excess_cross_corr()` method to do this)
+    	
+    $$\psi_{k_A, k_B} = P_{\geq k_A, \geq k_B}/(P_{\geq k_A} \times P_{\geq k_B})$$
+    		
+    Parameters
+    ----------
+    kA_kB_list : list of int tuples
+        nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details)
+    BinsRad : list of numpy float array
+        list of angular distance scale arrays (in radians) for each nearest neighbour combination in `kA_kB_list`. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the $i^{th}$ nearest neighbour combination.
+    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
+        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    MaskedTracerPosRad_A : numpy float array of shape ``(n_tracer_A, 2)``
+        array of sky locations for the first set of discrete tracers. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    MaskedTracerPosRad_B : numpy float array of shape ``(n_tracer_B, 2)``
+        array of sky locations for the second set of discrete tracers. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    Verbose : bool, optional
+        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+
+    Returns
+    -------
+    p_gtr_kA_list: list of numpy float arrays
+        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is represents the $k_A^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        
+    p_gtr_kB_list: list of numpy float arrays
+        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    
+    p_gtr_kA_kB_list: list of numpy float arrays
+        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is represents the joint $\{k_A^i, k_B^i\}$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        
+    Raises
+    ------
+    ValueError
+        if the lengths of `BinsRad` and `kA_kB_list` do not match.
+    ValueError
+        if the given query points are not on a two-dimensional grid.
+    ValueError
+        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    ValueError
+        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    ValueError
+        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    ValueError
+        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    ValueError
+        if any of the given tracer points are not on a two-dimensional grid.
+
+    See Also
+    --------
+    kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA : computes tracer-field cross-correlations using the $k$NN formalism.
+
+    Notes
+    -----
+    Measures the angular cross-correlation between two sets of discrete tracers using the k-nearest neighbour (kNN) formalism as defined in Banerjee & Abel (2021)[^1].
+
+    Data with associated observational footprints are supported, in which case, only tracer positions within the net footprint should be provided (if the two tracer sets have different footprints, a net footprint representing the intersection of the two footprints should be used). Importantly, in this case, query points need to be within the net footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). Please refer to the `kNN_ASMR.HelperFunctions.create_query_2DA()` method for help with masking and creating the modified query positions.
+
+    The parameter `kA_kB_list` should provide the desired combinations of NN indices for the two tracers sets being cross-correlated. For example, if you wish to compute the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set
+            
+        kA_kB_list = [(1,1), (1,2), (2,1)]
+
+    Please note that if the number density of one set of tracers is significantly smaller than the other, the joint kNN-CDFs approach the auto kNN-CDFs of the less dense tracer set. In this scenario, it may be better to treat the denser tracer set as a continuous field and use the `TracerFieldCross2DA()` method instead to conduct the cross-correlation analysis  (see Gupta & Banerjee (2024)[^2] for a detailed discussion).
+
+    References
+    ----------
+    [^1]: Arka Banerjee, Tom Abel, Cosmological cross-correlations and nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stab961), Volume 504, Issue 2, June 2021, Pages 2911–2923
+        
+    [^2]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose: total_start_time = time.perf_counter()
+
+    #-----------------------------------------------------------------------------------------------
+        
+    #Step 0: Check all inputs are consistent with the function requirement
+
+    if Verbose: print('Checking inputs ...')
+
+    if len(BinsRad)!=len(kA_kB_list): 
+        raise ValueError("length of 'BinsRad' must match length of 'kA_kB_list'.")
+
+    if MaskedQueryPosRad.shape[1]!=2: 
+        raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
+
+    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+        raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
+
+    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+        raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
+
+    if np.any(MaskedTracerPosRad_A[:, 0]<-np.pi/2 or MaskedTracerPosRad_A[:, 0]>np.pi/2 or MaskedTracerPosRad_B[:, 0]<-np.pi/2 or MaskedTracerPosRad_B[:, 0]>np.pi/2):
+        raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
+
+    if np.any(MaskedTracerPosRad_A[:, 1]<0 or MaskedTracerPosRad_A[:, 0]>2*np.pi or MaskedTracerPosRad_B[:, 1]<0 or MaskedTracerPosRad_B[:, 0]>2*np.pi):
+        raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
+
+    if MaskedTracerPosRad_A.shape[1]!=2 or MaskedTracerPosRad_B.shape[1]!=2: 
+        raise ValueError('Incorrect spatial dimension for tracers: array containing the tracer positions must be of shape (n_tracer, 2), where n_tracer is the number of tracers.')
+
+    if Verbose: print('\tdone.')
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Figuring out the NN indices from the kA_kB_list
+    kList_A, kList_B = [], []
+    for kA, kB in kA_kB_list:
+        kList_A.append(kA)
+        kList_B.append(kB)
+    kMax_A, kMax_B = max(kList_A), max(kList_B)
+
+    #-----------------------------------------------------------------------------------------------
+        
+    #Building the trees
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\nbuilding the trees ...')
+        start_time_A = time.perf_counter()
+    xtree_A = BallTree(MaskedTracerPosRad_A, metric='haversine')
+    if Verbose: 
+        print('\tfirst set of tracers done; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_A))
+        start_time_B = time.perf_counter()
+    xtree_B = BallTree(MaskedTracerPosRad_B, metric='haversine')
+    if Verbose: 
+        print('\tsecond set of tracers done; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_B))
+        print('\tcombined time: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Calculating the NN distances
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\ncomputing the tracer NN distances ...')
+    vol_A, _ = xtree_A.query(MaskedQueryPosRad, k=kMax_A)
+    vol_B, _ = xtree_B.query(MaskedQueryPosRad, k=kMax_B)
+    req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
+    req_vol_B, _ = vol_B[:, np.array(kList_B)-1]
+    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Calculating the auto kNN-CDFs
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\ncomputing the tracer auto-CDFs P_{>=kA}, P_{>=kB} ...')
+    p_gtr_kA_list = calc_kNN_CDF(req_vol_A, kList_A, BinsRad)
+    p_gtr_kB_list = calc_kNN_CDF(req_vol_B, kList_B, BinsRad)
+    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Calculating the joint kNN-CDFs
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
+    joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
+    for i, _ in enumerate(kA_kB_list):
+        joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
+    p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, range(joint_vol.shape[1]), BinsRad)
+    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose:
+        print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start_time))
+    
+    return p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list
+
+####################################################################################################
+
+def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, SmoothedFieldDict,  FieldConstPercThreshold, Verbose=False):
+    
+    r'''
+    Returns the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ for $k$ in `kList`, that quantify the extent of the spatial cross-correlation between the given discrete tracer positions (`MaskedTracerPosRad`) and the given continuous overdensity field (`SmoothedFieldDict`).
+    	
+    1. $P_{\geq k}(\theta)$: 
     	the kNN-CDF of the discrete tracers, evaluated at angular distance scale $\theta$
     		
     2. $P_{>{\rm dt}}(\theta)$: 
     	the probability of the overdensity field smoothed with a top-hat filter of angular size $\theta$ exceeding the given constant percentile density threshold
     		
-    3. $P_{>k, >{\rm dt}}(\theta)$:
-    	the joint probability of finding at least 'k' tracers within a spherical cap of radius $\theta$ AND the overdensity field smoothed at angular scale $\theta$ exceeding the given density threshold
+    3. $P_{\geq k, >{\rm dt}}(\theta)$:
+    	the joint probability of finding at least 'k' tracers within a spherical cap of radius $\theta$ AND the overdensity field smoothed at angular scale $\theta$ exceeding the given density threshold (as specified by the parameter `FieldConstPercThreshold`)
     		
     The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNN_ASMR.HelperFunctions.kNN_excess_cross_corr()` method to do this)
     	
-    $$\psi_{k, {\rm dt}} = P_{>k, >{\rm dt}}/(P_{>k} \times P_{>{\rm dt}})$$
+    $$\psi_{k, {\rm dt}} = P_{\geq k, >{\rm dt}}/(P_{\geq k} \times P_{>{\rm dt}})$$
 
     Parameters
     ----------
-    kMax : int
-        the number of nearest neighbours to calculate the distances to. For example, if ``kMax = 3``, the first 3 nearest-neighbour distributions will be computed.
+    kList : int
+        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
     BinsRad : list of numpy float array
-        list of angular distances (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the $i^{th}$ nearest neighbour.
+        list of angular distance arrays (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{th}$ element of `kList`.
     MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
         array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
     MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
@@ -191,7 +375,6 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
         auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins.
         
     p_gtr_dt_list: list of numpy float arrays
-        len(`BinsRad`[k-1]) for 1 <= k <= `kMax`
         continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
     
     p_gtr_k_dt_list: list of numpy float arrays
@@ -213,6 +396,10 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
         if the given tracer points are not on a two-dimensional grid.
     ValueError
         if the shape of field smoothed at a particular scale does not match the shape of the query point array.
+
+    See Also
+    --------
+    kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA : computes tracer-tracer cross-correlations using the $k$NN formalism.
 
     Notes
     -----
@@ -284,7 +471,7 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
     if Verbose: 
         start_time = time.perf_counter()
         print('\n\tcomputing the tracer NN distances ...')
-    vol, _ = xtree.query(MaskedQueryPosRad, k=kMax)
+    vol, _ = xtree.query(MaskedQueryPosRad, k=max(kList))[:, np.array(kList)-1]
     if Verbose: print('\t\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -292,8 +479,7 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
     #Calculating the kNN-CDFs
     if Verbose: 
         start_time = time.perf_counter()
-        print('\n\tcomputing the tracer auto-CDFs P_{>k} ...')
-    kList = range(1, kMax+1)
+        print('\n\tcomputing the tracer auto-CDFs P_{>=k} ...')
     p_gtr_k_list = calc_kNN_CDF(vol, kList, BinsRad)
 
     #-----------------------------------------------------------------------------------------------
@@ -315,11 +501,11 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
     p_gtr_k_dt_list = []
     p_gtr_dt_list = []
     
-    for k in range(kMax):
+    for k_ind, k in enumerate(kList):
 
         if Verbose: 
             start_time = time.perf_counter()
-            print('\n\tComputing P_{>dt} and P_{>k, dt} for k = {} ...'.format(k))
+            print('\n\tComputing P_{>dt} and P_{>=k, >dt} for k = {} ...'.format(k))
 
         p_gtr_k_dt = np.zeros(len(BinsRad[k]))
         p_gtr_dt = np.zeros(len(BinsRad[k]))
@@ -343,7 +529,7 @@ def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, Sm
             #---------------------------------------------------------------------------------------
 
             #Compute the fraction of query points satisfying the joint condition
-            ind_gtr_k_dt = np.where((vol[:, k]<ss)&(SmoothedField>delta_star_ss))
+            ind_gtr_k_dt = np.where((vol[:, k_ind]<ss)&(SmoothedField>delta_star_ss))
             p_gtr_k_dt[i] = len(ind_gtr_k_dt[0])/MaskedQueryPosRad.shape[0]
 
             #---------------------------------------------------------------------------------------
