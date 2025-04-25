@@ -24,6 +24,132 @@ from kNN_ASMR.HelperFunctions import calc_kNN_CDF
 
 #--------------------------------------  Function Definitions  -------------------------------------
 
+def TracerAuto2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnNNdist=False,Verbose=False):
+    
+    r'''
+    Computes the $k$NN-CDFs in 2D angular coordinates (Banerjee & Abel (2021)[^1], Gupta & Banerjee (2024)[^2]) of the provided discrete tracer set (`MaskedTracerPosRad`), evaluated at the provided angular distance scales `BinsRad`, for $1 \leq k \leq$ `kMax`. Each $k$NN-CDF measures the probability $P_{>k}(\theta)$ of finding at least $k$ tracers in a randomly placed spherical cap of radius $\theta$. The $k$NN-CDFs quantify the spatial clustering of the tracers.
+    		
+    Parameters
+    ----------
+    kMax : int
+        the number of nearest neighbours to calculate the distances to. For example, if ``kMax = 3``, the first 3 nearest-neighbour distributions will be computed.
+    BinsRad : list of numpy float array
+        list of angular distances (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the $i^{th}$ nearest neighbour.
+    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
+        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
+        array of sky locations for the discrete tracers. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    ReturnNNdist : bool, optional
+        if set to ``True``, the sorted arrays of NN distances will be returned along with the $k$NN-CDFs, by default ``False``.
+    Verbose : bool, optional
+        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+
+    Returns
+    -------
+    kNN_results: tuple of lists or list of numpy float arrays
+        results of the kNN computation. If `ReturnNNdist` is ``True``, returns the tuple ``(p_gtr_k_list, vol)`` where `p_gtr_k_list` is the list of auto kNN-CDFs, and `vol` is the list of NN distances. If `ReturnNNdist` is ``False``, returns `p_gtr_k_list` only
+        
+    Raises
+    ------
+    ValueError
+        if the given query points are not on a two-dimensional grid.
+    ValueError
+        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    ValueError
+        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    ValueError
+        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    ValueError
+        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    ValueError
+        if the given tracer points are not on a two-dimensional grid.
+
+    Notes
+    -----
+    Data with associated observational footprints are supported, in which case, only tracer positions within the footprint should be provided.Importantly, in this case, query points need to be within the footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). See the `kNN_ASMR.HelperFunctions.create_query_2DA()` method for help with masking and creating the modified query positions.
+
+    References
+    ----------
+    [^1]: Arka Banerjee, Tom Abel, Nearest neighbour distributions: New statistical measures for cosmological clustering, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/staa3604), Volume 500, Issue 4, February 2021, Pages 5479–5499
+        
+    [^2]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose: total_start_time = time.perf_counter()
+
+    #-----------------------------------------------------------------------------------------------
+        
+    #Step 0: Check all inputs are consistent with the function requirement
+
+    if Verbose: print('Checking inputs ...')
+
+    if MaskedQueryPosRad.shape[1]!=2: 
+        raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
+
+    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+        raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
+
+    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+        raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
+
+    if np.any(MaskedTracerPosRad[:, 0]<-np.pi/2 or MaskedTracerPosRad[:, 0]>np.pi/2):
+        raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
+
+    if np.any(MaskedTracerPosRad[:, 1]<0 or MaskedTracerPosRad[:, 0]>2*np.pi):
+        raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
+
+    if MaskedTracerPosRad.shape[1]!=2: 
+        raise ValueError('Incorrect spatial dimension for tracers: array containing the tracer positions must be of shape (n_tracer, 2), where n_tracer is the number of tracers.')
+
+    if Verbose: print('\tdone.')
+
+    #-----------------------------------------------------------------------------------------------
+        
+    #Building the tree
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\nbuilding the tree ...')
+    xtree = BallTree(MaskedTracerPosRad, metric='haversine')
+    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Calculating the NN distances
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\ncomputing the tracer NN distances ...')
+    vol, _ = xtree.query(MaskedQueryPosRad, k=kMax)
+    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Calculating the kNN-CDFs
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\ncomputing the tracer auto-CDFs P_{>k} ...')
+    kList = range(1, kMax+1)
+    p_gtr_k_list = calc_kNN_CDF(vol, kList, BinsRad)
+    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Collecting the results
+    if ReturnNNdist:
+        kNN_results = (p_gtr_k_list, vol)
+    else:
+        kNN_results = p_gtr_k_list
+
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose:
+        print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start_time))
+    
+    return kNN_results
+
+####################################################################################################
+
 def TracerFieldCross2DA(kMax, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, SmoothedFieldDict,  FieldConstPercThreshold, Verbose=False):
     
     r'''
