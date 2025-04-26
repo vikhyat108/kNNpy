@@ -11,9 +11,7 @@ import copy
 import pyfftw
 import warnings
 import smoothing_library as SL
-import MAS_library as MASL 
-
-#Test comment
+import MAS_library as MASL
 
 ####################################################################################################
 
@@ -23,7 +21,7 @@ import MAS_library as MASL
 
 def cdf_vol_knn(vol):
     r'''
-    Returns interpolating functions for emperical CDFs of the given $k$-nearest neighbour distances.
+    Returns interpolating functions for empirical CDFs of the given $k$-nearest neighbour distances.
     
     Parameters
     ----------
@@ -33,7 +31,7 @@ def cdf_vol_knn(vol):
     Returns
     -------
     cdf: list of function objects
-        list of interpolated emperical CDF functions that can be evaluated at desired distance bins.
+        list of interpolated empirical CDF functions that can be evaluated at desired distance bins.
     '''
     
     #-----------------------------------------------------------------------------------------------
@@ -49,7 +47,7 @@ def cdf_vol_knn(vol):
 
     #-----------------------------------------------------------------------------------------------
 
-    #Calculating the emperical CDF
+    #Calculating the empirical CDF
     gof = ((np.arange(0, n) + 1) / (n*1.0))
     for c in range(l):
         ind = np.argsort(vol[:, c])
@@ -68,16 +66,16 @@ def calc_kNN_CDF(vol, kList, bins):
     Parameters
     ----------
     vol : numpy float array of shape ``(n_query, n_kNN)``
-        Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
-    kList : list of int
-        the nearest neighbours for which the distances have been calculated to. For example, if `kList = [2, 4, 8]`, then `vol` should contain the sorted distances to the $2^{nd}$, $4^{th}$ and $8^{th}$ nearest-neighbours.
-    bins : list of numpy float arrays
-        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
+        2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried.
+    kList : int
+        the list of nearest neighbours which the distances in `vol` have been calculated to. For example, if ``kList = [1, 2, 4]``, then `vol` should containt the first, second and fourth nearest-neighbour distances.
+    bins : list of numpy float array
+        list of distance scale arrays at which the CDFs need to be evaluated (units must be same as in `vol`).
 
     Returns
     -------
-    data : list of numpy float arrays
-        kNN-CDFs evaluated at the desired distance bins.
+    data : list of numpy float array
+        kNN-CDFs evaluated at the desired distance bins. ``data[i]`` is the $k_i$NN-CDF if ``vol[:, i]`` containts the $k_i^{th}$ nearest-neigbour distances.
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -87,13 +85,13 @@ def calc_kNN_CDF(vol, kList, bins):
 
     #-----------------------------------------------------------------------------------------------
 
-    #Computing the interpolated emperical CDFs using the nearest-neighbour distances
+    #Computing the interpolated empirical CDFs using the nearest-neighbour distances
     cdfs = cdf_vol_knn(vol)
 
     #-----------------------------------------------------------------------------------------------
 
     #Looping over the nearest-neighbour indices
-    for i, k in enumerate(kList):
+    for i, _ in enumerate(kList):
 
         #-------------------------------------------------------------------------------------------
 
@@ -444,7 +442,7 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
     ----------
     skymap : numpy float array
         the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
-    bins : list of numpy float arrays
+    bins : list of numpy float array
         list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
     query_mask : numpy float array of shape ``skymap.shape``
         the HEALPix query mask.
@@ -672,18 +670,19 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
 
     Parameters
     ----------
-    auto_cdf_list_1 : list of numpy float arrays
-        auto kNN-CDFs of the first set of tracers.
-    auto_cdf_list_2 : list of numpy float arrays
-        auto kNN-CDFs of the second set of tracers.
-    joint_cdf_list : list of numpy float arrays
-        joint kNN distributions of the two tracer sets
+    auto_cdf_list_1 : list of numpy float array
+        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_1^i$NN-CDF if the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+    auto_cdf_list_2 : list of numpy float array
+        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_2^i$NN-CDF if where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+    joint_cdf_list : list of numpy float array
+        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+        
     k1_k2_list : list of int tuples
-        describes the kind of cross-correlations being computed (see notes for more details), by default `None`.
+        describes the kind of cross-correlations being computed (see notes for more details), by default `None`. Should be not None only if dealing with tracer-tracer cross-correlations
 
     Returns
     -------
-    psi_list : list of numpy float arrays
+    psi_list : list of numpy float array
         excess spatial cross-correlation between the two tracer sets.
 
     Raises
@@ -701,19 +700,21 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
             
         k1_k2_list = [(1,1), (1,2), (2,1)]
 
-    Note that the tuples should be consistent with the `joint_cdf_list`. For example, if
+    Note that the inputs must be self-consistent, which means the following must be ``True``
+
+        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2) and len(joint_cdf_list)==len(k1_k2_list)
+        
+    For example, if
 
         k1_k2_list = [(1,1), (1,2)]
 
     then
         
-        len(joint_cdf_list) == 2
+        len(auto_cdf_list_1) == 2 and len(auto_cdf_list_2) == 2 and len(joint_cdf_list) == 2
 
     must hold, and the first (second) element of `joint_cdf_list` should be the joint {1,1}NN-CDF ({1,2}NN-CDF).
         
-    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF), and the following must be `True`
-
-        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2)
+    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF).
 
     References
     ----------
@@ -726,22 +727,16 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
 
     #-------------------------------------------------------------------------------------------
     
+    #Check for consistency:
     if k1_k2_list:
-
-        #Check for consistency:
-        if len(joint_cdf_list)!=len(k1_k2_list): 
-            raise ValueError('Inconsistent input: shape of "joint_cdf_list" not consistent with that of "k1_k2_list"')
-        for k, (k1, k2) in enumerate(k1_k2_list):
-            psi_list.append(joint_cdf_list[k]/(auto_cdf_list_1[k1]*auto_cdf_list_2[k2]))
-
-    #-------------------------------------------------------------------------------------------
-    
+        if len(joint_cdf_list)!=len(k1_k2_list) or len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2): 
+            raise ValueError('Inconsistent input shapes')
     else:
-        #Check for consistency:
         if len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2): 
             raise ValueError('Inconsistent input: shapes not compatible with each other')
-        for k in range(len(joint_cdf_list)):
-            psi_list.append(joint_cdf_list[k]/(auto_cdf_list_1[k]*auto_cdf_list_2[k]))
+    
+    for k in range(len(joint_cdf_list)):
+        psi_list.append(joint_cdf_list[k]/(auto_cdf_list_1[k]*auto_cdf_list_2[k]))
 
     return psi_list
         
