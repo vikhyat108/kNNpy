@@ -129,7 +129,7 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer auto-CDFs P_{>=k} ...')
-    p_gtr_k_list = calc_kNN_CDF(vol, kList, BinsRad)
+    p_gtr_k_list = calc_kNN_CDF(vol, BinsRad)
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -185,13 +185,13 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     Returns
     -------
     p_gtr_kA_list: list of numpy float arrays
-        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is represents the $k_A^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_A^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     p_gtr_kB_list: list of numpy float arrays
-        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
     
     p_gtr_kA_kB_list: list of numpy float arrays
-        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     Raises
     ------
@@ -309,8 +309,8 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer auto-CDFs P_{>=kA}, P_{>=kB} ...')
-    p_gtr_kA_list = calc_kNN_CDF(req_vol_A, kList_A, BinsRad)
-    p_gtr_kB_list = calc_kNN_CDF(req_vol_B, kList_B, BinsRad)
+    p_gtr_kA_list = calc_kNN_CDF(req_vol_A, BinsRad)
+    p_gtr_kB_list = calc_kNN_CDF(req_vol_B, BinsRad)
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -322,7 +322,7 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
     for i, _ in enumerate(kA_kB_list):
         joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
-    p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, range(joint_vol.shape[1]), BinsRad)
+    p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -480,7 +480,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
     if Verbose: 
         start_time = time.perf_counter()
         print('\n\tcomputing the tracer auto-CDFs P_{>=k} ...')
-    p_gtr_k_list = calc_kNN_CDF(vol, kList, BinsRad)
+    p_gtr_k_list = calc_kNN_CDF(vol, BinsRad)
 
     #-----------------------------------------------------------------------------------------------
     
