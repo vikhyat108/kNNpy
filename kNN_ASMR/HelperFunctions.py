@@ -59,16 +59,14 @@ def cdf_vol_knn(vol):
 
 ####################################################################################################
 
-def calc_kNN_CDF(vol, kList, bins):
+def calc_kNN_CDF(vol, bins):
     r'''
     Returns the kNN-CDFs for the given nearest-neighbour distances, evaluated at the given distance bins.
 
     Parameters
     ----------
     vol : numpy float array of shape ``(n_query, n_kNN)``
-        2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried.
-    kList : int
-        the list of nearest neighbours which the distances in `vol` have been calculated to. For example, if ``kList = [1, 2, 4]``, then `vol` should containt the first, second and fourth nearest-neighbour distances.
+        2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried. `vol[:, i]` should be the array with the sorted $k_i^{th}$ nearest-neighbour distances.
     bins : list of numpy float array
         list of distance scale arrays at which the CDFs need to be evaluated (units must be same as in `vol`).
 
@@ -91,7 +89,7 @@ def calc_kNN_CDF(vol, kList, bins):
     #-----------------------------------------------------------------------------------------------
 
     #Looping over the nearest-neighbour indices
-    for i, _ in enumerate(kList):
+    for i in range(vol.shape[1]):
 
         #-------------------------------------------------------------------------------------------
 
