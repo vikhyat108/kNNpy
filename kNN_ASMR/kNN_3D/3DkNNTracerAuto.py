@@ -55,8 +55,7 @@ def kNN_TracerAuto3D(pos, n_kNN, query_type, query_grid, boxsize):
     boxsize: float
         the size of the box in which the data points are located.
     Outputs:
-        cutoff_intp_cdf: interpolated cumulative distribution function in (0.05, 0.95)
-        intp_cdf: interpolated cumulative distribution function
+        cdf: empirical kNN cumulative distribution function
     '''
 
     if query_grid**3>=100*pos.shape[0]:
