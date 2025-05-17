@@ -40,7 +40,7 @@ def get_knn_dists(pos, query_pos, n_kNN, boxsize):
     return dis
 ####################################################################################################
 #--------------------------------------  Main Code Block  -----------------------------------------
-def kNN_3D_TracerAuto3D(pos, n_kNN, query_type, query_grid, boxsize):
+def kNN_TracerAuto3D(pos, n_kNN, query_type, query_grid, boxsize):
     '''
     Gives the kNN CDFs for a given set of data points in 3D space.
     Inputs:
@@ -67,11 +67,11 @@ def kNN_3D_TracerAuto3D(pos, n_kNN, query_type, query_grid, boxsize):
         dist=np.sort(dist)
 
         cdf=[]
-    for k in range(len(r)):
-    # Count how many of the k-NN distances are less than the current radius r[k]
-        count = np.sum(dist <= r[k])
-        prob = count / query_grid**3  # Probability is the count divided by the total number of query points
-        cdf.append(prob)
+        for k in range(len(r)):
+        # Count how many of the k-NN distances are less than the current radius r[k]
+            count = np.sum(dist <= r[k])
+            prob = count / query_grid**3  # Probability is the count divided by the total number of query points
+            cdf.append(prob)
 
         return cdf
     else:
