@@ -5,11 +5,11 @@
 import numpy as np
 import scipy
 import scipy.spatial
-import gc
-import scipy.spatial
-import utils as il
 import time
-from HelperFunctions.py import create_query_3D
+import sys
+import os
+#Importing the required helper function
+from kNN_ASMR.HelperFunctions import calc_kNN_CDF
 ####################################################################################################
 
 #--------------------------------------  Function Definitions  -------------------------------------
