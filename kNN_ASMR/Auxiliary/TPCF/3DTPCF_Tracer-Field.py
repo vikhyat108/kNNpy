@@ -15,30 +15,42 @@ from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_3D
 
 # Function that returns the the 2-point Cross-Correlation Function between a set of discrete tracers and a continuous field using the stacking method
 
-def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, BoxSize, R, kmin=None, kmax=None, Verbose=False):
+def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, R, kmin=None, kmax=None, Verbose=False):
     '''
     Calculates the Two-point Cross-correlation function between a set of tracers and a field. The interpolation can only be done using the 
     CIC-mass assignment scheme.
 
     Parameters
     ----------
+    boxsize: float
+        The length (in Mpc/h) of the cubic box containing the tracers and the field
+
     bins : float array of shape (m,)
         Set of m radial distances at which the 2PCF will be computed
         
-    querypos : float array of shape (n_query,3) where n_query is the number of query points
+    QueryPos : float array of shape (n_query,3) where n_query is the number of query points
             3D positions of the random query points inside the box, given in Cartesian coordinates (x, y, z) within the range         [0, boxsize]
 
-    BoxSize : float
-        The length (in Mpc/h) of the cubic box containing the tracers and the field
-
-    pos : float array of shape (n_pos, 3) where n_pos is the number of discrete tracers
+    TracerPos : float array of shape (n_pos, 3) where n_pos is the number of discrete tracers
         3D positions of the n tracers (e.g., galaxies) inside the box, given in Cartesian coordinates (x, y, z) within the range         [0, boxsize]
 
     delta : float array of shape (ngrid, ngrid, ngrid)
         Smoothed overdensity field defined on a uniform grid with ngrid³ points
 
-    thickness : float
-        Thickness (in Mpc/h) of the spherical shell used for stacking to compute the 2PCF
+    thickness : float, optional
+        the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
+
+    R : float, optional
+        radial scale (in Mpc/h) at which the field is to be smoothed. Only use this parameter for real space smoothing.
+
+    kmin : float, optional
+        the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+
+    kmax : float, optional
+        the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    
+    Verbose : bool, optional
+        if set to True, the time taken to complete each step of the calculation will be printed, by default False.
     
     Returns
     -------
@@ -50,7 +62,7 @@ def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, BoxSize, 
     ValueError
         if the given query points are not on a three-dimensional grid.
     ValueError
-        if x,y, or z coordinate of any of the query points is not in ``(0, BoxSize)``.
+        if x,y, or z coordinate of any of the query points is not in ``(0, boxsize)``.
     ValueError
         if x,y, or z coordinate of any of the tracer points is not in ``(0, boxsize)``..
     ValueError
@@ -110,7 +122,7 @@ def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, BoxSize, 
     # Perform interpolation for each smoothed field
     for i, R in enumerate(bins):
         density_interpolated = np.zeros(TracerPos.shape[0], dtype=np.float32)
-        MASL.CIC_interp(smoothed_delta_dict[str(R)][i], BoxSize, TracerPos, density_interpolated)
+        MASL.CIC_interp(smoothed_delta_dict[str(R)][i], boxsize, TracerPos, density_interpolated)
         delta_interp[i] = density_interpolated
 
     # Computing the 2-point Cross-Correlation Function by averaging over the interpolated field at the tracer positions
