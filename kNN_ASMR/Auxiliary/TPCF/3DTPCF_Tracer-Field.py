@@ -9,13 +9,13 @@ import scipy.spatial
 import time
 import MAS_library as MASL
 import smoothing_library as SL
-from kNN_ASMR.HelperFunctions import smoothing_3D
+from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_3D
 
 ###############################################################################################################################
 
 # Function that returns the the 2-point Cross-Correlation Function between a set of discrete tracers and a continuous field using the stacking method
 
-def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, Filter, BoxSize, R, kmin=None, kmax=None, Verbose=False):
+def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, BoxSize, R, kmin=None, kmax=None, Verbose=False):
     '''
     Calculates the Two-point Cross-correlation function between a set of tracers and a field. The interpolation can only be done using the 
     CIC-mass assignment scheme.
@@ -102,17 +102,15 @@ def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, Filter, B
     shape = np.shape(delta)
     if len(shape) != 3 or shape[0] != shape[1] or shape[1] != shape[2]:
         raise ValueError("Error: Input array is not cubical (n, n, n).")
-    ngrid = shape[0]
-
-    grid = np.linspace(0, BoxSize, ngrid, endpoint=False)  # Grid points in each dimension  # Do we make this using the create_grid function
-    smoothed_delta= smoothing_3D(field=delta, Filter='Shell', grid=grid, BoxSize=boxsize, R=R, kmin=kmin, kmax=kmax, thickness=thickness, Verbose=Verbose, )
+    
+    smoothed_delta_dict= create_smoothed_field_dict_3D(field=delta, Filter='Shell', grid=QueryPos, Boxsize=boxsize, bins=bins, kmin=kmin, kmax=kmax, thickness=thickness, Verbose=Verbose)
     
     delta_interp = np.zeros((len(bins), len(TracerPos)))  # Shape (number_of_bins, number_of_tracers)
 
     # Perform interpolation for each smoothed field
     for i, R in enumerate(bins):
         density_interpolated = np.zeros(TracerPos.shape[0], dtype=np.float32)
-        MASL.CIC_interp(smoothed_delta[i], BoxSize, TracerPos, density_interpolated)
+        MASL.CIC_interp(smoothed_delta_dict[str(R)][i], BoxSize, TracerPos, density_interpolated)
         delta_interp[i] = density_interpolated
 
     # Computing the 2-point Cross-Correlation Function by averaging over the interpolated field at the tracer positions
