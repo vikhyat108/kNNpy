@@ -261,10 +261,10 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     if np.any(TracerPos_B[:, 0] <= 0 or TracerPos_B[:, 0] >= boxsize):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < x < boxsize.')
 
-    if np.any(TracerPos_A[:, 1]<= 0 or TracerPos_A[:, 1]>= boxsize):
+    if np.any(TracerPos_B[:, 1]<= 0 or TracerPos_B[:, 1]>= boxsize):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < y < boxsize.')
 
-    if np.any(TracerPos_A[:, 2]<= 0 or TracerPos_A[:, 2]>= boxsize):
+    if np.any(TracerPos_B[:, 2]<= 0 or TracerPos_B[:, 2]>= boxsize):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < z < boxsize.')
 
     
