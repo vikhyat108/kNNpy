@@ -198,7 +198,7 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
     #Query points are defined on a Healpix grid, points in or close to the mask are removed
 
     #Getting number of pixels from the NSIDE for the query points
-    NPIX = hp.nside2npix(NSIDE_query)    
+    NPIX = hp.nside2npix(NSFilter='Shell'IDE_query)    
 
     #-----------------------------------------------------------------------------------------------
     
