@@ -385,6 +385,7 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     See Also
     --------
     kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA: computes tracer-tracer cross-correlation for a single realisation of both tracers using the $k$NN formalism.
+    
     kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA_DataVector : computes tracer-field cross-correlation data vectors for multiple realisations of the tracer using the $k$NN formalism.
 
     Notes
