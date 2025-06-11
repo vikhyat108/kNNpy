@@ -9,7 +9,7 @@ import time
 import sys
 import os
 #Importing the required helper function
-from kNN_ASMR.HelperFunctions import TracerTracerCross3D
+from kNN_ASMR.HelperFunctions import calc_kNN_CDF
 ####################################################################################################
 
 #--------------------------------------  Function Definitions  -------------------------------------
@@ -57,7 +57,7 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
 
     Returns
     -------
-    Realizations: a dictionary where the $i^{\text{th}}$ key correspond to the 3D cross-correlation calculated between the $i^{\text{th}} 
+    Realizations: a numpy array of arrays where the $i^{\text{th}}$ element corresponds to the 3D cross-correlation calculated between the $i^{\text{th}} 
     realization of Tracer A and Tracer B. The values correspond to an numpy array: [p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list]
     p_gtr_kA_list: list of numpy float arrays
         list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_A^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
@@ -151,10 +151,76 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     if Verbose: print('\tdone.')
 
     #-----------------------------------------------------------------------------------------------
+    #Figuring out the NN indices from the kA_kB_list
+    kList_A, kList_B = [], []
+    for kA, kB in kA_kB_list:
+        kList_A.append(kA)
+        kList_B.append(kB)
+    kMax_A, kMax_B = max(kList_A), max(kList_B)
 
-    Realizations={}
+    #-----------------------------------------------------------------------------------------------
+        
+    #Building the trees
+    if Verbose: 
+        start_time = time.perf_counter()
+        print('\nbuilding the trees ...')
+        start_time_B = time.perf_counter()
+    xtree_B = scipy.spatial.cKDTree(TracerPos_B, boxsize=boxsize)  
+    if Verbose: 
+        print('\tsecond set of tracers done; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_B))
+
+    #Initializing the containinment array
+    #Realizations=np.zeros((len(TracerPos_A_dict.values()),3,len(kA_kB_list)))
+    Realizations=[]
     
-    for i in range(len(keys)):
-        p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list=TracerTracerCross3D(boxsize=boxsize,kA_kB_list=kA_kB_list, BinsRad=BinsRad, QueryPos=QueryPos,TracerPos_A=TracerPos_A_dict[keys[i]], TracerPos_B=TracerPos_B, Verbose=Verbose)
-        Realizations[keys[i]]=np.array([p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list])
+    for i, values in enumerate(TracerPos_A_dict.values()):
+        if Verbose:
+            print(f'\n Building the tree for the {i}th relaization of Tracer A')
+            start_time_A=time.perf_counter()
+        xtree_A=scipy.spatial.cKDTree(values, boxsize=boxsize)
+        if Verbose:
+            print('\tset of tracers being iterated over done; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_A))
+            print('\tcombined time: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+        #Calculating the NN distances
+        if Verbose: 
+            start_time = time.perf_counter()
+            print('\ncomputing the tracer NN distances ...')
+        vol_A, _ = xtree_A.query(QueryPos, k=kMax_A)
+        vol_B, _ = xtree_B.query(QueryPos, k=kMax_B)
+        req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
+        req_vol_B, _ = vol_B[:, np.array(kList_B)-1]
+        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+        #-----------------------------------------------------------------------------------------------
+    
+        #Calculating the auto kNN-CDFs
+        if Verbose: 
+            start_time = time.perf_counter()
+            print('\ncomputing the tracer auto-CDFs P_{>=kA}, P_{>=kB} ...')
+        p_gtr_kA_list = calc_kNN_CDF(req_vol_A, BinsRad)
+        p_gtr_kB_list = calc_kNN_CDF(req_vol_B, BinsRad)
+        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+        #-----------------------------------------------------------------------------------------------
+
+        #Calculating the joint kNN-CDFs
+        if Verbose: 
+            start_time = time.perf_counter()
+            print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
+        joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
+        for i, _ in enumerate(kA_kB_list):
+            joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
+        p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
+        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+
+        #-----------------------------------------------------------------------------------------------
+
+        if Verbose:
+            print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start_time))
+        
+        Realizations.append([p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list])
+    Realizations=np.array(Realizations) 
     return Realizations
+
+####################################################################################################
