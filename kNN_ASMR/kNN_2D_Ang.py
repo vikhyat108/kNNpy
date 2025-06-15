@@ -354,11 +354,11 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
 
     Returns
     -------
-    p_gtr_kA_list: list of numpy float arrays
+    p_gtr_kA_veclist: list of numpy float arrays
         list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured $k_A^i$NN-CDFs, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
     p_gtr_kB_list: list of numpy float arrays
         list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    p_gtr_kA_kB_list: list of numpy float arrays
+    p_gtr_kA_kB_veclist: list of numpy float arrays
         list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     Raises
@@ -380,13 +380,13 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
 
     See Also
     --------
-    kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA: computes tracer-tracer cross-correlation for a single realisation of both tracers using the $k$NN formalism.
+    kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA : computes tracer-tracer cross-correlation for a single realisation of both tracers using the $k$NN formalism.
     
     kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA_DataVector : computes tracer-field cross-correlation data vectors for multiple realisations of the tracer using the $k$NN formalism.
 
     Notes
     -----
-    Please refer to the documentation of kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA for important usage notes that also apply to this function. <Explain why cross-correlating multiple realisations of tracer A with single realisation of tracer B might be useful>
+    Please refer to the documentation of kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA for important usage notes that also apply to this function and references. <Explain why cross-correlating multiple realisations of tracer A with single realisation of tracer B might be useful>
     '''
     
     #-----------------------------------------------------------------------------------------------
@@ -411,14 +411,14 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if np.any(MaskedTracerPosRad_A[:, :, 0]<-np.pi/2 or MaskedTracerPosRad_A[:, :, 0]>np.pi/2 or MaskedTracerPosRad_B[:, 0]<-np.pi/2 or MaskedTracerPosRad_B[:, 0]>np.pi/2):
+    if np.any(MaskedTracerPosVectorRad_A[:, :, 0]<-np.pi/2 or MaskedTracerPosVectorRad_A[:, :, 0]>np.pi/2 or MaskedTracerPosRad_B[:, 0]<-np.pi/2 or MaskedTracerPosRad_B[:, 0]>np.pi/2):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosRad_A[:, :, 1]<0 or MaskedTracerPosRad_A[:, :, 0]>2*np.pi or MaskedTracerPosRad_B[:, 1]<0 or MaskedTracerPosRad_B[:, 0]>2*np.pi):
+    if np.any(MaskedTracerPosVectorRad_A[:, :, 1]<0 or MaskedTracerPosVectorRad_A[:, :, 0]>2*np.pi or MaskedTracerPosRad_B[:, 1]<0 or MaskedTracerPosRad_B[:, 0]>2*np.pi):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if MaskedTracerPosRad_A.shape[2]!=2 or MaskedTracerPosRad_B.shape[1]!=2: 
-        raise ValueError('Incorrect spatial dimension for tracers: array containing the tracer positions must be of shape (n_tracer, 2), where n_tracer is the number of tracers.')
+    if MaskedTracerPosVectorRad_A.shape[2]!=2 or MaskedTracerPosRad_B.shape[1]!=2: 
+        raise ValueError('Incorrect spatial dimension for tracers')
 
     if Verbose: print('\tdone.')
 
@@ -467,7 +467,7 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     if Verbose: print('\n\nNow looping over the realisations of tracer A\n')
 
     n_reals = MaskedTracerPosVectorRad_A.shape[0]
-    p_gtr_kA_veclist, p_gtr_kA_kB_veclist = [], [], []
+    p_gtr_kA_veclist, p_gtr_kA_kB_veclist = [], []
     for k_ind in range(len(kA_kB_list)):
         p_gtr_kA_veclist.append(np.zeros((n_reals, len(BinsRad[k_ind]))))
         p_gtr_kA_kB_veclist.append(np.zeros((n_reals, len(BinsRad[k_ind]))))
@@ -475,8 +475,10 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     for realisation, MaskedTracerPosRad_A in enumerate(MaskedTracerPosVectorRad_A):
 
         if Verbose: 
-            start_time = time.perf_counter()
+            start_time_real = time.perf_counter()
             print(f'\n\n--------------  Realisation {realisation+1}/{n_reals}  --------------\n')
+
+        #-------------------------------------------------------------------------------------------
 
         #Building the tree
         if Verbose: 
@@ -486,6 +488,8 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
         if Verbose: 
             print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_tree))
 
+        #-------------------------------------------------------------------------------------------
+
         #Calculating the NN distances
         if Verbose: 
             start_time_NN = time.perf_counter()
@@ -493,6 +497,8 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
         vol_A, _ = xtree_A.query(MaskedQueryPosRad, k=kMax_A)
         req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_NN))
+
+        #-------------------------------------------------------------------------------------------
     
         #Calculating the auto kNN-CDFs
         if Verbose: 
@@ -502,6 +508,8 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
         for k_ind in range(len(kA_kB_list)):
             p_gtr_kA_veclist[k_ind][realisation] = p_gtr_kA_list[k_ind]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_CDF))
+
+        #-------------------------------------------------------------------------------------------
 
         #Calculating the joint kNN-CDFs
         if Verbose: 
@@ -515,8 +523,10 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
             p_gtr_kA_kB_veclist[k_ind][realisation] = p_gtr_kA_kB_list[k_ind]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_joint))
 
+        #-------------------------------------------------------------------------------------------
+
         if Verbose: 
-            print('\ntime taken for realisation {}: {:.2e} s.'.format(realisation+1, time.perf_counter()-start_time))
+            print('\ntime taken for realisation {}: {:.2e} s.'.format(realisation+1, time.perf_counter()-start_time_real))
 
     #-----------------------------------------------------------------------------------------------
 
@@ -591,6 +601,8 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
         if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
     ValueError
         if the given tracer points are not on a two-dimensional grid.
+    ValueError
+        if the shape of field skymap (after masking) does not match the shape of the given query point array.
 
     See Also
     --------
@@ -693,11 +705,15 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 
     SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, BinsRad, QueryMask, Verbose=False)
 
+    #Check if the masked smoothed field is consistent with the number of query points
+    if SmoothedFieldDict[str(BinsRad[0][0])].shape[0]!=MaskedQueryPosRad.shape[0]:
+        raise ValueError('Shape of field after masking does not match shape of query point array; please enter the correct query mask!')
+
     if Verbose: print('\tdone; time taken for step 2: {:.2e} s.'.format(time.perf_counter()-step_2_start_time))
     
     #-----------------------------------------------------------------------------------------------
         
-    #Step 3: calculate the fraction of query points with nearest neighbour distance less than the angular distance and smoothened field greater than the overdensity threshold
+    #Step 3: calculate the fraction of query points with nearest neighbour distance less than the angular distance and smoothed field greater than the overdensity threshold
 
     if Verbose: 
         step_3_start_time = time.perf_counter()
@@ -723,10 +739,6 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 
             #Load the smoothed field
             SmoothedField = SmoothedFieldDict[str(ss)]
-
-            #Check if the masked smoothed field is consistent with the number of query points
-            if SmoothedField.shape[0]!=MaskedQueryPosRad.shape[0]:
-                raise ValueError('Shape of field smoothed at scale {:.3e} rad does not match shape of query point array.'.format(ss))
 
             #---------------------------------------------------------------------------------------
             
@@ -762,6 +774,244 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
         return p_gtr_k_list, p_gtr_dt_list, p_gtr_k_dt_list, SmoothedFieldDict
     else: 
         return p_gtr_k_list, p_gtr_dt_list, p_gtr_k_dt_list
+
+####################################################################################################
+    
+def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosVectorRad, FieldSkymap, QueryMask, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
+    
+    r'''
+    Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`MaskedTracerPosVectorRad`] and a single realisation of the given continuous overdensity field (`FieldSkymap`). Please refer to notes to understand why this might be useful.
+    	
+    Parameters
+    ----------
+    kList : int
+        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    BinsRad : list of numpy float array
+        list of angular distance arrays (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{th}$ element of `kList`.
+    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
+        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    MaskedTracerPosVectorRad : numpy float array of shape ``(n_realisations, n_tracer, 2)``
+        array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    FieldSkymap : numpy float array
+        the healpy map of the continuous field. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    QueryMask : numpy float array of shape ``FieldSkymap.shape``
+        the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see kNN_ASMR.HelperFunctions.create_query_2DA for how to compute this mask from an observational mask, and for a detailed description).
+    FieldConstPercThreshold : float
+        the percentile value for the constant percentile threshold to be used for the continuous field. For example, ``FieldConstPercThreshold = 75.0`` represents a 75th percentile threshold.
+    ReturnSmoothedDict : bool, optional
+        if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements, by default ``False``.
+    Verbose : bool, optional
+        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+
+    Returns
+    -------
+    p_gtr_k_veclist: list of numpy float arrays
+        list of auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
+    p_gtr_dt_list: list of numpy float arrays
+        continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
+    p_gtr_k_dt_veclist: list of numpy float arrays
+        list of joint tracer-field nearest neighbour distributions evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
+    SmoothedFieldDict : dict
+        dictionary containing the continuous field masked within the observational footprint and smoothed at the provided angular distance scales, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
+
+    Raises
+    ------
+    ValueError
+        if the given query points are not on a two-dimensional grid.
+    ValueError
+        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    ValueError
+        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    ValueError
+        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    ValueError
+        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    ValueError
+        if the given tracer points are not on a two-dimensional grid.
+    ValueError
+        if the shape of field skymap (after masking) does not match the shape of the given query point array.
+
+    See Also
+    --------
+    kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA : computes tracer-field cross-correlations using the $k$NN formalism.
+    
+    kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA_DataVector : computes tracer-tracer cross-correlation data vectors for multiple realisations of the first tracer and single realisation of the second tracer using the $k$NN formalism.
+
+    Notes
+    -----
+    Please refer to the documentation of kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA for important usage notes that also apply to this function and references. <Explain why cross-correlating multiple realisations of tracer with single realisation of field might be useful>
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose: total_start_time = time.perf_counter()
+
+    #-----------------------------------------------------------------------------------------------
+        
+    #Step 0: Check all inputs are consistent with the function requirement
+
+    if Verbose: print('Checking inputs ...')
+
+    if MaskedQueryPosRad.shape[1]!=2: 
+        raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
+
+    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+        raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
+
+    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+        raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
+
+    if np.any(MaskedTracerPosVectorRad[:, :, 0]<-np.pi/2 or MaskedTracerPosVectorRad[:, :, 0]>np.pi/2):
+        raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
+
+    if np.any(MaskedTracerPosVectorRad[:, :, 1]<0 or MaskedTracerPosVectorRad[:, :, 0]>2*np.pi):
+        raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
+
+    if MaskedTracerPosVectorRad.shape[2]!=2: 
+        raise ValueError('Incorrect spatial dimension for tracers: array containing the tracer positions must be of shape (n_realisations, n_tracer, 2), where n_realisations is the number of realisations and n_tracer is the number of tracers.')
+
+    if Verbose: print('\tdone.')
+
+    #-----------------------------------------------------------------------------------------------
+        
+    #Step 1: smooth the continuous field
+
+    if Verbose: 
+        step_1_start_time = time.perf_counter()
+        print('\ninitiating step 1 (smoothing the continuous field at the given angular distance scales)...')
+
+    SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, BinsRad, QueryMask, Verbose=False)
+
+    #Check if the masked smoothed field is consistent with the number of query points
+    if SmoothedFieldDict[str(BinsRad[0][0])].shape[0]!=MaskedQueryPosRad.shape[0]:
+        raise ValueError('Shape of field after masking does not match shape of query point array; please enter the correct query mask!')
+
+    if Verbose: print('\tdone; time taken for step 1: {:.2e} s.'.format(time.perf_counter()-step_1_start_time))
+    
+    #-----------------------------------------------------------------------------------------------
+        
+    #Step 2: 
+
+    # A. Compute the fraction of query points at which the smoothed fields at the different angular
+    #    scales are greater than the overdensity threshold.
+
+    # B. For each realization of the discrete tracer set, calculate 
+    #   (i)  nearest neighbour distances of query points, and the kNN-CDFs for the discrete tracers
+    #   (ii) the fraction of query points with nearest neighbour distance less than the angular
+    #        distance and smoothed field greater than the overdensity threshold
+
+    if Verbose: 
+        step_2_start_time = time.perf_counter()
+        print('\ninitiating step 2 (looping the tracer-field cross-correlation computations over the multiple tracer realisations)...')
+
+    n_reals = MaskedTracerPosVectorRad.shape[0]
+    p_gtr_k_veclist, p_gtr_dt_list, p_gtr_k_dt_veclist = [], [], []
+
+    for k_ind, k in enumerate(kList):
+        p_gtr_k_veclist.append(np.zeros((n_reals, len(BinsRad[k_ind]))))
+        p_gtr_dt_list.append(np.zeros(len(BinsRad[k_ind])))
+        p_gtr_k_dt_veclist.append(np.zeros((n_reals, len(BinsRad[k_ind]))))
+
+    #-----------------------------------------------------------------------------------------------
+
+    for realisation, MaskedTracerPosRad in enumerate(MaskedTracerPosVectorRad):
+
+        if Verbose:
+            start_time_real = time.perf_counter()
+            print(f'\n\n--------------  Realisation {realisation+1}/{n_reals}  --------------\n')
+
+        #-------------------------------------------------------------------------------------------
+
+        #Tracer calculations
+
+        #Building the tree
+        if Verbose: 
+            start_time_tree = time.perf_counter()
+            print('\nbuilding the BallTree for the discrete tracer set ...')
+        xtree = BallTree(MaskedTracerPosRad, metric='haversine')
+        if Verbose: 
+            print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_tree))
+
+        #-------------------------------------------------------------------------------------------
+
+        #Calculating the NN distances
+        if Verbose: 
+            start_time_NN = time.perf_counter()
+            print('\ncomputing the tracer NN distances ...')
+        vol, _ = xtree.query(MaskedQueryPosRad, k=max(kList))[:, np.array(kList)-1]
+        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_NN))
+
+        #-------------------------------------------------------------------------------------------
+    
+        #Calculating the auto kNN-CDFs
+        if Verbose: 
+            start_time_CDF = time.perf_counter()
+            print('\ncomputing the tracer auto-CDFs P_{>=k} ...')
+        p_gtr_k_list = calc_kNN_CDF(vol, BinsRad)
+        for k_ind, k in enumerate(kList):
+            p_gtr_k_veclist[k_ind][realisation] = p_gtr_k_list[k_ind]
+        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_CDF))
+
+        #-------------------------------------------------------------------------------------------
+
+        #Tracer-field calculations
+
+        if Verbose: 
+            start_time_tf_cross = time.perf_counter()
+            print('\ncomputing the tracer-field cross-correlation ...')
+
+        for k_ind, k in enumerate(kList):
+
+            if Verbose: 
+                if realisation==0:
+                    print('\n\tComputing P_{>dt} and P_{>=k, >dt} for k = {} ...'.format(k))
+                else:
+                    print('\n\tComputing P_{>=k, >dt} for k = {} ...'.format(k))
+
+            for i, ss in enumerate(BinsRad[k]):
+
+                #-----------------------------------------------------------------------------------
+
+                #Load the smoothed field
+                SmoothedField = SmoothedFieldDict[str(ss)]
+
+                #-----------------------------------------------------------------------------------
+                
+                #Compute the overdensity threshold            
+                delta_star_ss = np.percentile(SmoothedField, FieldConstPercThreshold)    
+
+                #-----------------------------------------------------------------------------------
+
+                #Compute the fraction of query points satisfying the joint condition
+                ind_gtr_k_dt = np.where((vol[:, k_ind]<ss)&(SmoothedField>delta_star_ss))
+                p_gtr_k_dt_veclist[i][realisation] = len(ind_gtr_k_dt[0])/MaskedQueryPosRad.shape[0]
+
+                #-----------------------------------------------------------------------------------
+
+                #Compute the fraction of query points with smoothed field exceeding the overdensity threshold
+                if realisation==0: 
+                    ind_gtr_dt = np.where(SmoothedField>delta_star_ss)
+                    p_gtr_dt_list[i] = len(ind_gtr_dt[0])/MaskedQueryPosRad.shape[0]
+
+        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_tf_cross))
+
+        #-------------------------------------------------------------------------------------------
+
+        if Verbose: 
+            print('\ntime taken for realisation {}: {:.2e} s.'.format(realisation+1, time.perf_counter()-start_time_real))
+
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose: print('\n\tdone; time taken for step 2: {:.2e} s.'.format(time.perf_counter()-step_2_start_time))
+
+    #-----------------------------------------------------------------------------------------------
+
+    if Verbose: print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start_time))
+    
+    if ReturnSmoothedDict: 
+        return p_gtr_k_veclist, p_gtr_dt_list, p_gtr_k_dt_veclist, SmoothedFieldDict
+    else: 
+        return p_gtr_k_veclist, p_gtr_dt_list, p_gtr_k_dt_veclist
 
 ####################################################################################################
 
