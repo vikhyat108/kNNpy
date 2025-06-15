@@ -612,8 +612,6 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     -----
     Measures the angular cross-correlation between a set of discrete tracers and a continuous overdensity field using the k-nearest neighbour (kNN) formalism as defined in Banerjee & Abel (2023)[^1] and Gupta & Banerjee (2024)[^2].
     
-    The field must already be smoothed at the desired angular distance scales using a top-hat filter (see the `kNN_ASMR.HelperFunctions` module for help with smoothing). The smoothed fields need to be provided as a dictionary (`SmoothedFieldDict`), see below for further details.
-    
     Currently, the algorithm requires a constant percentile overdensity threshold for the continuous field and query points to be defined on a HEALPix grid. Extentions to a constant mass threshold and poisson-sampled query points on the sky may be added in the future. 
     
     Data with associated observational footprints are supported, in which case, only tracer positions within the footprint should be provided and the field should be masked appropriately.Importantly, in this case, query points need to be within the footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). If the footprints of the tracer set and the field are different, a combined mask representing the intersection of the two footprints should be used (see the `kNN_ASMR.HelperFunctions.create_query_2DA()` method for help with masking and creating the modified query positions).
@@ -780,7 +778,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosVectorRad, FieldSkymap, QueryMask, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
     
     r'''
-    Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNN_ASMR.kNN_2D_Ang.TracerTracerCross2DA for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`MaskedTracerPosVectorRad`] and a single realisation of the given continuous overdensity field (`FieldSkymap`). Please refer to notes to understand why this might be useful.
+    Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`MaskedTracerPosVectorRad`] and a single realisation of the given continuous overdensity field (`FieldSkymap`). Please refer to notes to understand why this might be useful.
     	
     Parameters
     ----------
