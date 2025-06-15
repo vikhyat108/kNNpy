@@ -18,7 +18,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 #Importing the required helper function
-from kNN_ASMR.HelperFunctions import calc_kNN_CDF
+from kNN_ASMR.HelperFunctions import calc_kNN_CDF, create_smoothed_field_dict_2DA
 
 ####################################################################################################
 
@@ -186,10 +186,8 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     -------
     p_gtr_kA_list: list of numpy float arrays
         list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_A^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-        
     p_gtr_kB_list: list of numpy float arrays
         list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    
     p_gtr_kA_kB_list: list of numpy float arrays
         list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
@@ -358,10 +356,8 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     -------
     p_gtr_kA_list: list of numpy float arrays
         list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured $k_A^i$NN-CDFs, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-        
     p_gtr_kB_list: list of numpy float arrays
         list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    
     p_gtr_kA_kB_list: list of numpy float arrays
         list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
@@ -531,10 +527,10 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
 
 ####################################################################################################
 
-def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, SmoothedFieldDict,  FieldConstPercThreshold, Verbose=False):
+def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, FieldSkymap, QueryMask, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
     
     r'''
-    Returns the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ for $k$ in `kList`, that quantify the extent of the spatial cross-correlation between the given discrete tracer positions (`MaskedTracerPosRad`) and the given continuous overdensity field (`SmoothedFieldDict`).
+    Returns the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ for $k$ in `kList`, that quantify the extent of the spatial cross-correlation between the given discrete tracer positions (`MaskedTracerPosRad`) and the given continuous overdensity field (`FieldSkymap`).
     	
     1. $P_{\geq k}(\theta)$: 
     	the kNN-CDF of the discrete tracers, evaluated at angular distance scale $\theta$
@@ -559,10 +555,14 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
         array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
     MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
         array of sky locations for the discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field masked within the observational footprint and smoothed at various angular distance scales. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
+    FieldSkymap : numpy float array
+        the healpy map of the continuous field. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    QueryMask : numpy float array of shape ``FieldSkymap.shape``
+        the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see kNN_ASMR.HelperFunctions.create_query_2DA for how to compute this mask from an observational mask, and for a detailed description).
     FieldConstPercThreshold : float
         the percentile value for the constant percentile threshold to be used for the continuous field. For example, ``FieldConstPercThreshold = 75.0`` represents a 75th percentile threshold.
+    ReturnSmoothedDict : bool, optional
+        if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements, by default ``False``.
     Verbose : bool, optional
         if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
@@ -570,12 +570,12 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
     -------
     p_gtr_k_list: list of numpy float arrays
         auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins.
-        
     p_gtr_dt_list: list of numpy float arrays
         continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
-    
     p_gtr_k_dt_list: list of numpy float arrays
         joint tracer-field nearest neighbour distributions evaluated at the desired distance bins.
+    SmoothedFieldDict : dict
+        dictionary containing the continuous field masked within the observational footprint and smoothed at the provided angular distance scales, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
 
     Raises
     ------
@@ -591,8 +591,6 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
         if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
     ValueError
         if the given tracer points are not on a two-dimensional grid.
-    ValueError
-        if the shape of field smoothed at a particular scale does not match the shape of the query point array.
 
     See Also
     --------
@@ -651,7 +649,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
 
     if Verbose: 
         step_1_start_time = time.perf_counter()
-        print('\ninitiating step 1 ...')
+        print('\ninitiating step 1 (NN measurements for the discrete tracer set)...')
 
     #-----------------------------------------------------------------------------------------------
     
@@ -684,14 +682,26 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
     if Verbose: 
         print('\t\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
         print('\ntime taken for step 1: {:.2e} s.'.format(time.perf_counter()-step_1_start_time))
-    
+        
     #-----------------------------------------------------------------------------------------------
         
-    #Steps 2: calculate the fraction of query points with nearest neighbour distance less than the angular distance and smoothened field greater than the overdensity threshold
+    #Step 2: calculate the smoothed field dictionary
 
     if Verbose: 
         step_2_start_time = time.perf_counter()
-        print('\ninitiating step 2 ...')
+        print('\ninitiating step 2 (smoothing the continuous field at the given angular distance scales)...')
+
+    SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, BinsRad, QueryMask, Verbose=False)
+
+    if Verbose: print('\tdone; time taken for step 2: {:.2e} s.'.format(time.perf_counter()-step_2_start_time))
+    
+    #-----------------------------------------------------------------------------------------------
+        
+    #Step 3: calculate the fraction of query points with nearest neighbour distance less than the angular distance and smoothened field greater than the overdensity threshold
+
+    if Verbose: 
+        step_3_start_time = time.perf_counter()
+        print('\ninitiating step 3 (computing the tracer-field cross-correlation)...')
 
     #-----------------------------------------------------------------------------------------------
         
@@ -742,13 +752,16 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, S
 
         #-------------------------------------------------------------------------------------------
 
-        if Verbose: print('\t\tdone; time taken for step 2: {:.2e} s.'.format(time.perf_counter()-step_2_start_time))
+    if Verbose: print('\tdone; time taken for step 3: {:.2e} s.'.format(time.perf_counter()-step_3_start_time))
 
     #-----------------------------------------------------------------------------------------------
 
     if Verbose: print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start_time))
     
-    return p_gtr_k_list, p_gtr_dt_list, p_gtr_k_dt_list
+    if ReturnSmoothedDict: 
+        return p_gtr_k_list, p_gtr_dt_list, p_gtr_k_dt_list, SmoothedFieldDict
+    else: 
+        return p_gtr_k_list, p_gtr_dt_list, p_gtr_k_dt_list
 
 ####################################################################################################
 
