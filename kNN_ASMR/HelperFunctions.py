@@ -525,34 +525,47 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
     thickness : float, optional
         the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
     Verbose : bool, optional
-        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
+        if set to True, the time taken to complete each step of the calculation will be printed, by default False.
 
     Returns
     -------
-    smoothed_field : numpy float array of shape ``field.shape``
+    smoothed_field : numpy float array of shape field.shape
         the smoothed field.
 
     Raises
     ------
     ValueError
-        If required parameters (like `R`, `kmin`, `kmax`, or `thickness`) are missing for the specified filter type.
+        If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.
+    ValueError
+        If the input field dimensions do not form a cubical box.
+    ValueError
+        If the grid size does not match the field dimensions.
     ValueError
         If an unknown filter name is provided.
 
     Notes
     -----
-    - For real-space filters ('Top-Hat', 'Gaussian', 'Shell'), the radial scale `R` must be specified.
-    - For the 'Shell' filter, `thickness` must also be specified.
-    - For the 'Top-Hat-k' filter in Fourier space, `kmin` and `kmax` must be specified, while `R` and `thickness` are ignored.
+    - For real-space filters ('Top-Hat', 'Gaussian', 'Shell'), the radial scale R must be specified.
+    - For the 'Shell' filter, thickness must also be specified.
+    - For the 'Top-Hat-k' filter in Fourier space, kmin and kmax must be specified, while R and thickness are ignored.
     - Any unused parameters will trigger warnings but not stop execution.
     '''
     
     #-----------------------------------------------------------------------------------------------
+    
     if Verbose:
         total_start_time = time.perf_counter()
         print("\nStarting smoothing ...")
+        
     #-----------------------------------------------------------------------------------------------
-
+    
+    if not (field.shape[0] == field.shape[1] == field.shape[2]):
+        raise ValueError("The box provided is not cubical.")
+    elif field.shape[0] != grid:
+        raise ValueError("Grid size provided does not match with dimensions of the cubical box.")
+        
+    #-----------------------------------------------------------------------------------------------
+    
     if Filter in ['Top-Hat', 'Gaussian']:
         if R is None:
             raise ValueError(f"R must be provided for {Filter} filter.")
@@ -567,7 +580,7 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
         smoothed_field = pyfftw.interfaces.numpy_fft.irfftn(smoothed_field_k)
         
     #-----------------------------------------------------------------------------------------------
-
+    
     elif Filter == 'Top-Hat-k':
         if kmin is None or kmax is None:
             raise ValueError("Both kmin and kmax must be provided for 'Top-Hat-k' filter.")
@@ -583,7 +596,7 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
         smoothed_field = pyfftw.interfaces.numpy_fft.irfftn(smoothed_field_k)
         
     #-----------------------------------------------------------------------------------------------
-
+    
     elif Filter == 'Shell':
         if R is None or thickness is None:
             raise ValueError("Both R and thickness must be provided for 'Shell' filter.")
@@ -608,21 +621,104 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
 
         smoothed_field_k = field_k * W_k
         smoothed_field = pyfftw.interfaces.numpy_fft.irfftn(smoothed_field_k) / np.sum(W)
-
+        
     #-----------------------------------------------------------------------------------------------
-
+    
     else:
         raise ValueError(f"Unknown filter: {Filter}")
         
     #-----------------------------------------------------------------------------------------------
-
+    
     if Verbose:
         print("Smoothing completed.")
-        print('Total time taken: {:.2e} s.'.format(time.perf_counter() - total_start_time))
+        print(f'Total time taken: {time.perf_counter() - total_start_time:.2e} s.')
         
     #-----------------------------------------------------------------------------------------------
-
+    
     return smoothed_field
+
+####################################################################################################
+
+def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, kmin=None, kmax=None, thickness=None, Verbose=False):
+    r'''
+    Creates a dictionary containing the continuous field smoothed at various radial distance scales.
+
+    Parameters
+    ----------
+    field : numpy float array
+        the 3D array of the continuous field that needs to be smoothed. 
+    Filter : string
+        the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.
+    grid : int
+        the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
+    BoxSize : float
+        the size of the 3D box of the input density field, in Mpc/h.
+    bins : list of numpy float array
+        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{th}$ nearest neighbour.
+    kmin : float, optional
+        the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    kmax : float, optional
+        the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    thickness : float, optional
+        the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
+    Verbose : bool, optional
+        if set to True, the time taken to complete each step of the calculation will be printed, by default False.
+
+    Returns
+    -------
+    SmoothedFieldDict : dict
+        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict['50.0']`  represents the continuous map smoothed at a scale of 50 Mpc/h.
+
+    Raises
+    ------
+    ValueError
+        If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.
+    ValueError
+        If the input field dimensions do not form a cubical box.
+    ValueError
+        If the grid size does not match the field dimensions.
+    ValueError
+        If an unknown filter name is provided.
+
+    Notes
+    -----
+    - For real-space filters ('Top-Hat', 'Gaussian', 'Shell'), the radial scale R must be specified.
+    - For the 'Shell' filter, thickness must also be specified.
+    - For the 'Top-Hat-k' filter in Fourier space, kmin and kmax must be specified, while R and thickness are ignored.
+    - Any unused parameters will trigger warnings but not stop execution.
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+    
+    if Verbose: 
+        total_start = time.perf_counter()
+        print(f'\nSmoothing the density field over the radial distance scales...\n')
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Initializing the dictionary
+    SmoothedFieldDict = {}
+
+    #-----------------------------------------------------------------------------------------------
+    
+    #Looping over the nearest neighbour indices as inferred from the length of 'bins'
+    for i in range(len(bins)):
+
+        #-------------------------------------------------------------------------------------------
+        
+        if Verbose: start = time.perf_counter()
+
+        #-------------------------------------------------------------------------------------------
+        
+        for j, R in enumerate(bins[i]):
+            SmoothedFieldDict[str(R)] = \
+            smoothing_3D(field, Filter, grid, BoxSize, R, kmin, kmax, thickness, Verbose)
+
+    #-----------------------------------------------------------------------------------------------
+    
+    if Verbose: print('\nTotal time taken for all scales: {:.2e} s.'.format(time.perf_counter()-total_start))
+
+    return SmoothedFieldDict
 
 ####################################################################################################
 
