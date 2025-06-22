@@ -46,7 +46,7 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
 
     Returns
     -------
-    kNN_results: tuple of lists or list of numpy float arrays
+    kNN_results: tuple of lists | list of numpy float arrays
         results of the kNN computation. If `ReturnNNdist` is ``True``, returns the tuple ``(p_gtr_k_list, vol)`` where `p_gtr_k_list` is the list of auto kNN-CDFs, and `vol` is the list of NN distances. If `ReturnNNdist` is ``False``, returns `p_gtr_k_list` only
         
     Raises
@@ -87,19 +87,19 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
 
     if MaskedQueryPosRad.shape[1]!=2: 
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
-
-    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+    
+    if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
-
-    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+    
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
-
-    if np.any(MaskedTracerPosRad[:, 0]<-np.pi/2 or MaskedTracerPosRad[:, 0]>np.pi/2):
+    
+    if np.any((MaskedTracerPosRad[:, 0]<-np.pi/2) | (MaskedTracerPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
-
-    if np.any(MaskedTracerPosRad[:, 1]<0 or MaskedTracerPosRad[:, 0]>2*np.pi):
+    
+    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
-
+    
     if MaskedTracerPosRad.shape[1]!=2: 
         raise ValueError('Incorrect spatial dimension for tracers: array containing the tracer positions must be of shape (n_tracer, 2), where n_tracer is the number of tracers.')
 
@@ -120,7 +120,8 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
-    vol, _ = xtree.query(MaskedQueryPosRad, k=max(kList))[:, np.array(kList)-1]
+    vol_, _ = xtree.query(MaskedQueryPosRad, k=max(kList))
+    vol = vol_[:, np.array(kList)-1]
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -247,19 +248,19 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     if MaskedQueryPosRad.shape[1]!=2: 
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
 
-    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+    if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if np.any(MaskedTracerPosRad_A[:, 0]<-np.pi/2 or MaskedTracerPosRad_A[:, 0]>np.pi/2 or MaskedTracerPosRad_B[:, 0]<-np.pi/2 or MaskedTracerPosRad_B[:, 0]>np.pi/2):
+    if np.any((MaskedTracerPosRad_A[:, 0]<-np.pi/2) | (MaskedTracerPosRad_A[:, 0]>np.pi/2) | (MaskedTracerPosRad_B[:, 0]<-np.pi/2) | (MaskedTracerPosRad_B[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosRad_A[:, 1]<0 or MaskedTracerPosRad_A[:, 0]>2*np.pi or MaskedTracerPosRad_B[:, 1]<0 or MaskedTracerPosRad_B[:, 0]>2*np.pi):
+    if np.any((MaskedTracerPosRad_A[:, 1]<0) | (MaskedTracerPosRad_A[:, 0]>2*np.pi) | (MaskedTracerPosRad_B[:, 1]<0) | (MaskedTracerPosRad_B[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if MaskedTracerPosRad_A.shape[1]!=2 or MaskedTracerPosRad_B.shape[1]!=2: 
+    if (MaskedTracerPosRad_A.shape[1]!=2) | (MaskedTracerPosRad_B.shape[1]!=2): 
         raise ValueError('Incorrect spatial dimension for tracers: array containing the tracer positions must be of shape (n_tracer, 2), where n_tracer is the number of tracers.')
 
     if Verbose: print('\tdone.')
@@ -405,19 +406,19 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     if MaskedQueryPosRad.shape[1]!=2: 
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
 
-    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+    if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if np.any(MaskedTracerPosVectorRad_A[:, :, 0]<-np.pi/2 or MaskedTracerPosVectorRad_A[:, :, 0]>np.pi/2 or MaskedTracerPosRad_B[:, 0]<-np.pi/2 or MaskedTracerPosRad_B[:, 0]>np.pi/2):
+    if np.any((MaskedTracerPosVectorRad_A[:, :, 0]<-np.pi/2) | (MaskedTracerPosVectorRad_A[:, :, 0]>np.pi/2) | (MaskedTracerPosRad_B[:, 0]<-np.pi/2) | (MaskedTracerPosRad_B[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosVectorRad_A[:, :, 1]<0 or MaskedTracerPosVectorRad_A[:, :, 0]>2*np.pi or MaskedTracerPosRad_B[:, 1]<0 or MaskedTracerPosRad_B[:, 0]>2*np.pi):
+    if np.any((MaskedTracerPosVectorRad_A[:, :, 1]<0) | (MaskedTracerPosVectorRad_A[:, :, 0]>2*np.pi) | (MaskedTracerPosRad_B[:, 1]<0) | (MaskedTracerPosRad_B[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if MaskedTracerPosVectorRad_A.shape[2]!=2 or MaskedTracerPosRad_B.shape[1]!=2: 
+    if (MaskedTracerPosVectorRad_A.shape[2]!=2) | (MaskedTracerPosRad_B.shape[1]!=2): 
         raise ValueError('Incorrect spatial dimension for tracers')
 
     if Verbose: print('\tdone.')
@@ -636,16 +637,16 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     if MaskedQueryPosRad.shape[1]!=2: 
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
 
-    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+    if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if np.any(MaskedTracerPosRad[:, 0]<-np.pi/2 or MaskedTracerPosRad[:, 0]>np.pi/2):
+    if np.any((MaskedTracerPosRad[:, 0]<-np.pi/2) | (MaskedTracerPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosRad[:, 1]<0 or MaskedTracerPosRad[:, 0]>2*np.pi):
+    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if MaskedTracerPosRad.shape[1]!=2: 
@@ -676,7 +677,8 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     if Verbose: 
         start_time = time.perf_counter()
         print('\n\tcomputing the tracer NN distances ...')
-    vol, _ = xtree.query(MaskedQueryPosRad, k=max(kList))[:, np.array(kList)-1]
+    vol_, _ = xtree.query(MaskedQueryPosRad, k=max(kList))
+    vol = vol_[:, np.array(kList)-1]
     if Verbose: print('\t\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -726,12 +728,12 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 
         if Verbose: 
             start_time = time.perf_counter()
-            print('\n\tComputing P_{>dt} and P_{>=k, >dt} for k = {} ...'.format(k))
+            print('\n\tComputing P_(>dt) and P_(>=k, >dt) for k = {} ...'.format(k))
 
-        p_gtr_k_dt = np.zeros(len(BinsRad[k]))
-        p_gtr_dt = np.zeros(len(BinsRad[k]))
+        p_gtr_k_dt = np.zeros(len(BinsRad[k_ind]))
+        p_gtr_dt = np.zeros(len(BinsRad[k_ind]))
 
-        for i, ss in enumerate(BinsRad[k]):
+        for i, ss in enumerate(BinsRad[k_ind]):
 
             #---------------------------------------------------------------------------------------
 
@@ -762,7 +764,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 
         #-------------------------------------------------------------------------------------------
 
-    if Verbose: print('\tdone; time taken for step 3: {:.2e} s.'.format(time.perf_counter()-step_3_start_time))
+    if Verbose: print('\n\tdone; time taken for step 3: {:.2e} s.'.format(time.perf_counter()-step_3_start_time))
 
     #-----------------------------------------------------------------------------------------------
 
@@ -853,16 +855,16 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
     if MaskedQueryPosRad.shape[1]!=2: 
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 2), where n_query is the number of query points.')
 
-    if np.any(MaskedQueryPosRad[:, 0]<-np.pi/2 or MaskedQueryPosRad[:, 0]>np.pi/2):
+    if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedQueryPosRad[:, 1]<0 or MaskedQueryPosRad[:, 0]>2*np.pi):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
-    if np.any(MaskedTracerPosVectorRad[:, :, 0]<-np.pi/2 or MaskedTracerPosVectorRad[:, :, 0]>np.pi/2):
+    if np.any((MaskedTracerPosVectorRad[:, :, 0]<-np.pi/2) | (MaskedTracerPosVectorRad[:, :, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosVectorRad[:, :, 1]<0 or MaskedTracerPosVectorRad[:, :, 0]>2*np.pi):
+    if np.any((MaskedTracerPosVectorRad[:, :, 1]<0) | (MaskedTracerPosVectorRad[:, :, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if MaskedTracerPosVectorRad.shape[2]!=2: 
@@ -936,7 +938,8 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
         if Verbose: 
             start_time_NN = time.perf_counter()
             print('\ncomputing the tracer NN distances ...')
-        vol, _ = xtree.query(MaskedQueryPosRad, k=max(kList))[:, np.array(kList)-1]
+        vol_, _ = xtree.query(MaskedQueryPosRad, k=max(kList))
+        vol = vol_[:, np.array(kList)-1]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_NN))
 
         #-------------------------------------------------------------------------------------------
@@ -962,11 +965,11 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
 
             if Verbose: 
                 if realisation==0:
-                    print('\n\tComputing P_{>dt} and P_{>=k, >dt} for k = {} ...'.format(k))
+                    print('\n\tComputing P_(>dt) and P_(>=k, >dt) for k = {} ...'.format(k))
                 else:
-                    print('\n\tComputing P_{>=k, >dt} for k = {} ...'.format(k))
+                    print('\n\tComputing P_(>=k, >dt) for k = {} ...'.format(k))
 
-            for i, ss in enumerate(BinsRad[k]):
+            for i, ss in enumerate(BinsRad[k_ind]):
 
                 #-----------------------------------------------------------------------------------
 
