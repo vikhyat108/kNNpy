@@ -4,14 +4,9 @@
 
 import numpy as np
 import scipy
-from scipy import interpolate
 import healpy as hp
 import time
 import copy
-import pyfftw
-import warnings
-import smoothing_library as SL
-import MAS_library as MASL
 
 ####################################################################################################
 
