@@ -985,14 +985,14 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
 
                 #Compute the fraction of query points satisfying the joint condition
                 ind_gtr_k_dt = np.where((vol[:, k_ind]<ss)&(SmoothedField>delta_star_ss))
-                p_gtr_k_dt_veclist[i][realisation] = len(ind_gtr_k_dt[0])/MaskedQueryPosRad.shape[0]
+                p_gtr_k_dt_veclist[k_ind][realisation, i] = len(ind_gtr_k_dt[0])/MaskedQueryPosRad.shape[0]
 
                 #-----------------------------------------------------------------------------------
 
                 #Compute the fraction of query points with smoothed field exceeding the overdensity threshold
                 if realisation==0: 
                     ind_gtr_dt = np.where(SmoothedField>delta_star_ss)
-                    p_gtr_dt_list[i] = len(ind_gtr_dt[0])/MaskedQueryPosRad.shape[0]
+                    p_gtr_dt_list[k_ind][i] = len(ind_gtr_dt[0])/MaskedQueryPosRad.shape[0]
 
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_tf_cross))
 
