@@ -718,7 +718,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 
     if Verbose: 
         step_3_start_time = time.perf_counter()
-        print('\ninitiating step 3 (computing the tracer-field cross-correlation)...')
+        print('\ninitiating step 3 (computing the tracer-field cross-correlation)...\n')
 
     #-----------------------------------------------------------------------------------------------
         
@@ -729,7 +729,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 
         if Verbose: 
             start_time = time.perf_counter()
-            print('\n\tComputing P_(>dt) and P_(>=k, >dt) for k = {} ...'.format(k))
+            print('\tComputing P_(>dt) and P_(>=k, >dt) for k = {} ...'.format(k))
 
         p_gtr_k_dt = np.zeros(len(BinsRad[k_ind]))
         p_gtr_dt = np.zeros(len(BinsRad[k_ind]))
@@ -960,15 +960,15 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
 
         if Verbose: 
             start_time_tf_cross = time.perf_counter()
-            print('\ncomputing the tracer-field cross-correlation ...')
+            print('\ncomputing the tracer-field cross-correlation ...\n')
 
         for k_ind, k in enumerate(kList):
 
             if Verbose: 
                 if realisation==0:
-                    print('\n\tComputing P_(>dt) and P_(>=k, >dt) for k = {} ...'.format(k))
+                    print('\tComputing P_(>dt) and P_(>=k, >dt) for k = {} ...'.format(k))
                 else:
-                    print('\n\tComputing P_(>=k, >dt) for k = {} ...'.format(k))
+                    print('\tComputing P_(>=k, >dt) for k = {} ...'.format(k))
 
             for i, ss in enumerate(BinsRad[k_ind]):
 
@@ -995,7 +995,7 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
                     ind_gtr_dt = np.where(SmoothedField>delta_star_ss)
                     p_gtr_dt_list[k_ind][i] = len(ind_gtr_dt[0])/MaskedQueryPosRad.shape[0]
 
-        if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_tf_cross))
+        if Verbose: print('\n\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_tf_cross))
 
         #-------------------------------------------------------------------------------------------
 
