@@ -18,7 +18,8 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 #Importing the required helper function
-from kNN_ASMR.HelperFunctions import calc_kNN_CDF, create_smoothed_field_dict_2DA
+from kNN_ASMR.HelperFunctions import calc_kNN_CDF
+from kNN_ASMR.HelperFunctions_2DA import create_smoothed_field_dict_2DA
 
 ####################################################################################################
 
@@ -1003,7 +1004,9 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
 
     #-----------------------------------------------------------------------------------------------
 
-    if Verbose: print('\n\tdone; time taken for step 2: {:.2e} s.'.format(time.perf_counter()-step_2_start_time))
+    if Verbose: 
+        print('\n\n--------------  all realisations done!  --------------\n')
+        print('\n\ttime taken for step 2: {:.2e} s.'.format(time.perf_counter()-step_2_start_time))
 
     #-----------------------------------------------------------------------------------------------
 
