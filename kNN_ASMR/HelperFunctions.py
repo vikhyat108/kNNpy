@@ -313,7 +313,7 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
 
 ####################################################################################################
 
-def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, kmin=None, kmax=None, thickness=None, Verbose=False):
+def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, thickness=None, Verbose=False):
     r'''
     Creates a dictionary containing the continuous field smoothed at various radial distance scales.
 
@@ -322,17 +322,13 @@ def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, kmin=None,
     field : numpy float array
         the 3D array of the continuous field that needs to be smoothed. 
     Filter : string
-        the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.
+        the filter to be used for smoothing. Valid filter types are: 'Top-Hat', 'Gaussian', 'Shell'. 
     grid : int
         the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
     BoxSize : float
         the size of the 3D box of the input density field, in Mpc/h.
     bins : list of numpy float array
         list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{th}$ nearest neighbour.
-    kmin : float, optional
-        the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
-    kmax : float, optional
-        the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
     thickness : float, optional
         the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
     Verbose : bool, optional
@@ -346,7 +342,7 @@ def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, kmin=None,
     Raises
     ------
     ValueError
-        If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.
+        If required parameters (like bins or thickness) are missing for the specified filter type.
     ValueError
         If the input field dimensions do not form a cubical box.
     ValueError
@@ -356,11 +352,20 @@ def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, kmin=None,
 
     Notes
     -----
-    - For real-space filters ('Top-Hat', 'Gaussian', 'Shell'), the radial scale R must be specified.
-    - For the 'Shell' filter, thickness must also be specified.
-    - For the 'Top-Hat-k' filter in Fourier space, kmin and kmax must be specified, while R and thickness are ignored.
+    - This function only works for the real space filters, so 'Top-Hat-k' is not a valid filter for this function.
+    - For the 'Shell' filter, thickness must be specified.
     - Any unused parameters will trigger warnings but not stop execution.
     '''
+    
+    #-----------------------------------------------------------------------------------------------
+    
+    # This function is only for smoothing in real space
+    
+    if Filter == 'Top-Hat-k':
+        raise ValueError(f"Unknown filter: {Filter}")
+        
+    kmin = None
+    kmax = None
     
     #-----------------------------------------------------------------------------------------------
     
