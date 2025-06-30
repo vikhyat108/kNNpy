@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import integrate as integrate
 from pylab import *
-
+import scipy
 
 def PeakCurves(DensityFields=[], Nreals=10, MaxThreshold=16, Nthresh=101, Type=0, Plot=1, LogScale=1, CosmoLabels=['null']):
     '''
@@ -64,54 +63,20 @@ def PeakCurves(DensityFields=[], Nreals=10, MaxThreshold=16, Nthresh=101, Type=0
         Nreals = int(Nreals)
         Nthresh = int(Nthresh)
         b = np.stack(DensityFields)
-        peaksarr = double([[[0]*Nreals]*Nthresh]*b.shape[0])
         tmean = double([[0]*Nthresh]*b.shape[0])
         tstddev = double([[0]*Nthresh]*b.shape[0])
-        thresh = double([0]*Nthresh)
-        peaks = 0
-        index = 0
-        for t in linspace(-1,MaxThreshold,Nthresh):
-            thresh[index]=t
-            index+=1
-        index=0
-        for cosmo in range(0,b.shape[0],1):
-            for z in range(0,Nreals,1):
-                bz=b[cosmo,z]
-                for t in linspace(-1,MaxThreshold,Nthresh):
-                    for i in range(0,len(bz),1):
-                        for j in range(0,len(bz[i]),1):
-                            if((i==0) and (j==0)):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i,j+1]) and (bz[i,j]>=bz[i+1,j]) and (bz[i,j]>=bz[i+1,j+1])) and (bz[i,j]>=bz[len(bz)-1,len(bz)-1]) and (bz[i,j]>=bz[0,len(bz)-1]) and (bz[i,j]>=bz[len(bz)-1,0]) and (bz[i,j]>=bz[len(bz)-1,1]) and (bz[i,j]>=bz[1,len(bz)-1]):
-                                    peaks+=1
-                            elif((i==0) and (j==(len(bz[i])-1))):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i,j-1]) and (bz[i,j]>=bz[i+1,j-1]) and (bz[i,j]>=bz[i+1,j])) and (bz[i,j]>=bz[len(bz)-1,len(bz)-1]) and (bz[i,j]>=bz[0,0]) and (bz[i,j]>=bz[len(bz)-1,0]) and (bz[i,j]>=bz[1,0]) and (bz[i,j]>=bz[len(bz)-1,len(bz)-2]):
-                                    peaks+=1
-                            elif((i==(len(bz)-1)) and (j==0)):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i-1,j]) and (bz[i,j]>=bz[i-1,j+1]) and (bz[i,j]>=bz[i,j+1])) and (bz[i,j]>=bz[len(bz)-1,len(bz)-1]) and (bz[i,j]>=bz[0,len(bz)-1]) and (bz[i,j]>=bz[0,0]) and (bz[i,j]>=bz[0,1]) and (bz[i,j]>=bz[len(bz)-2,len(bz)-1]):
-                                    peaks+=1
-                            elif((i==(len(bz)-1)) and (j==(len(bz[i])-1))):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i-1,j-1]) and (bz[i,j]>=bz[i-1,j]) and (bz[i,j]>=bz[i,j-1])) and (bz[i,j]>=bz[0,0]) and (bz[i,j]>=bz[0,len(bz)-1]) and (bz[i,j]>=bz[len(bz)-1,0]) and (bz[i,j]>=bz[len(bz)-2,0]) and (bz[i,j]>=bz[0,len(bz)-2]):
-                                    peaks+=1
-                            elif(i==0):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i,j-1]) and (bz[i,j]>=bz[i,j+1]) and (bz[i,j]>=bz[i+1,j-1]) and (bz[i,j]>=bz[i+1,j]) and (bz[i,j]>=bz[i+1,j+1])) and (bz[i,j]>=bz[len(bz)-1,j-1]) and (bz[i,j]>=bz[len(bz)-1,j]) and (bz[i,j]>=bz[len(bz)-1,j+1]):
-                                    peaks+=1
-                            elif(i==(len(bz)-1)):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i-1,j-1]) and (bz[i,j]>=bz[i-1,j]) and (bz[i,j]>=bz[i-1,j+1]) and (bz[i,j]>=bz[i,j-1]) and (bz[i,j]>=bz[i,j+1])) and (bz[i,j]>=bz[0,j-1]) and (bz[i,j]>=bz[0,j]) and (bz[i,j]>=bz[0,j+1]):
-                                    peaks+=1
-                            elif(j==0):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i-1,j]) and (bz[i,j]>=bz[i-1,j+1]) and (bz[i,j]>=bz[i,j+1]) and (bz[i,j]>=bz[i+1,j]) and (bz[i,j]>=bz[i+1,j+1])) and (bz[i,j]>=bz[i-1,len(bz)-1]) and (bz[i,j]>=bz[i,len(bz)-1]) and (bz[i,j]>=bz[i+1,len(bz)-1]):
-                                    peaks+=1
-                            elif(j==(len(bz[i])-1)):
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i-1,j-1]) and (bz[i,j]>=bz[i-1,j]) and (bz[i,j]>=bz[i,j-1]) and (bz[i,j]>=bz[i+1,j-1]) and (bz[i,j]>=bz[i+1,j])) and (bz[i,j]>=bz[i-1,0]) and (bz[i,j]>=bz[i,0]) and (bz[i,j]>=bz[i+1,0]):
-                                    peaks+=1
-                            else:
-                                if((bz[i,j]>=t) and (bz[i,j]>=bz[i-1,j-1]) and (bz[i,j]>=bz[i-1,j]) and (bz[i,j]>=bz[i-1,j+1]) and (bz[i,j]>=bz[i,j-1]) and (bz[i,j]>=bz[i,j+1]) and (bz[i,j]>=bz[i+1,j-1]) and (bz[i,j]>=bz[i+1,j]) and (bz[i,j]>=bz[i+1,j+1])):
-                                    peaks+=1                         
-                    peaksarr[cosmo,index,z]=double(peaks)
-                    peaks=0
-                    index+=1
-                print('%d%% Done.'%(((double(cosmo)*double(Nreals))+double(z)+1.0)/(0.01*double(Nreals)*b.shape[0])))
-                index=0
+        n_cosmos, n_realizations, height, width = b.shape
+        peaksarr = np.zeros((n_cosmos, Nthresh, Nreals), dtype=np.float64)
+        thresh = np.linspace(-1, MaxThreshold, Nthresh)
+        for cosmo in range(n_cosmos):
+            for z in range(Nreals):
+                bz = b[cosmo, z]
+                local_max = (scipy.ndimage.maximum_filter(bz, size=3, mode='wrap')==bz)
+                for t_idx, t in enumerate(thresh):
+                    threshold_mask = (bz>=t)
+                    peaks_mask = (local_max & threshold_mask)
+                    peaksarr[cosmo, t_idx, z] = np.sum(peaks_mask)
+            print('%d%% Done.'%(((double(cosmo)*double(Nreals))+double(z)+1.0)/(0.01*double(Nreals)*b.shape[0])))
         if(Type==0):
             for cosmo in range(0,b.shape[0],1):
                 for t in range(0,Nthresh,1):

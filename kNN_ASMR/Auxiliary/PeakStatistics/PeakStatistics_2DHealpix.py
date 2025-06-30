@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import integrate as integrate
-import healpy as hp
 from pylab import *
-
+import healpy as hp
 
 def spherical_peaks(denslice,MaxThreshold,Nthresh):
     # Peak Finder Helper Function
