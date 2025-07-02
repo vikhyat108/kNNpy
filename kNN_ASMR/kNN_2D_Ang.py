@@ -295,13 +295,17 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     
     #Calculating the NN distances
     if Verbose: 
-        start_time = time.perf_counter()
+        start_time_NNA = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
     vol_A, _ = xtree_A.query(MaskedQueryPosRad, k=kMax_A)
+    if Verbose: 
+        print('\ttime taken for tracer A: {:.2e} s.'.format(time.perf_counter()-start_time_NNA))
+        start_time_NNB = time.perf_counter()
     vol_B, _ = xtree_B.query(MaskedQueryPosRad, k=kMax_B)
-    req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
-    req_vol_B, _ = vol_B[:, np.array(kList_B)-1]
-    if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
+    if Verbose: print('\ttime taken for tracer B: {:.2e} s.'.format(time.perf_counter()-start_time_NNB))
+    req_vol_A = vol_A[:, np.array(kList_A)-1]
+    req_vol_B = vol_B[:, np.array(kList_B)-1]
+    if Verbose: print('\tdone')
 
     #-----------------------------------------------------------------------------------------------
     
@@ -319,7 +323,7 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
-    joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
+    joint_vol = np.zeros((vol_A.shape[0], len(kA_kB_list)))
     for i, _ in enumerate(kA_kB_list):
         joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
     p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
@@ -452,7 +456,7 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
         start_time = time.perf_counter()
         print('\ncomputing the NN distances...')
     vol_B, _ = xtree_B.query(MaskedQueryPosRad, k=kMax_B)
-    req_vol_B, _ = vol_B[:, np.array(kList_B)-1]
+    req_vol_B = vol_B[:, np.array(kList_B)-1]
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #Calculating the auto kNN-CDFs
@@ -497,7 +501,7 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
             start_time_NN = time.perf_counter()
             print('\ncomputing the NN distances ...')
         vol_A, _ = xtree_A.query(MaskedQueryPosRad, k=kMax_A)
-        req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
+        req_vol_A = vol_A[:, np.array(kList_A)-1]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_NN))
 
         #-------------------------------------------------------------------------------------------
@@ -517,7 +521,7 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
         if Verbose: 
             start_time_joint = time.perf_counter()
             print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
-        joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
+        joint_vol = np.zeros((vol_A.shape[0], len(kA_kB_list)))
         for i, _ in enumerate(kA_kB_list):
             joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
         p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
