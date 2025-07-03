@@ -124,7 +124,8 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
-    vol, _ = xtree.query(QueryPos, k=max(kList))[:, np.array(kList)-1]
+    distances, _ = xtree.query(QueryPos, k=max(kList))
+    vol = distances[:, np.array(kList)-1]
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
