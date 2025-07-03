@@ -149,7 +149,7 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     if ReturnNNdist:
         kNN_results = (p_gtr_k_list, vol)
     else:
-        kNN_results = p_gtr_k_list
+        kNN_results = (p_gtr_k_list, None)
 
     #-----------------------------------------------------------------------------------------------
 
