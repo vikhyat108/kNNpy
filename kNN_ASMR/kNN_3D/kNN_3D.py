@@ -127,11 +127,7 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     dists, idx= xtree.query(QueryPos, k=max(kList), workers=-1)
     del idx
     gc.collect()
-    if len(dists.shape)==1:
-        dists=dists[:, np.newaxis]
-    vol=[dists[:,k] for k in range(len(kList))]
-    vol=np.array(vol, dtype=np.float32)
-    vol=vol.T
+    vol=dists[:,np.array(kList)-1]
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
