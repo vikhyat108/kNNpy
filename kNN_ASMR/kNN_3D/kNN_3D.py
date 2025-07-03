@@ -85,22 +85,22 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 3), ' \
         'where n_query is the number of query points.')
 
-    if np.any(QueryPos[:, 0] <= 0 or QueryPos[:, 0] >= boxsize):
+    if np.any((QueryPos[:, 0] <= 0) | (QueryPos[:, 0] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any(QueryPos[:, 1] <= 0 or QueryPos[:, 1] >= boxsize):
+    if np.any((QueryPos[:, 1] <= 0) | (QueryPos[:, 1] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any(QueryPos[:, 2] <= 0 or QueryPos[:, 2] >= boxsize):
+    if np.any((QueryPos[:, 2] <= 0) | (QueryPos[:, 2] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < z < boxsize.')
 
-    if np.any(TracerPos[:, 0] <= 0 or TracerPos[:, 0] >= boxsize):
+    if np.any((TracerPos[:, 0] <= 0) | (TracerPos[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any(TracerPos[:, 1]<= 0 or TracerPos[:, 1]>= boxsize):
+    if np.any((TracerPos[:, 1]<= 0) | (TracerPos[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any(TracerPos[:, 2]<= 0 or TracerPos[:, 2]>= boxsize):
+    if np.any((TracerPos[:, 2]<= 0) | (TracerPos[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 < z < boxsize.')
 
     if TracerPos.shape[1]!=3: 
