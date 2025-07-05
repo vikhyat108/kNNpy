@@ -23,7 +23,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 
 #Importing the required helper function
-from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_2DA
+from kNN_ASMR.HelperFunctions_2DA import create_smoothed_field_dict_2DA
 
 ####################################################################################################
 
@@ -99,10 +99,10 @@ def CorrelationFunction(BinsRad, MaskedTracerPosRad, FieldSkymap, NR_ND=10, Retu
 
     if Verbose: print('Checking inputs ...')
 
-    if np.any(MaskedTracerPosRad[:, 0]<-np.pi/2 or MaskedTracerPosRad[:, 0]>np.pi/2):
+    if np.any((MaskedTracerPosRad[:, 0]<-np.pi/2) | (MaskedTracerPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosRad[:, 1]<0 or MaskedTracerPosRad[:, 0]>2*np.pi):
+    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if MaskedTracerPosRad.shape[1]!=2: 
@@ -132,7 +132,7 @@ def CorrelationFunction(BinsRad, MaskedTracerPosRad, FieldSkymap, NR_ND=10, Retu
         print('\nSmoothing the continuous field at the given angular distance scales...')
 
     #Note: QueryMask is set to 2 everywhere to avoid masking out any additional pixels. The pixels outside the footprint are automatically masked during the smoothing process (refer to the HelperFunctions module documentation for more details).
-    SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, [BinsRad], QueryMask=2*np.ones_like(FieldSkymap).astype(int), Verbose=False)
+    SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, [BinsRad], query_mask=2*np.ones_like(FieldSkymap).astype(int), Verbose=False)
 
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-smooth_start_time))
     
@@ -259,10 +259,10 @@ def CorrelationFunction_DataVector(BinsRad, MaskedTracerPosVectorRad, FieldSkyma
 
     if Verbose: print('Checking inputs ...')
 
-    if np.any(MaskedTracerPosVectorRad[:, :, 0]<-np.pi/2 or MaskedTracerPosVectorRad[:, :, 0]>np.pi/2):
+    if np.any((MaskedTracerPosVectorRad[:, :, 0]<-np.pi/2) | (MaskedTracerPosVectorRad[:, :, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any(MaskedTracerPosVectorRad[:, :, 1]<0 or MaskedTracerPosVectorRad[:, :, 0]>2*np.pi):
+    if np.any((MaskedTracerPosVectorRad[:, :, 1]<0) | (MaskedTracerPosVectorRad[:, :, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if MaskedTracerPosVectorRad.shape[2]!=2: 
@@ -292,7 +292,7 @@ def CorrelationFunction_DataVector(BinsRad, MaskedTracerPosVectorRad, FieldSkyma
         print('\nSmoothing the continuous field at the given angular distance scales...')
 
     #Note: QueryMask is set to 2 everywhere to avoid masking out any additional pixels. The pixels outside the footprint are automatically masked during the smoothing process (refer to the HelperFunctions module documentation for more details).
-    SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, [BinsRad], QueryMask=2*np.ones_like(FieldSkymap).astype(int), Verbose=False)
+    SmoothedFieldDict = create_smoothed_field_dict_2DA(FieldSkymap, [BinsRad], query_mask=2*np.ones_like(FieldSkymap).astype(int), Verbose=False)
 
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-smooth_start_time))
     
