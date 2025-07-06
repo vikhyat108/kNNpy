@@ -19,6 +19,204 @@ from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_3D
 #################################################################################################################
 
 #----------------------------------------  Function Definitions  ----------------------------------------
+import numpy as np
+import time
+import sys
+import scipy.spatial
+import os
+import gc
+
+# Ensure module path is correctly added for relative imports
+module_path = os.path.abspath(os.path.join(''))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+####################################################################################################
+
+#-------------------  These libraries are required for evaluating the functions  -------------------
+
+import numpy as np
+import scipy
+from scipy import interpolate
+import time
+import copy
+import pyfftw
+import warnings
+import smoothing_library as SL
+import MAS_library as MASL
+
+####################################################################################################
+
+#--------------------------------------  Function Definitions  -------------------------------------
+
+####################################################################################################
+
+def cdf_vol_knn(vol):
+    r'''
+    Returns interpolating functions for empirical CDFs of the given $k$-nearest neighbour distances.
+    
+    Parameters
+    ----------
+    vol : numpy float array of shape ``(n_query, n_kNN)``
+        Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
+
+    Returns
+    -------
+    cdf: list of function objects
+        list of interpolated empirical CDF functions that can be evaluated at desired distance bins.
+    '''
+    
+    #-----------------------------------------------------------------------------------------------
+
+    #Initialising a list to contain the interpolating functions
+    cdf = []
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Inferring the number of query points and nearest neighbours
+    n = vol.shape[0]
+    l = vol.shape[1]
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Calculating the empirical CDF
+    gof = ((np.arange(0, n) + 1) / (n*1.0))
+    for c in range(l):
+        ind = np.argsort(vol[:, c])
+        s_vol= vol[ind, c]
+        #Calculating the interpolating function
+        cdf.append(interpolate.interp1d(s_vol, gof, kind='linear', bounds_error=False))
+        
+    return cdf
+
+####################################################################################################
+
+def calc_kNN_CDF(vol, bins):
+    r'''
+    Returns the kNN-CDFs for the given nearest-neighbour distances, evaluated at the given distance bins.
+
+    Parameters
+    ----------
+    vol : numpy float array of shape ``(n_query, n_kNN)``
+        2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried. `vol[:, i]` should be the array with the sorted $k_i^{th}$ nearest-neighbour distances.
+    bins : list of numpy float array
+        list of distance scale arrays at which the CDFs need to be evaluated (units must be same as in `vol`).
+
+    Returns
+    -------
+    data : list of numpy float array
+        kNN-CDFs evaluated at the desired distance bins. ``data[i]`` is the $k_i$NN-CDF if ``vol[:, i]`` containts the $k_i^{th}$ nearest-neigbour distances.
+    '''
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Initialising the list of kNN-CDFs
+    data = []
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Computing the interpolated empirical CDFs using the nearest-neighbour distances
+    cdfs = cdf_vol_knn(vol)
+
+    #-----------------------------------------------------------------------------------------------
+
+    #Looping over the nearest-neighbour indices
+    for i in range(vol.shape[1]):
+
+        #-------------------------------------------------------------------------------------------
+
+        #Finding the minimum and maximum values of the NN distances
+        min_dist = np.min(vol[:, i])
+        max_dist = np.max(vol[:, i])
+
+        #-------------------------------------------------------------------------------------------
+
+        #Finding if any of the user-input bins lie outside the range spanned by the NN distances
+        bin_mask = np.searchsorted(bins[i], [min_dist, max_dist])
+        if bin_mask[1]!=len(bins[i]):
+            if bins[i][bin_mask[1]] == max_dist:
+                bin_mask[1] += 1
+
+        #-------------------------------------------------------------------------------------------
+                
+        NNcdf = np.zeros(len(bins[i]))
+        
+        #Setting the value of the CDFs at scales smaller than the smallest NN distance to 0
+        NNcdf[:bin_mask[0]] = 0
+        
+        NNcdf[bin_mask[0]:bin_mask[1]] = cdfs[i](bins[i][bin_mask[0]:bin_mask[1]])
+        
+        #Setting the value of the CDFs at scales larger than the largest NN distance to 1
+        NNcdf[bin_mask[1]:] = 1
+        
+        data.append(NNcdf)
+        
+    return data
+
+####################################################################################################
+
+def create_query_3D(query_type, query_grid, BoxSize):
+    '''
+    Generates an array of query points; can be either randomly drawn from a uniform distribution defined over the box or put on a uniform grid.
+
+    Parameters
+    ----------
+    query_type : {'grid', 'random'}, str
+        the type of query points to be generated; should be 'grid' for query points defined on a uniform grid and 'random' for query points drawn from a uniform random distribution.
+    query_grid : int
+        the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
+    BoxSize : float
+        the size of the 3D box of the input density field, in Mpc/h.
+
+    Returns
+    -------
+    query_pos : numpy float array of shape ``(query_grid**3, 3)``
+        array of query point positions. For each query point in the array, the first, second and third entries are the x, y and z coordinates respectively, in Mpc/h.
+
+    Raises
+    ------
+    ValueError
+        if an unknown query type is provided.
+        
+    See Also
+    --------
+    kNN_ASMR.HelperFunctions.create_query_2DA : generates query points in 2D angular coordinates.
+    '''
+
+    if query_type == 'grid':
+
+        #Creating a grid of query points
+        x_ = np.linspace(0., BoxSize, query_grid)
+        y_ = np.linspace(0., BoxSize, query_grid)
+        z_ = np.linspace(0., BoxSize, query_grid)
+
+        x, y, z = np.array(np.meshgrid(x_, y_, z_, indexing='xy'))
+
+        query_pos = np.zeros((query_grid**3, 3))
+        query_pos[:, 0] = np.reshape(x, query_grid**3)
+        query_pos[:, 1] = np.reshape(y, query_grid**3)
+        query_pos[:, 2] = np.reshape(z, query_grid**3)
+
+    elif query_type == 'random':
+
+        #Creating a set of randomly distributed query points
+        query_pos = np.random.rand(query_grid**3, 3)*BoxSize
+
+    else:   
+        raise ValueError(f"Unknown query type: {query_type}; please provide a valid query type")
+    
+    return query_pos
+    
+####################################################################################################
+
+#----------------------------------------  END OF PROGRAM!  ----------------------------------------
+
+####################################################################################################
+
+
+#################################################################################################################
+
+#----------------------------------------  Function Definitions  ----------------------------------------
 
 def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=False,Verbose=False):
     
@@ -124,10 +322,10 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
-    dists, idx= xtree.query(QueryPos, k=max(kList), workers=-1)
-    del idx
-    gc.collect()
-    vol=dists[:,np.array(kList)-1]
+    dists, _= xtree.query(QueryPos, k=max(kList), workers=-1)
+    vol = dists[:, np.array(kList)-1]
+    
+    
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -155,7 +353,6 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     return kNN_results
 
 ####################################################################################################
-
 def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, TracerPos_B, Verbose=False):
     
     r'''
@@ -249,31 +446,31 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query,3),' \
         ' where n_query is the number of query points.')
     
-    if np.any(QueryPos[:, 0] <= 0 or QueryPos[:, 0] >= boxsize):
+    if np.any((QueryPos[:, 0] <= 0) | (QueryPos[:, 0] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any(QueryPos[:, 1] <= 0 or QueryPos[:, 1] >= boxsize):
+    if np.any((QueryPos[:, 1] <= 0) | (QueryPos[:, 1] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any(QueryPos[:, 2] <= 0 or QueryPos[:, 2] >= boxsize):
+    if np.any((QueryPos[:, 2] <= 0 ) | (QueryPos[:, 2] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < z < boxsize.')
 
-    if np.any(TracerPos_A[:, 0] <= 0 or TracerPos_A[:, 0] >= boxsize):
+    if np.any((TracerPos_A[:, 0] <= 0) | (TracerPos_A[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < x < boxsize.')
 
-    if np.any(TracerPos_A[:, 1]<= 0 or TracerPos_A[:, 1]>= boxsize):
+    if np.any((TracerPos_A[:, 1]<= 0) | (TracerPos_A[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < y < boxsize.')
 
-    if np.any(TracerPos_A[:, 2]<= 0 or TracerPos_A[:, 2]>= boxsize):
+    if np.any((TracerPos_A[:, 2]<= 0) | (TracerPos_A[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < z < boxsize.')
 
-    if np.any(TracerPos_B[:, 0] <= 0 or TracerPos_B[:, 0] >= boxsize):
+    if np.any((TracerPos_B[:, 0] <= 0) | (TracerPos_B[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < x < boxsize.')
 
-    if np.any(TracerPos_B[:, 1]<= 0 or TracerPos_B[:, 1]>= boxsize):
+    if np.any((TracerPos_B[:, 1]<= 0) | (TracerPos_B[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < y < boxsize.')
 
-    if np.any(TracerPos_B[:, 2]<= 0 or TracerPos_B[:, 2]>= boxsize):
+    if np.any((TracerPos_B[:, 2]<= 0) | (TracerPos_B[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < z < boxsize.')
 
     
@@ -316,8 +513,8 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
         print('\ncomputing the tracer NN distances ...')
     vol_A, _ = xtree_A.query(QueryPos, k=kMax_A)
     vol_B, _ = xtree_B.query(QueryPos, k=kMax_B)
-    req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
-    req_vol_B, _ = vol_B[:, np.array(kList_B)-1]
+    req_vol_A = vol_A[:, np.array(kList_A)-1]
+    req_vol_B = vol_B[:, np.array(kList_B)-1]
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -336,7 +533,7 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
-    joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
+    joint_vol = np.zeros((vol_A.shape[0], len(kA_kB_list)))
     for i, _ in enumerate(kA_kB_list):
         joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
     p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
@@ -435,7 +632,7 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     #-----------------------------------------------------------------------------------------------
 
     if Verbose: total_start_time = time.perf_counter()
-    keys=TracerPos_A_dict.keys()
+    keys=list(TracerPos_A_dict.keys())
 
     #-----------------------------------------------------------------------------------------------
         
@@ -450,33 +647,33 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query,3),' \
         ' where n_query is the number of query points.')
     
-    if np.any(QueryPos[:, 0] <= 0 or QueryPos[:, 0] >= boxsize):
+    if np.any((QueryPos[:, 0] <= 0) | (QueryPos[:, 0] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any(QueryPos[:, 1] <= 0 or QueryPos[:, 1] >= boxsize):
+    if np.any((QueryPos[:, 1] <= 0) | (QueryPos[:, 1] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any(QueryPos[:, 2] <= 0 or QueryPos[:, 2] >= boxsize):
+    if np.any((QueryPos[:, 2] <= 0) | (QueryPos[:, 2] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < z < boxsize.')
     for i in range(len(keys)):
-        if np.any(TracerPos_A_dict[keys[i]][:, 0] <= 0 or TracerPos_A_dict[i][:, 0] >= boxsize):
+        if np.any((TracerPos_A_dict[keys[i]][:, 0] <= 0) | (TracerPos_A_dict[keys[i]][:, 0] >= boxsize)):
             raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < x < boxsize.')
 
     for i in range(len(keys)):
-        if np.any(TracerPos_A_dict[keys[i]][:, 1]<= 0 or TracerPos_A_dict[keys[i]][:, 1]>= boxsize):
+        if np.any((TracerPos_A_dict[keys[i]][:, 1]<= 0) | (TracerPos_A_dict[keys[i]][:, 1]>= boxsize)):
             raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < y < boxsize.')
 
     for i in range(len(keys)):
-        if np.any(TracerPos_A_dict[keys[i]][:, 2]<= 0 or TracerPos_A_dict[keys[i]][:, 2]>= boxsize):
+        if np.any((TracerPos_A_dict[keys[i]][:, 2]<= 0) | (TracerPos_A_dict[keys[i]][:, 2]>= boxsize)):
             raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < z < boxsize.')
 
-    if np.any(TracerPos_B[:, 0] <= 0 or TracerPos_B[:, 0] >= boxsize):
+    if np.any((TracerPos_B[:, 0] <= 0) | (TracerPos_B[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < x < boxsize.')
 
-    if np.any(TracerPos_B[:, 1]<= 0 or TracerPos_B[:, 1]>= boxsize):
+    if np.any((TracerPos_B[:, 1]<= 0) | (TracerPos_B[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < y < boxsize.')
 
-    if np.any(TracerPos_B[:, 2]<= 0 or TracerPos_B[:, 2]>= boxsize):
+    if np.any((TracerPos_B[:, 2]<= 0) | (TracerPos_B[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < z < boxsize.')
 
     for i in range(len(keys)):
@@ -524,8 +721,8 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
             print('\ncomputing the tracer NN distances ...')
         vol_A, _ = xtree_A.query(QueryPos, k=kMax_A)
         vol_B, _ = xtree_B.query(QueryPos, k=kMax_B)
-        req_vol_A, _ = vol_A[:, np.array(kList_A)-1]
-        req_vol_B, _ = vol_B[:, np.array(kList_B)-1]
+        req_vol_A = vol_A[:, np.array(kList_A)-1]
+        req_vol_B = vol_B[:, np.array(kList_B)-1]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
         #-----------------------------------------------------------------------------------------------
@@ -544,7 +741,7 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
         if Verbose: 
             start_time = time.perf_counter()
             print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
-        joint_vol = np.zeros((vol_A.shape, len(kA_kB_list)))
+        joint_vol = np.zeros((vol_A.shape[0], len(kA_kB_list)))
         for i, _ in enumerate(kA_kB_list):
             joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
         p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
