@@ -228,6 +228,8 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     		
     Parameters
     ----------
+    boxsize:  float
+        The size of the cubic box in which the tracers and the continuous field are defined.
     kList : list of ints
         the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and 
         fourth-nearest neighbour distributions will be computed.
@@ -374,6 +376,8 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     		
     Parameters
     ----------
+    boxszie:  float
+        The size of the cubic box in which the tracers and the continuous field are defined.
     kA_kB_list : list of int tuples
         nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details)
     BinsRad : list of numpy float array
@@ -570,6 +574,8 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     		
     Parameters
     ----------
+    boxsize:  float
+        The size of the cubic box in which the tracers and the continuous field are defined.
     kA_kB_list : list of int tuples
         nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details)
     BinsRad : list of numpy float array
