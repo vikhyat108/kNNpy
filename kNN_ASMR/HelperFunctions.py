@@ -3,10 +3,8 @@
 #-------------------  These libraries are required for evaluating the functions  -------------------
 
 import numpy as np
-import scipy
 from scipy import interpolate
 import time
-import copy
 import pyfftw
 import warnings
 import smoothing_library as SL
