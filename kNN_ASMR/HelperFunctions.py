@@ -154,7 +154,7 @@ def create_query_3D(query_type, query_grid, BoxSize):
 
     #Validating inputs
 
-    if not BoxSize or np.isinf(BoxSize) or BoxSize<=0.0:
+    if np.isnan(BoxSize) or np.isinf(BoxSize) or BoxSize<=0.0:
         raise ValueError(f"Invalid box size: {BoxSize}; please provide a positive real number less than infinity!")
 
     #Creating the query points
