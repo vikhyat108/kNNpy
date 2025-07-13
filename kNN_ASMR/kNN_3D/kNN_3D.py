@@ -283,22 +283,22 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query, 3), ' \
         'where n_query is the number of query points.')
 
-    if np.any((QueryPos[:, 0] <= 0) | (QueryPos[:, 0] >= boxsize)):
+    if np.any((QueryPos[:, 0] < 0) | (QueryPos[:, 0] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any((QueryPos[:, 1] <= 0) | (QueryPos[:, 1] >= boxsize)):
+    if np.any((QueryPos[:, 1] < 0) | (QueryPos[:, 1] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any((QueryPos[:, 2] <= 0) | (QueryPos[:, 2] >= boxsize)):
+    if np.any((QueryPos[:, 2] < 0) | (QueryPos[:, 2] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < z < boxsize.')
 
-    if np.any((TracerPos[:, 0] <= 0) | (TracerPos[:, 0] >= boxsize)):
+    if np.any((TracerPos[:, 0] < 0) | (TracerPos[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any((TracerPos[:, 1]<= 0) | (TracerPos[:, 1]>= boxsize)):
+    if np.any((TracerPos[:, 1]< 0) | (TracerPos[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any((TracerPos[:, 2]<= 0) | (TracerPos[:, 2]>= boxsize)):
+    if np.any((TracerPos[:, 2]< 0) | (TracerPos[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 < z < boxsize.')
 
     if TracerPos.shape[1]!=3: 
@@ -446,31 +446,31 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query,3),' \
         ' where n_query is the number of query points.')
     
-    if np.any((QueryPos[:, 0] <= 0) | (QueryPos[:, 0] >= boxsize)):
+    if np.any((QueryPos[:, 0] < 0) | (QueryPos[:, 0] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any((QueryPos[:, 1] <= 0) | (QueryPos[:, 1] >= boxsize)):
+    if np.any((QueryPos[:, 1] < 0) | (QueryPos[:, 1] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any((QueryPos[:, 2] <= 0 ) | (QueryPos[:, 2] >= boxsize)):
+    if np.any((QueryPos[:, 2] < 0 ) | (QueryPos[:, 2] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < z < boxsize.')
 
-    if np.any((TracerPos_A[:, 0] <= 0) | (TracerPos_A[:, 0] >= boxsize)):
+    if np.any((TracerPos_A[:, 0] < 0) | (TracerPos_A[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < x < boxsize.')
 
-    if np.any((TracerPos_A[:, 1]<= 0) | (TracerPos_A[:, 1]>= boxsize)):
+    if np.any((TracerPos_A[:, 1]< 0) | (TracerPos_A[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < y < boxsize.')
 
-    if np.any((TracerPos_A[:, 2]<= 0) | (TracerPos_A[:, 2]>= boxsize)):
+    if np.any((TracerPos_A[:, 2]< 0) | (TracerPos_A[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < z < boxsize.')
 
-    if np.any((TracerPos_B[:, 0] <= 0) | (TracerPos_B[:, 0] >= boxsize)):
+    if np.any((TracerPos_B[:, 0] < 0) | (TracerPos_B[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < x < boxsize.')
 
-    if np.any((TracerPos_B[:, 1]<= 0) | (TracerPos_B[:, 1]>= boxsize)):
+    if np.any((TracerPos_B[:, 1]< 0) | (TracerPos_B[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < y < boxsize.')
 
-    if np.any((TracerPos_B[:, 2]<= 0) | (TracerPos_B[:, 2]>= boxsize)):
+    if np.any((TracerPos_B[:, 2]< 0) | (TracerPos_B[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < z < boxsize.')
 
     
@@ -647,33 +647,33 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
         raise ValueError('Incorrect spatial dimension for query points: array containing the query point positions must be of shape (n_query,3),' \
         ' where n_query is the number of query points.')
     
-    if np.any((QueryPos[:, 0] <= 0) | (QueryPos[:, 0] >= boxsize)):
+    if np.any((QueryPos[:, 0] < 0) | (QueryPos[:, 0] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < x < boxsize.')
 
-    if np.any((QueryPos[:, 1] <= 0) | (QueryPos[:, 1] >= boxsize)):
+    if np.any((QueryPos[:, 1] < 0) | (QueryPos[:, 1] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < y < boxsize.')
 
-    if np.any((QueryPos[:, 2] <= 0) | (QueryPos[:, 2] >= boxsize)):
+    if np.any((QueryPos[:, 2] < 0) | (QueryPos[:, 2] >= boxsize)):
         raise ValueError('Invalid query point position(s): please ensure 0 < z < boxsize.')
     for i in range(len(keys)):
-        if np.any((TracerPos_A_dict[keys[i]][:, 0] <= 0) | (TracerPos_A_dict[keys[i]][:, 0] >= boxsize)):
+        if np.any((TracerPos_A_dict[keys[i]][:, 0] < 0) | (TracerPos_A_dict[keys[i]][:, 0] >= boxsize)):
             raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < x < boxsize.')
 
     for i in range(len(keys)):
-        if np.any((TracerPos_A_dict[keys[i]][:, 1]<= 0) | (TracerPos_A_dict[keys[i]][:, 1]>= boxsize)):
+        if np.any((TracerPos_A_dict[keys[i]][:, 1]< 0) | (TracerPos_A_dict[keys[i]][:, 1]>= boxsize)):
             raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < y < boxsize.')
 
     for i in range(len(keys)):
-        if np.any((TracerPos_A_dict[keys[i]][:, 2]<= 0) | (TracerPos_A_dict[keys[i]][:, 2]>= boxsize)):
+        if np.any((TracerPos_A_dict[keys[i]][:, 2]< 0) | (TracerPos_A_dict[keys[i]][:, 2]>= boxsize)):
             raise ValueError('Invalid tracer point position(s) for the first set: please ensure 0 < z < boxsize.')
 
-    if np.any((TracerPos_B[:, 0] <= 0) | (TracerPos_B[:, 0] >= boxsize)):
+    if np.any((TracerPos_B[:, 0] < 0) | (TracerPos_B[:, 0] >= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < x < boxsize.')
 
-    if np.any((TracerPos_B[:, 1]<= 0) | (TracerPos_B[:, 1]>= boxsize)):
+    if np.any((TracerPos_B[:, 1]< 0) | (TracerPos_B[:, 1]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < y < boxsize.')
 
-    if np.any((TracerPos_B[:, 2]<= 0) | (TracerPos_B[:, 2]>= boxsize)):
+    if np.any((TracerPos_B[:, 2]< 0) | (TracerPos_B[:, 2]>= boxsize)):
         raise ValueError('Invalid tracer point position(s) for the second set: please ensure 0 < z < boxsize.')
 
     for i in range(len(keys)):
