@@ -668,6 +668,8 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
         raise ValueError("Tracer positions must be 3D (shape: n_tracer x 3).")
     if np.any((TracerPos <= 0) | (TracerPos > BoxSize)):
         raise ValueError("Tracer positions must be within the box [0, BoxSize).")
+    if np.any((QueryPos <= 0) | (QueryPos > BoxSize)):
+        raise ValueError("Tracer positions must be within the box [0, BoxSize).")
 
     if Verbose: print('\tdone.')
 
@@ -892,6 +894,8 @@ def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVect
 
     # Tracer positions must lie within [0, BoxSize)
     if np.any((TracerPosVector <= 0) | (TracerPosVector > BoxSize)):
+        raise ValueError("Tracer positions must be within the box [0, BoxSize).")
+    if np.any((QueryPos <= 0) | (QueryPos > BoxSize)):
         raise ValueError("Tracer positions must be within the box [0, BoxSize).")
 
     if Verbose:
