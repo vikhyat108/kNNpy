@@ -14,7 +14,7 @@ import copy
 
 ####################################################################################################
 
-def create_query_2DA(NSIDE_query, mask, tolerance):
+def create_query_2DA(NSIDE_query, mask, tolerance, Verbose=False):
     r'''
     Computes the usable query points for the given mask (ie., query points at least a user-defined 
     threshold distance away from the mask edge) and returns the same, along with a HEALPix 
@@ -33,6 +33,8 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
     tolerance : float
         the minimum angular distance (in radians) a query point needs to be away from the mask edge
         to be considered usable.
+    Verbose : bool, optional
+        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
     Returns
     -------
@@ -68,6 +70,10 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
 
     #Check all inputs are consistent with the function requirement
 
+    if Verbose: 
+        total_start = time.perf_counter()
+        print('\nValidating inputs...')
+
     #Check if 'tolerance' is a valid angle
     if tolerance<0 or tolerance>2*np.pi:
         raise ValueError('Invalid threshold distance: please ensure 0 <= tolerance <= 2*pi.')
@@ -83,10 +89,14 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
     if NSIDE_mask!=NSIDE_query:
         raise ValueError(f'NSIDE of the query grid ({NSIDE_query}) does not match NSIDE of \
         the mask ({NSIDE_mask}).')
+    
+    if Verbose: print('\tdone.')
 
     #-----------------------------------------------------------------------------------------------
 
     #Query points are defined on a Healpix grid, points in or close to the mask are removed
+
+    if Verbose: print('\nDefining a query mask...')
 
     #Getting number of pixels from the NSIDE for the query points
     NPIX = hp.nside2npix(NSIDE_query)    
@@ -101,10 +111,16 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
     #Check if non-trivial observational mask is present
     if np.any(mask == hp.UNSEEN):
 
+        if Verbose: 
+            print('\tNon-trivial observational mask detected. Now removing the query points outside the observational footprint and the query points too close to the mask boundary...')
+
         pixels = np.arange(NPIX)
         qpos_arr = np.array(hp.pix2vec(NSIDE_query, pixels))
         #Looping over the initial query pixels
         for pix_ind, qpos in enumerate(qpos_arr.T):
+            perc_progress = int((pix_ind+1)*100/len(qpos_arr.T))
+            perc_progress_2 = int((pix_ind+2)*100/len(qpos_arr.T))
+            if Verbose and perc_progress%10==0 and perc_progress!=perc_progress_2: print('\t{}% done'.format(perc_progress))
             sel_pix_close = hp.query_disc(NSIDE_query, qpos, tolerance)
             #1 means that the query point is close to the mask edge
             if np.any(mask[sel_pix_close]==hp.UNSEEN): query_mask[pix_ind] = 1
@@ -117,6 +133,8 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
 
     #Getting the query positions
 
+    if Verbose: print('\nGetting the query positions...')
+
     query_pixels = np.arange(NPIX)[query_mask==2]
     
     #Getting the latitudes and longitudes in degrees
@@ -125,6 +143,10 @@ def create_query_2DA(NSIDE_query, mask, tolerance):
     
     #converting to radians
     QueryPositions = np.deg2rad(QueryPositions_Deg)
+
+    if Verbose:
+        print('\tdone.')
+        print('\nTotal time taken: {:.2e} s'.format(time.perf_counter()-total_start))
 
     return query_mask, QueryPositions
 
