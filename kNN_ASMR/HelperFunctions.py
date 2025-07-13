@@ -133,7 +133,7 @@ def create_query_3D(query_type, query_grid, BoxSize):
     query_grid : int
         the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
     BoxSize : float
-        the size of the 3D box of the input density field, in Mpc/h.
+        the size of the 3D box of the input density field, in Mpc/h. Must be a positive real number, and must not be ``np.inf`` or ``np.nan``.
 
     Returns
     -------
@@ -143,6 +143,8 @@ def create_query_3D(query_type, query_grid, BoxSize):
     Raises
     ------
     ValueError
+        if `BoxSize` is not a positive real number less than infinity.
+    ValueError
         if an unknown query type is provided.
         
     See Also
@@ -150,12 +152,19 @@ def create_query_3D(query_type, query_grid, BoxSize):
     kNN_ASMR.HelperFunctions.create_query_2DA : generates query points in 2D angular coordinates.
     '''
 
+    #Validating inputs
+
+    if not BoxSize or np.isinf(BoxSize) or BoxSize<=0.0:
+        raise ValueError(f"Invalid box size: {BoxSize}; please provide a positive real number less than infinity!")
+
+    #Creating the query points
+
     if query_type == 'grid':
 
         #Creating a grid of query points
-        x_ = np.linspace(0., BoxSize, query_grid)
-        y_ = np.linspace(0., BoxSize, query_grid)
-        z_ = np.linspace(0., BoxSize, query_grid)
+        x_ = np.linspace(0., BoxSize, query_grid, endpoint=False)
+        y_ = np.linspace(0., BoxSize, query_grid, endpoint=False)
+        z_ = np.linspace(0., BoxSize, query_grid, endpoint=False)
 
         x, y, z = np.array(np.meshgrid(x_, y_, z_, indexing='xy'))
 
