@@ -4,6 +4,14 @@ import sys
 import scipy.spatial
 import os
 import gc
+import scipy
+from scipy import interpolate
+import copy
+import pyfftw
+import warnings
+import smoothing_library as SL
+import MAS_library as MASL
+
 
 # Ensure module path is correctly added for relative imports
 module_path = os.path.abspath(os.path.join(''))
@@ -19,35 +27,6 @@ from kNN_ASMR.HelperFunctions import smoothing_3D
 from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_3D
 
 #################################################################################################################
-
-#----------------------------------------  Function Definitions  ----------------------------------------
-import numpy as np
-import time
-import sys
-import scipy.spatial
-import os
-import gc
-
-# Ensure module path is correctly added for relative imports
-module_path = os.path.abspath(os.path.join(''))
-if module_path not in sys.path:
-    sys.path.append(module_path)
-
-####################################################################################################
-
-#-------------------  These libraries are required for evaluating the functions  -------------------
-
-import numpy as np
-import scipy
-from scipy import interpolate
-import time
-import copy
-import pyfftw
-import warnings
-import smoothing_library as SL
-import MAS_library as MASL
-
-####################################################################################################
 
 #--------------------------------------  Function Definitions  -------------------------------------
 
@@ -91,9 +70,9 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     ValueError
         if the given query points are not on a three-dimensional grid.
     ValueError
-        if x,y, or z coordinate of any of the query points is not in ``(0, boxsize)``.
+        if x,y, or z coordinate of any of the query points is not in ``[0, boxsize)``.
     ValueError
-        if x,y, or z coordinate of any of the tracer points is not in ``(0, boxsize)``..
+        if x,y, or z coordinate of any of the tracer points is not in ``[0, boxsize)``..
     ValueError
         if the given tracer points are not on a three-dimensional grid.
 
@@ -246,9 +225,9 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     ValueError
         if the given query points are not on a three-dimensional grid.
     ValueError
-        if x,y, or z coordinates of any of the query points is not in ``(0, boxsize)``.
+        if x,y, or z coordinates of any of the query points is not in ``[0, boxsize)``.
     ValueError
-        if x,y, or z coordinates of any of the tracer points is not in ``(0, boxsize)``.
+        if x,y, or z coordinates of any of the tracer points is not in ``[0, boxsize)``.
     ValueError
         if any of the given tracer points are not on a three-dimensional grid.
 
@@ -447,9 +426,9 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     ValueError
         if the given query points are not on a three-dimensional grid.
     ValueError
-        if x,y, or z coordinates of any of the query points is not in ``(0, boxsize)``.
+        if x,y, or z coordinates of any of the query points is not in ``[0, boxsize)``.
     ValueError
-        if x,y, or z coordinates of any of the tracer points is not in ``(0, boxsize)``.
+        if x,y, or z coordinates of any of the tracer points is not in `'[0, boxsize)``.
     ValueError
         if any of the given tracer points are not on a three-dimensional grid.
 
