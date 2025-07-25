@@ -409,7 +409,7 @@
 </span><span id="L-313"><a href="#L-313"><span class="linenos">313</span></a>
 </span><span id="L-314"><a href="#L-314"><span class="linenos">314</span></a><span class="c1">####################################################################################################</span>
 </span><span id="L-315"><a href="#L-315"><span class="linenos">315</span></a>
-</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_smoothed_field_dict_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">kmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-316"><a href="#L-316"><span class="linenos">316</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_smoothed_field_dict_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="L-317"><a href="#L-317"><span class="linenos">317</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-318"><a href="#L-318"><span class="linenos">318</span></a><span class="sd">    Creates a dictionary containing the continuous field smoothed at various radial distance scales.</span>
 </span><span id="L-319"><a href="#L-319"><span class="linenos">319</span></a>
@@ -418,197 +418,202 @@
 </span><span id="L-322"><a href="#L-322"><span class="linenos">322</span></a><span class="sd">    field : numpy float array</span>
 </span><span id="L-323"><a href="#L-323"><span class="linenos">323</span></a><span class="sd">        the 3D array of the continuous field that needs to be smoothed. </span>
 </span><span id="L-324"><a href="#L-324"><span class="linenos">324</span></a><span class="sd">    Filter : string</span>
-</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="sd">        the filter to be used for smoothing. &#39;Top-Hat&#39;, &#39;Gaussian&#39;, &#39;Shell&#39; are for real space, and &#39;Top-Hat-k&#39; is a top-hat filter in k-space.</span>
+</span><span id="L-325"><a href="#L-325"><span class="linenos">325</span></a><span class="sd">        the filter to be used for smoothing. Valid filter types are: &#39;Top-Hat&#39;, &#39;Gaussian&#39;, &#39;Shell&#39;. </span>
 </span><span id="L-326"><a href="#L-326"><span class="linenos">326</span></a><span class="sd">    grid : int</span>
 </span><span id="L-327"><a href="#L-327"><span class="linenos">327</span></a><span class="sd">        the grid size of the input density field, which should be field.shape[0] assuming a cubical box.</span>
 </span><span id="L-328"><a href="#L-328"><span class="linenos">328</span></a><span class="sd">    BoxSize : float</span>
 </span><span id="L-329"><a href="#L-329"><span class="linenos">329</span></a><span class="sd">        the size of the 3D box of the input density field, in Mpc/h.</span>
 </span><span id="L-330"><a href="#L-330"><span class="linenos">330</span></a><span class="sd">    bins : list of numpy float array</span>
 </span><span id="L-331"><a href="#L-331"><span class="linenos">331</span></a><span class="sd">        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{th}$ nearest neighbour.</span>
-</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    kmin : float, optional</span>
-</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">        the minimum value of the wavenumber. Only use this parameter when &#39;Top-Hat-k&#39; filter is used.</span>
-</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">    kmax : float, optional</span>
-</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a><span class="sd">        the maximum value of the wavenumber. Only use this parameter when &#39;Top-Hat-k&#39; filter is used.</span>
-</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a><span class="sd">    thickness : float, optional</span>
-</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="sd">        the thickness of the shell used for smoothing. Only use this parameter when &#39;Shell&#39; filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.</span>
-</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a><span class="sd">    Verbose : bool, optional</span>
-</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a><span class="sd">        if set to True, the time taken to complete each step of the calculation will be printed, by default False.</span>
-</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a>
-</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a><span class="sd">    Returns</span>
-</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a><span class="sd">    -------</span>
-</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="sd">    SmoothedFieldDict : dict</span>
-</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict[&#39;50.0&#39;]`  represents the continuous map smoothed at a scale of 50 Mpc/h.</span>
-</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a>
-</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">    Raises</span>
-</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">    ------</span>
+</span><span id="L-332"><a href="#L-332"><span class="linenos">332</span></a><span class="sd">    thickness : float, optional</span>
+</span><span id="L-333"><a href="#L-333"><span class="linenos">333</span></a><span class="sd">        the thickness of the shell used for smoothing. Only use this parameter when &#39;Shell&#39; filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.</span>
+</span><span id="L-334"><a href="#L-334"><span class="linenos">334</span></a><span class="sd">    Verbose : bool, optional</span>
+</span><span id="L-335"><a href="#L-335"><span class="linenos">335</span></a><span class="sd">        if set to True, the time taken to complete each step of the calculation will be printed, by default False.</span>
+</span><span id="L-336"><a href="#L-336"><span class="linenos">336</span></a>
+</span><span id="L-337"><a href="#L-337"><span class="linenos">337</span></a><span class="sd">    Returns</span>
+</span><span id="L-338"><a href="#L-338"><span class="linenos">338</span></a><span class="sd">    -------</span>
+</span><span id="L-339"><a href="#L-339"><span class="linenos">339</span></a><span class="sd">    SmoothedFieldDict : dict</span>
+</span><span id="L-340"><a href="#L-340"><span class="linenos">340</span></a><span class="sd">        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict[&#39;50.0&#39;]`  represents the continuous map smoothed at a scale of 50 Mpc/h.</span>
+</span><span id="L-341"><a href="#L-341"><span class="linenos">341</span></a>
+</span><span id="L-342"><a href="#L-342"><span class="linenos">342</span></a><span class="sd">    Raises</span>
+</span><span id="L-343"><a href="#L-343"><span class="linenos">343</span></a><span class="sd">    ------</span>
+</span><span id="L-344"><a href="#L-344"><span class="linenos">344</span></a><span class="sd">    ValueError</span>
+</span><span id="L-345"><a href="#L-345"><span class="linenos">345</span></a><span class="sd">        If required parameters (like bins or thickness) are missing for the specified filter type.</span>
+</span><span id="L-346"><a href="#L-346"><span class="linenos">346</span></a><span class="sd">    ValueError</span>
+</span><span id="L-347"><a href="#L-347"><span class="linenos">347</span></a><span class="sd">        If the input field dimensions do not form a cubical box.</span>
 </span><span id="L-348"><a href="#L-348"><span class="linenos">348</span></a><span class="sd">    ValueError</span>
-</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="sd">        If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.</span>
+</span><span id="L-349"><a href="#L-349"><span class="linenos">349</span></a><span class="sd">        If the grid size does not match the field dimensions.</span>
 </span><span id="L-350"><a href="#L-350"><span class="linenos">350</span></a><span class="sd">    ValueError</span>
-</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a><span class="sd">        If the input field dimensions do not form a cubical box.</span>
-</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a><span class="sd">    ValueError</span>
-</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="sd">        If the grid size does not match the field dimensions.</span>
-</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a><span class="sd">    ValueError</span>
-</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="sd">        If an unknown filter name is provided.</span>
-</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a>
-</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a><span class="sd">    Notes</span>
-</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a><span class="sd">    -----</span>
-</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a><span class="sd">    - For real-space filters (&#39;Top-Hat&#39;, &#39;Gaussian&#39;, &#39;Shell&#39;), the radial scale R must be specified.</span>
-</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a><span class="sd">    - For the &#39;Shell&#39; filter, thickness must also be specified.</span>
-</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a><span class="sd">    - For the &#39;Top-Hat-k&#39; filter in Fourier space, kmin and kmax must be specified, while R and thickness are ignored.</span>
-</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a><span class="sd">    - Any unused parameters will trigger warnings but not stop execution.</span>
-</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>    
-</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a>    
-</span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> 
-</span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>        <span class="n">total_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Smoothing the density field over the radial distance scales...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a>
-</span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="L-372"><a href="#L-372"><span class="linenos">372</span></a>
-</span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a>    <span class="c1">#Initializing the dictionary</span>
-</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a>    <span class="n">SmoothedFieldDict</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="L-351"><a href="#L-351"><span class="linenos">351</span></a><span class="sd">        If an unknown filter name is provided.</span>
+</span><span id="L-352"><a href="#L-352"><span class="linenos">352</span></a>
+</span><span id="L-353"><a href="#L-353"><span class="linenos">353</span></a><span class="sd">    Notes</span>
+</span><span id="L-354"><a href="#L-354"><span class="linenos">354</span></a><span class="sd">    -----</span>
+</span><span id="L-355"><a href="#L-355"><span class="linenos">355</span></a><span class="sd">    - This function only works for the real space filters, so &#39;Top-Hat-k&#39; is not a valid filter for this function.</span>
+</span><span id="L-356"><a href="#L-356"><span class="linenos">356</span></a><span class="sd">    - For the &#39;Shell&#39; filter, thickness must be specified.</span>
+</span><span id="L-357"><a href="#L-357"><span class="linenos">357</span></a><span class="sd">    - Any unused parameters will trigger warnings but not stop execution.</span>
+</span><span id="L-358"><a href="#L-358"><span class="linenos">358</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-359"><a href="#L-359"><span class="linenos">359</span></a>    
+</span><span id="L-360"><a href="#L-360"><span class="linenos">360</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="L-361"><a href="#L-361"><span class="linenos">361</span></a>    
+</span><span id="L-362"><a href="#L-362"><span class="linenos">362</span></a>    <span class="c1"># This function is only for smoothing in real space</span>
+</span><span id="L-363"><a href="#L-363"><span class="linenos">363</span></a>    
+</span><span id="L-364"><a href="#L-364"><span class="linenos">364</span></a>    <span class="k">if</span> <span class="n">Filter</span> <span class="o">==</span> <span class="s1">&#39;Top-Hat-k&#39;</span><span class="p">:</span>
+</span><span id="L-365"><a href="#L-365"><span class="linenos">365</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown filter: </span><span class="si">{</span><span class="n">Filter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-366"><a href="#L-366"><span class="linenos">366</span></a>        
+</span><span id="L-367"><a href="#L-367"><span class="linenos">367</span></a>    <span class="n">kmin</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-368"><a href="#L-368"><span class="linenos">368</span></a>    <span class="n">kmax</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="L-369"><a href="#L-369"><span class="linenos">369</span></a>    
+</span><span id="L-370"><a href="#L-370"><span class="linenos">370</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="L-371"><a href="#L-371"><span class="linenos">371</span></a>    
+</span><span id="L-372"><a href="#L-372"><span class="linenos">372</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> 
+</span><span id="L-373"><a href="#L-373"><span class="linenos">373</span></a>        <span class="n">total_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="L-374"><a href="#L-374"><span class="linenos">374</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Smoothing the density field over the radial distance scales...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 </span><span id="L-375"><a href="#L-375"><span class="linenos">375</span></a>
 </span><span id="L-376"><a href="#L-376"><span class="linenos">376</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a>    
-</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>    <span class="c1">#Looping over the nearest neighbour indices as inferred from the length of &#39;bins&#39;</span>
-</span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)):</span>
+</span><span id="L-377"><a href="#L-377"><span class="linenos">377</span></a>
+</span><span id="L-378"><a href="#L-378"><span class="linenos">378</span></a>    <span class="c1">#Initializing the dictionary</span>
+</span><span id="L-379"><a href="#L-379"><span class="linenos">379</span></a>    <span class="n">SmoothedFieldDict</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="L-380"><a href="#L-380"><span class="linenos">380</span></a>
-</span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a>        
-</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a>        <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-</span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a>
-</span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>        
-</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">R</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
-</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>            <span class="n">SmoothedFieldDict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">R</span><span class="p">)]</span> <span class="o">=</span> \
-</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>            <span class="n">smoothing_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">kmin</span><span class="p">,</span> <span class="n">kmax</span><span class="p">,</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">Verbose</span><span class="p">)</span>
-</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>
-</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>    
-</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total time taken for all scales: </span><span class="si">{:.2e}</span><span class="s1"> s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">total_start</span><span class="p">))</span>
-</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>
-</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>    <span class="k">return</span> <span class="n">SmoothedFieldDict</span>
-</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>
-</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a><span class="c1">####################################################################################################</span>
-</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>
-</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a><span class="k">def</span><span class="w"> </span><span class="nf">CIC_3D_Interp</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">):</span>
-</span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a><span class="sd">    Interpolates a 3D field onto particle positions using Cloud-In-Cell (CIC) interpolation.</span>
-</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a>
-</span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a><span class="sd">    Parameters</span>
-</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a><span class="sd">    ----------</span>
-</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a><span class="sd">    field : numpy.ndarray of shape ``(Ng, Ng, Ng)``</span>
-</span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a><span class="sd">        The 3D scalar field defined on a cubic grid with resolution &#39;Ng^3&#39;.</span>
+</span><span id="L-381"><a href="#L-381"><span class="linenos">381</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="L-382"><a href="#L-382"><span class="linenos">382</span></a>    
+</span><span id="L-383"><a href="#L-383"><span class="linenos">383</span></a>    <span class="c1">#Looping over the nearest neighbour indices as inferred from the length of &#39;bins&#39;</span>
+</span><span id="L-384"><a href="#L-384"><span class="linenos">384</span></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)):</span>
+</span><span id="L-385"><a href="#L-385"><span class="linenos">385</span></a>
+</span><span id="L-386"><a href="#L-386"><span class="linenos">386</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="L-387"><a href="#L-387"><span class="linenos">387</span></a>        
+</span><span id="L-388"><a href="#L-388"><span class="linenos">388</span></a>        <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="L-389"><a href="#L-389"><span class="linenos">389</span></a>
+</span><span id="L-390"><a href="#L-390"><span class="linenos">390</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="L-391"><a href="#L-391"><span class="linenos">391</span></a>        
+</span><span id="L-392"><a href="#L-392"><span class="linenos">392</span></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">R</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+</span><span id="L-393"><a href="#L-393"><span class="linenos">393</span></a>            <span class="n">SmoothedFieldDict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">R</span><span class="p">)]</span> <span class="o">=</span> \
+</span><span id="L-394"><a href="#L-394"><span class="linenos">394</span></a>            <span class="n">smoothing_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">kmin</span><span class="p">,</span> <span class="n">kmax</span><span class="p">,</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">Verbose</span><span class="p">)</span>
+</span><span id="L-395"><a href="#L-395"><span class="linenos">395</span></a>
+</span><span id="L-396"><a href="#L-396"><span class="linenos">396</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="L-397"><a href="#L-397"><span class="linenos">397</span></a>    
+</span><span id="L-398"><a href="#L-398"><span class="linenos">398</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total time taken for all scales: </span><span class="si">{:.2e}</span><span class="s1"> s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">total_start</span><span class="p">))</span>
+</span><span id="L-399"><a href="#L-399"><span class="linenos">399</span></a>
+</span><span id="L-400"><a href="#L-400"><span class="linenos">400</span></a>    <span class="k">return</span> <span class="n">SmoothedFieldDict</span>
+</span><span id="L-401"><a href="#L-401"><span class="linenos">401</span></a>
+</span><span id="L-402"><a href="#L-402"><span class="linenos">402</span></a><span class="c1">####################################################################################################</span>
+</span><span id="L-403"><a href="#L-403"><span class="linenos">403</span></a>
+</span><span id="L-404"><a href="#L-404"><span class="linenos">404</span></a><span class="k">def</span><span class="w"> </span><span class="nf">CIC_3D_Interp</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">):</span>
+</span><span id="L-405"><a href="#L-405"><span class="linenos">405</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-406"><a href="#L-406"><span class="linenos">406</span></a><span class="sd">    Interpolates a 3D field onto particle positions using Cloud-In-Cell (CIC) interpolation.</span>
 </span><span id="L-407"><a href="#L-407"><span class="linenos">407</span></a>
-</span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a><span class="sd">    pos : numpy.ndarray of shape ``(Np, 3)``</span>
-</span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a><span class="sd">        The positions of &#39;Np&#39; particles. The columns represent x, y, and z coordinates. Units in Mpc/h</span>
-</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a><span class="sd">    </span>
-</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a><span class="sd">    Boxsize: float</span>
-</span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a><span class="sd">            The side length of the cubic volume in the same units as `pos`.</span>
-</span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a><span class="sd">    Returns</span>
-</span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a><span class="sd">    -------</span>
-</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a><span class="sd">    fieldI : numpy.ndarray of shape ``(Np,)``</span>
-</span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a><span class="sd">        The interpolated field values at the given particle positions.</span>
-</span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a>    
-</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="L-420"><a href="#L-420"><span class="linenos">420</span></a>
-</span><span id="L-421"><a href="#L-421"><span class="linenos">421</span></a>    <span class="c1"># define the array containing the value of the density field at positions pos</span>
-</span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a>    <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="L-423"><a href="#L-423"><span class="linenos">423</span></a>
+</span><span id="L-408"><a href="#L-408"><span class="linenos">408</span></a><span class="sd">    Parameters</span>
+</span><span id="L-409"><a href="#L-409"><span class="linenos">409</span></a><span class="sd">    ----------</span>
+</span><span id="L-410"><a href="#L-410"><span class="linenos">410</span></a><span class="sd">    field : numpy.ndarray of shape ``(Ng, Ng, Ng)``</span>
+</span><span id="L-411"><a href="#L-411"><span class="linenos">411</span></a><span class="sd">        The 3D scalar field defined on a cubic grid with resolution &#39;Ng^3&#39;.</span>
+</span><span id="L-412"><a href="#L-412"><span class="linenos">412</span></a>
+</span><span id="L-413"><a href="#L-413"><span class="linenos">413</span></a><span class="sd">    pos : numpy.ndarray of shape ``(Np, 3)``</span>
+</span><span id="L-414"><a href="#L-414"><span class="linenos">414</span></a><span class="sd">        The positions of &#39;Np&#39; particles. The columns represent x, y, and z coordinates. Units in Mpc/h</span>
+</span><span id="L-415"><a href="#L-415"><span class="linenos">415</span></a><span class="sd">    </span>
+</span><span id="L-416"><a href="#L-416"><span class="linenos">416</span></a><span class="sd">    Boxsize: float</span>
+</span><span id="L-417"><a href="#L-417"><span class="linenos">417</span></a><span class="sd">            The side length of the cubic volume in the same units as `pos`.</span>
+</span><span id="L-418"><a href="#L-418"><span class="linenos">418</span></a><span class="sd">    Returns</span>
+</span><span id="L-419"><a href="#L-419"><span class="linenos">419</span></a><span class="sd">    -------</span>
+</span><span id="L-420"><a href="#L-420"><span class="linenos">420</span></a><span class="sd">    fieldI : numpy.ndarray of shape ``(Np,)``</span>
+</span><span id="L-421"><a href="#L-421"><span class="linenos">421</span></a><span class="sd">        The interpolated field values at the given particle positions.</span>
+</span><span id="L-422"><a href="#L-422"><span class="linenos">422</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-423"><a href="#L-423"><span class="linenos">423</span></a>    
 </span><span id="L-424"><a href="#L-424"><span class="linenos">424</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
 </span><span id="L-425"><a href="#L-425"><span class="linenos">425</span></a>
-</span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a>    <span class="c1"># find the value of the density field at the positions pos</span>
-</span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a>    <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="L-426"><a href="#L-426"><span class="linenos">426</span></a>    <span class="c1"># define the array containing the value of the density field at positions pos</span>
+</span><span id="L-427"><a href="#L-427"><span class="linenos">427</span></a>    <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 </span><span id="L-428"><a href="#L-428"><span class="linenos">428</span></a>
 </span><span id="L-429"><a href="#L-429"><span class="linenos">429</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
 </span><span id="L-430"><a href="#L-430"><span class="linenos">430</span></a>
-</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>    <span class="k">return</span> <span class="n">density_interpolated</span>
-</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>
-</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a><span class="c1">####################################################################################################</span>
-</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>
-</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a><span class="k">def</span><span class="w"> </span><span class="nf">kNN_excess_cross_corr</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">,</span> <span class="n">auto_cdf_list_2</span><span class="p">,</span> <span class="n">joint_cdf_list</span><span class="p">,</span> <span class="n">k1_k2_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a><span class="sd">    Computes the excess spatial cross-correlation (Banerjee &amp; Abel 2023)[^1] between two tracers (discrete or continuous) from their joint kNN distributions (`joint_cdf_list`) and their respective kNN-CDFs (`auto_cdf_list_1`, `auto_cdf_list_2`).</span>
-</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a>
-</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a><span class="sd">    Parameters</span>
-</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a><span class="sd">    ----------</span>
-</span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a><span class="sd">    auto_cdf_list_1 : list of numpy float array</span>
-</span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a><span class="sd">        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_1^i$NN-CDF if the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
-</span><span id="L-443"><a href="#L-443"><span class="linenos">443</span></a><span class="sd">    auto_cdf_list_2 : list of numpy float array</span>
-</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a><span class="sd">        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_2^i$NN-CDF if where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
-</span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a><span class="sd">    joint_cdf_list : list of numpy float array</span>
-</span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a><span class="sd">        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
-</span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a><span class="sd">        </span>
-</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a><span class="sd">    k1_k2_list : list of int tuples</span>
-</span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a><span class="sd">        describes the kind of cross-correlations being computed (see notes for more details), by default `None`. Should be not None only if dealing with tracer-tracer cross-correlations</span>
-</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a>
-</span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a><span class="sd">    Returns</span>
-</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a><span class="sd">    -------</span>
-</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="sd">    psi_list : list of numpy float array</span>
-</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a><span class="sd">        excess spatial cross-correlation between the two tracer sets.</span>
+</span><span id="L-431"><a href="#L-431"><span class="linenos">431</span></a>    <span class="c1"># find the value of the density field at the positions pos</span>
+</span><span id="L-432"><a href="#L-432"><span class="linenos">432</span></a>    <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="L-433"><a href="#L-433"><span class="linenos">433</span></a>
+</span><span id="L-434"><a href="#L-434"><span class="linenos">434</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="L-435"><a href="#L-435"><span class="linenos">435</span></a>
+</span><span id="L-436"><a href="#L-436"><span class="linenos">436</span></a>    <span class="k">return</span> <span class="n">density_interpolated</span>
+</span><span id="L-437"><a href="#L-437"><span class="linenos">437</span></a>
+</span><span id="L-438"><a href="#L-438"><span class="linenos">438</span></a><span class="c1">####################################################################################################</span>
+</span><span id="L-439"><a href="#L-439"><span class="linenos">439</span></a>
+</span><span id="L-440"><a href="#L-440"><span class="linenos">440</span></a><span class="k">def</span><span class="w"> </span><span class="nf">kNN_excess_cross_corr</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">,</span> <span class="n">auto_cdf_list_2</span><span class="p">,</span> <span class="n">joint_cdf_list</span><span class="p">,</span> <span class="n">k1_k2_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="L-441"><a href="#L-441"><span class="linenos">441</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="L-442"><a href="#L-442"><span class="linenos">442</span></a><span class="sd">    Computes the excess spatial cross-correlation (Banerjee &amp; Abel 2023)[^1] between two tracers (discrete or continuous) from their joint kNN distributions (`joint_cdf_list`) and their respective kNN-CDFs (`auto_cdf_list_1`, `auto_cdf_list_2`).</span>
+</span><span id="L-443"><a href="#L-443"><span class="linenos">443</span></a>
+</span><span id="L-444"><a href="#L-444"><span class="linenos">444</span></a><span class="sd">    Parameters</span>
+</span><span id="L-445"><a href="#L-445"><span class="linenos">445</span></a><span class="sd">    ----------</span>
+</span><span id="L-446"><a href="#L-446"><span class="linenos">446</span></a><span class="sd">    auto_cdf_list_1 : list of numpy float array</span>
+</span><span id="L-447"><a href="#L-447"><span class="linenos">447</span></a><span class="sd">        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_1^i$NN-CDF if the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
+</span><span id="L-448"><a href="#L-448"><span class="linenos">448</span></a><span class="sd">    auto_cdf_list_2 : list of numpy float array</span>
+</span><span id="L-449"><a href="#L-449"><span class="linenos">449</span></a><span class="sd">        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_2^i$NN-CDF if where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
+</span><span id="L-450"><a href="#L-450"><span class="linenos">450</span></a><span class="sd">    joint_cdf_list : list of numpy float array</span>
+</span><span id="L-451"><a href="#L-451"><span class="linenos">451</span></a><span class="sd">        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
+</span><span id="L-452"><a href="#L-452"><span class="linenos">452</span></a><span class="sd">        </span>
+</span><span id="L-453"><a href="#L-453"><span class="linenos">453</span></a><span class="sd">    k1_k2_list : list of int tuples</span>
+</span><span id="L-454"><a href="#L-454"><span class="linenos">454</span></a><span class="sd">        describes the kind of cross-correlations being computed (see notes for more details), by default `None`. Should be not None only if dealing with tracer-tracer cross-correlations</span>
 </span><span id="L-455"><a href="#L-455"><span class="linenos">455</span></a>
-</span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a><span class="sd">    Raises</span>
-</span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a><span class="sd">    ------</span>
-</span><span id="L-458"><a href="#L-458"><span class="linenos">458</span></a><span class="sd">    ValueError</span>
-</span><span id="L-459"><a href="#L-459"><span class="linenos">459</span></a><span class="sd">        if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`</span>
-</span><span id="L-460"><a href="#L-460"><span class="linenos">460</span></a><span class="sd">    ValueError</span>
-</span><span id="L-461"><a href="#L-461"><span class="linenos">461</span></a><span class="sd">        if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`</span>
-</span><span id="L-462"><a href="#L-462"><span class="linenos">462</span></a>
-</span><span id="L-463"><a href="#L-463"><span class="linenos">463</span></a><span class="sd">    Notes</span>
-</span><span id="L-464"><a href="#L-464"><span class="linenos">464</span></a><span class="sd">    -----</span>
-</span><span id="L-465"><a href="#L-465"><span class="linenos">465</span></a><span class="sd">    The parameter `k1_k2_list` describes the kind of cross-correlations being computed. It should be set to `None` for every scenario other than tracer-tracer cross-correlation, in which case it should provide the combinations of NN indices for the two tracers sets being cross-correlated. </span>
-</span><span id="L-466"><a href="#L-466"><span class="linenos">466</span></a><span class="sd">    </span>
-</span><span id="L-467"><a href="#L-467"><span class="linenos">467</span></a><span class="sd">    For example, if you wish to compute the excess cross correlation for the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set</span>
-</span><span id="L-468"><a href="#L-468"><span class="linenos">468</span></a><span class="sd">            </span>
-</span><span id="L-469"><a href="#L-469"><span class="linenos">469</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2), (2,1)]</span>
-</span><span id="L-470"><a href="#L-470"><span class="linenos">470</span></a>
-</span><span id="L-471"><a href="#L-471"><span class="linenos">471</span></a><span class="sd">    Note that the inputs must be self-consistent, which means the following must be ``True``</span>
-</span><span id="L-472"><a href="#L-472"><span class="linenos">472</span></a>
-</span><span id="L-473"><a href="#L-473"><span class="linenos">473</span></a><span class="sd">        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2) and len(joint_cdf_list)==len(k1_k2_list)</span>
-</span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a><span class="sd">        </span>
-</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a><span class="sd">    For example, if</span>
-</span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a>
-</span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2)]</span>
-</span><span id="L-478"><a href="#L-478"><span class="linenos">478</span></a>
-</span><span id="L-479"><a href="#L-479"><span class="linenos">479</span></a><span class="sd">    then</span>
-</span><span id="L-480"><a href="#L-480"><span class="linenos">480</span></a><span class="sd">        </span>
-</span><span id="L-481"><a href="#L-481"><span class="linenos">481</span></a><span class="sd">        len(auto_cdf_list_1) == 2 and len(auto_cdf_list_2) == 2 and len(joint_cdf_list) == 2</span>
-</span><span id="L-482"><a href="#L-482"><span class="linenos">482</span></a>
-</span><span id="L-483"><a href="#L-483"><span class="linenos">483</span></a><span class="sd">    must hold, and the first (second) element of `joint_cdf_list` should be the joint {1,1}NN-CDF ({1,2}NN-CDF).</span>
-</span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a><span class="sd">        </span>
-</span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a><span class="sd">    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF).</span>
-</span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a>
-</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a><span class="sd">    References</span>
-</span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="sd">    ----------</span>
-</span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a><span class="sd">    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868</span>
-</span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-456"><a href="#L-456"><span class="linenos">456</span></a><span class="sd">    Returns</span>
+</span><span id="L-457"><a href="#L-457"><span class="linenos">457</span></a><span class="sd">    -------</span>
+</span><span id="L-458"><a href="#L-458"><span class="linenos">458</span></a><span class="sd">    psi_list : list of numpy float array</span>
+</span><span id="L-459"><a href="#L-459"><span class="linenos">459</span></a><span class="sd">        excess spatial cross-correlation between the two tracer sets.</span>
+</span><span id="L-460"><a href="#L-460"><span class="linenos">460</span></a>
+</span><span id="L-461"><a href="#L-461"><span class="linenos">461</span></a><span class="sd">    Raises</span>
+</span><span id="L-462"><a href="#L-462"><span class="linenos">462</span></a><span class="sd">    ------</span>
+</span><span id="L-463"><a href="#L-463"><span class="linenos">463</span></a><span class="sd">    ValueError</span>
+</span><span id="L-464"><a href="#L-464"><span class="linenos">464</span></a><span class="sd">        if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`</span>
+</span><span id="L-465"><a href="#L-465"><span class="linenos">465</span></a><span class="sd">    ValueError</span>
+</span><span id="L-466"><a href="#L-466"><span class="linenos">466</span></a><span class="sd">        if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`</span>
+</span><span id="L-467"><a href="#L-467"><span class="linenos">467</span></a>
+</span><span id="L-468"><a href="#L-468"><span class="linenos">468</span></a><span class="sd">    Notes</span>
+</span><span id="L-469"><a href="#L-469"><span class="linenos">469</span></a><span class="sd">    -----</span>
+</span><span id="L-470"><a href="#L-470"><span class="linenos">470</span></a><span class="sd">    The parameter `k1_k2_list` describes the kind of cross-correlations being computed. It should be set to `None` for every scenario other than tracer-tracer cross-correlation, in which case it should provide the combinations of NN indices for the two tracers sets being cross-correlated. </span>
+</span><span id="L-471"><a href="#L-471"><span class="linenos">471</span></a><span class="sd">    </span>
+</span><span id="L-472"><a href="#L-472"><span class="linenos">472</span></a><span class="sd">    For example, if you wish to compute the excess cross correlation for the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set</span>
+</span><span id="L-473"><a href="#L-473"><span class="linenos">473</span></a><span class="sd">            </span>
+</span><span id="L-474"><a href="#L-474"><span class="linenos">474</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2), (2,1)]</span>
+</span><span id="L-475"><a href="#L-475"><span class="linenos">475</span></a>
+</span><span id="L-476"><a href="#L-476"><span class="linenos">476</span></a><span class="sd">    Note that the inputs must be self-consistent, which means the following must be ``True``</span>
+</span><span id="L-477"><a href="#L-477"><span class="linenos">477</span></a>
+</span><span id="L-478"><a href="#L-478"><span class="linenos">478</span></a><span class="sd">        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2) and len(joint_cdf_list)==len(k1_k2_list)</span>
+</span><span id="L-479"><a href="#L-479"><span class="linenos">479</span></a><span class="sd">        </span>
+</span><span id="L-480"><a href="#L-480"><span class="linenos">480</span></a><span class="sd">    For example, if</span>
+</span><span id="L-481"><a href="#L-481"><span class="linenos">481</span></a>
+</span><span id="L-482"><a href="#L-482"><span class="linenos">482</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2)]</span>
+</span><span id="L-483"><a href="#L-483"><span class="linenos">483</span></a>
+</span><span id="L-484"><a href="#L-484"><span class="linenos">484</span></a><span class="sd">    then</span>
+</span><span id="L-485"><a href="#L-485"><span class="linenos">485</span></a><span class="sd">        </span>
+</span><span id="L-486"><a href="#L-486"><span class="linenos">486</span></a><span class="sd">        len(auto_cdf_list_1) == 2 and len(auto_cdf_list_2) == 2 and len(joint_cdf_list) == 2</span>
+</span><span id="L-487"><a href="#L-487"><span class="linenos">487</span></a>
+</span><span id="L-488"><a href="#L-488"><span class="linenos">488</span></a><span class="sd">    must hold, and the first (second) element of `joint_cdf_list` should be the joint {1,1}NN-CDF ({1,2}NN-CDF).</span>
+</span><span id="L-489"><a href="#L-489"><span class="linenos">489</span></a><span class="sd">        </span>
+</span><span id="L-490"><a href="#L-490"><span class="linenos">490</span></a><span class="sd">    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF).</span>
 </span><span id="L-491"><a href="#L-491"><span class="linenos">491</span></a>
-</span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a>
-</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a>    <span class="n">psi_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a>
-</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a>    
-</span><span id="L-498"><a href="#L-498"><span class="linenos">498</span></a>    <span class="c1">#Check for consistency:</span>
-</span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a>    <span class="k">if</span> <span class="n">k1_k2_list</span><span class="p">:</span>
-</span><span id="L-500"><a href="#L-500"><span class="linenos">500</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">k1_k2_list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
-</span><span id="L-501"><a href="#L-501"><span class="linenos">501</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input shapes&#39;</span><span class="p">)</span>
-</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
-</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input: shapes not compatible with each other&#39;</span><span class="p">)</span>
-</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>    
-</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)):</span>
-</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a>        <span class="n">psi_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">auto_cdf_list_2</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>
-</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>    <span class="k">return</span> <span class="n">psi_list</span>
-</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>        
-</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a><span class="c1">####################################################################################################</span>
-</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>
-</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a><span class="c1">#----------------------------------------  END OF PROGRAM!  ----------------------------------------</span>
-</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>
-</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a><span class="c1">####################################################################################################</span>
+</span><span id="L-492"><a href="#L-492"><span class="linenos">492</span></a><span class="sd">    References</span>
+</span><span id="L-493"><a href="#L-493"><span class="linenos">493</span></a><span class="sd">    ----------</span>
+</span><span id="L-494"><a href="#L-494"><span class="linenos">494</span></a><span class="sd">    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868</span>
+</span><span id="L-495"><a href="#L-495"><span class="linenos">495</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="L-496"><a href="#L-496"><span class="linenos">496</span></a>
+</span><span id="L-497"><a href="#L-497"><span class="linenos">497</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="L-498"><a href="#L-498"><span class="linenos">498</span></a>
+</span><span id="L-499"><a href="#L-499"><span class="linenos">499</span></a>    <span class="n">psi_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-500"><a href="#L-500"><span class="linenos">500</span></a>
+</span><span id="L-501"><a href="#L-501"><span class="linenos">501</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="L-502"><a href="#L-502"><span class="linenos">502</span></a>    
+</span><span id="L-503"><a href="#L-503"><span class="linenos">503</span></a>    <span class="c1">#Check for consistency:</span>
+</span><span id="L-504"><a href="#L-504"><span class="linenos">504</span></a>    <span class="k">if</span> <span class="n">k1_k2_list</span><span class="p">:</span>
+</span><span id="L-505"><a href="#L-505"><span class="linenos">505</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">k1_k2_list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
+</span><span id="L-506"><a href="#L-506"><span class="linenos">506</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input shapes&#39;</span><span class="p">)</span>
+</span><span id="L-507"><a href="#L-507"><span class="linenos">507</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="L-508"><a href="#L-508"><span class="linenos">508</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
+</span><span id="L-509"><a href="#L-509"><span class="linenos">509</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input: shapes not compatible with each other&#39;</span><span class="p">)</span>
+</span><span id="L-510"><a href="#L-510"><span class="linenos">510</span></a>    
+</span><span id="L-511"><a href="#L-511"><span class="linenos">511</span></a>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)):</span>
+</span><span id="L-512"><a href="#L-512"><span class="linenos">512</span></a>        <span class="n">psi_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">auto_cdf_list_2</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+</span><span id="L-513"><a href="#L-513"><span class="linenos">513</span></a>
+</span><span id="L-514"><a href="#L-514"><span class="linenos">514</span></a>    <span class="k">return</span> <span class="n">psi_list</span>
+</span><span id="L-515"><a href="#L-515"><span class="linenos">515</span></a>        
+</span><span id="L-516"><a href="#L-516"><span class="linenos">516</span></a><span class="c1">####################################################################################################</span>
+</span><span id="L-517"><a href="#L-517"><span class="linenos">517</span></a>
+</span><span id="L-518"><a href="#L-518"><span class="linenos">518</span></a><span class="c1">#----------------------------------------  END OF PROGRAM!  ----------------------------------------</span>
+</span><span id="L-519"><a href="#L-519"><span class="linenos">519</span></a>
+</span><span id="L-520"><a href="#L-520"><span class="linenos">520</span></a><span class="c1">####################################################################################################</span>
 </span></pre></div>
 
 
@@ -1083,13 +1088,13 @@ the smoothed field.</li>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">create_smoothed_field_dict_3D</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">field</span>,</span><span class="param">	<span class="n">Filter</span>,</span><span class="param">	<span class="n">grid</span>,</span><span class="param">	<span class="n">BoxSize</span>,</span><span class="param">	<span class="n">bins</span>,</span><span class="param">	<span class="n">kmin</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">kmax</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">thickness</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
+        <span class="name">create_smoothed_field_dict_3D</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">field</span>, </span><span class="param"><span class="n">Filter</span>, </span><span class="param"><span class="n">grid</span>, </span><span class="param"><span class="n">BoxSize</span>, </span><span class="param"><span class="n">bins</span>, </span><span class="param"><span class="n">thickness</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="create_smoothed_field_dict_3D-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#create_smoothed_field_dict_3D"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="create_smoothed_field_dict_3D-317"><a href="#create_smoothed_field_dict_3D-317"><span class="linenos">317</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_smoothed_field_dict_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">kmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="create_smoothed_field_dict_3D-317"><a href="#create_smoothed_field_dict_3D-317"><span class="linenos">317</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_smoothed_field_dict_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">thickness</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="create_smoothed_field_dict_3D-318"><a href="#create_smoothed_field_dict_3D-318"><span class="linenos">318</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="create_smoothed_field_dict_3D-319"><a href="#create_smoothed_field_dict_3D-319"><span class="linenos">319</span></a><span class="sd">    Creates a dictionary containing the continuous field smoothed at various radial distance scales.</span>
 </span><span id="create_smoothed_field_dict_3D-320"><a href="#create_smoothed_field_dict_3D-320"><span class="linenos">320</span></a>
@@ -1098,77 +1103,82 @@ the smoothed field.</li>
 </span><span id="create_smoothed_field_dict_3D-323"><a href="#create_smoothed_field_dict_3D-323"><span class="linenos">323</span></a><span class="sd">    field : numpy float array</span>
 </span><span id="create_smoothed_field_dict_3D-324"><a href="#create_smoothed_field_dict_3D-324"><span class="linenos">324</span></a><span class="sd">        the 3D array of the continuous field that needs to be smoothed. </span>
 </span><span id="create_smoothed_field_dict_3D-325"><a href="#create_smoothed_field_dict_3D-325"><span class="linenos">325</span></a><span class="sd">    Filter : string</span>
-</span><span id="create_smoothed_field_dict_3D-326"><a href="#create_smoothed_field_dict_3D-326"><span class="linenos">326</span></a><span class="sd">        the filter to be used for smoothing. &#39;Top-Hat&#39;, &#39;Gaussian&#39;, &#39;Shell&#39; are for real space, and &#39;Top-Hat-k&#39; is a top-hat filter in k-space.</span>
+</span><span id="create_smoothed_field_dict_3D-326"><a href="#create_smoothed_field_dict_3D-326"><span class="linenos">326</span></a><span class="sd">        the filter to be used for smoothing. Valid filter types are: &#39;Top-Hat&#39;, &#39;Gaussian&#39;, &#39;Shell&#39;. </span>
 </span><span id="create_smoothed_field_dict_3D-327"><a href="#create_smoothed_field_dict_3D-327"><span class="linenos">327</span></a><span class="sd">    grid : int</span>
 </span><span id="create_smoothed_field_dict_3D-328"><a href="#create_smoothed_field_dict_3D-328"><span class="linenos">328</span></a><span class="sd">        the grid size of the input density field, which should be field.shape[0] assuming a cubical box.</span>
 </span><span id="create_smoothed_field_dict_3D-329"><a href="#create_smoothed_field_dict_3D-329"><span class="linenos">329</span></a><span class="sd">    BoxSize : float</span>
 </span><span id="create_smoothed_field_dict_3D-330"><a href="#create_smoothed_field_dict_3D-330"><span class="linenos">330</span></a><span class="sd">        the size of the 3D box of the input density field, in Mpc/h.</span>
 </span><span id="create_smoothed_field_dict_3D-331"><a href="#create_smoothed_field_dict_3D-331"><span class="linenos">331</span></a><span class="sd">    bins : list of numpy float array</span>
 </span><span id="create_smoothed_field_dict_3D-332"><a href="#create_smoothed_field_dict_3D-332"><span class="linenos">332</span></a><span class="sd">        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{th}$ nearest neighbour.</span>
-</span><span id="create_smoothed_field_dict_3D-333"><a href="#create_smoothed_field_dict_3D-333"><span class="linenos">333</span></a><span class="sd">    kmin : float, optional</span>
-</span><span id="create_smoothed_field_dict_3D-334"><a href="#create_smoothed_field_dict_3D-334"><span class="linenos">334</span></a><span class="sd">        the minimum value of the wavenumber. Only use this parameter when &#39;Top-Hat-k&#39; filter is used.</span>
-</span><span id="create_smoothed_field_dict_3D-335"><a href="#create_smoothed_field_dict_3D-335"><span class="linenos">335</span></a><span class="sd">    kmax : float, optional</span>
-</span><span id="create_smoothed_field_dict_3D-336"><a href="#create_smoothed_field_dict_3D-336"><span class="linenos">336</span></a><span class="sd">        the maximum value of the wavenumber. Only use this parameter when &#39;Top-Hat-k&#39; filter is used.</span>
-</span><span id="create_smoothed_field_dict_3D-337"><a href="#create_smoothed_field_dict_3D-337"><span class="linenos">337</span></a><span class="sd">    thickness : float, optional</span>
-</span><span id="create_smoothed_field_dict_3D-338"><a href="#create_smoothed_field_dict_3D-338"><span class="linenos">338</span></a><span class="sd">        the thickness of the shell used for smoothing. Only use this parameter when &#39;Shell&#39; filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.</span>
-</span><span id="create_smoothed_field_dict_3D-339"><a href="#create_smoothed_field_dict_3D-339"><span class="linenos">339</span></a><span class="sd">    Verbose : bool, optional</span>
-</span><span id="create_smoothed_field_dict_3D-340"><a href="#create_smoothed_field_dict_3D-340"><span class="linenos">340</span></a><span class="sd">        if set to True, the time taken to complete each step of the calculation will be printed, by default False.</span>
-</span><span id="create_smoothed_field_dict_3D-341"><a href="#create_smoothed_field_dict_3D-341"><span class="linenos">341</span></a>
-</span><span id="create_smoothed_field_dict_3D-342"><a href="#create_smoothed_field_dict_3D-342"><span class="linenos">342</span></a><span class="sd">    Returns</span>
-</span><span id="create_smoothed_field_dict_3D-343"><a href="#create_smoothed_field_dict_3D-343"><span class="linenos">343</span></a><span class="sd">    -------</span>
-</span><span id="create_smoothed_field_dict_3D-344"><a href="#create_smoothed_field_dict_3D-344"><span class="linenos">344</span></a><span class="sd">    SmoothedFieldDict : dict</span>
-</span><span id="create_smoothed_field_dict_3D-345"><a href="#create_smoothed_field_dict_3D-345"><span class="linenos">345</span></a><span class="sd">        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict[&#39;50.0&#39;]`  represents the continuous map smoothed at a scale of 50 Mpc/h.</span>
-</span><span id="create_smoothed_field_dict_3D-346"><a href="#create_smoothed_field_dict_3D-346"><span class="linenos">346</span></a>
-</span><span id="create_smoothed_field_dict_3D-347"><a href="#create_smoothed_field_dict_3D-347"><span class="linenos">347</span></a><span class="sd">    Raises</span>
-</span><span id="create_smoothed_field_dict_3D-348"><a href="#create_smoothed_field_dict_3D-348"><span class="linenos">348</span></a><span class="sd">    ------</span>
+</span><span id="create_smoothed_field_dict_3D-333"><a href="#create_smoothed_field_dict_3D-333"><span class="linenos">333</span></a><span class="sd">    thickness : float, optional</span>
+</span><span id="create_smoothed_field_dict_3D-334"><a href="#create_smoothed_field_dict_3D-334"><span class="linenos">334</span></a><span class="sd">        the thickness of the shell used for smoothing. Only use this parameter when &#39;Shell&#39; filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.</span>
+</span><span id="create_smoothed_field_dict_3D-335"><a href="#create_smoothed_field_dict_3D-335"><span class="linenos">335</span></a><span class="sd">    Verbose : bool, optional</span>
+</span><span id="create_smoothed_field_dict_3D-336"><a href="#create_smoothed_field_dict_3D-336"><span class="linenos">336</span></a><span class="sd">        if set to True, the time taken to complete each step of the calculation will be printed, by default False.</span>
+</span><span id="create_smoothed_field_dict_3D-337"><a href="#create_smoothed_field_dict_3D-337"><span class="linenos">337</span></a>
+</span><span id="create_smoothed_field_dict_3D-338"><a href="#create_smoothed_field_dict_3D-338"><span class="linenos">338</span></a><span class="sd">    Returns</span>
+</span><span id="create_smoothed_field_dict_3D-339"><a href="#create_smoothed_field_dict_3D-339"><span class="linenos">339</span></a><span class="sd">    -------</span>
+</span><span id="create_smoothed_field_dict_3D-340"><a href="#create_smoothed_field_dict_3D-340"><span class="linenos">340</span></a><span class="sd">    SmoothedFieldDict : dict</span>
+</span><span id="create_smoothed_field_dict_3D-341"><a href="#create_smoothed_field_dict_3D-341"><span class="linenos">341</span></a><span class="sd">        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict[&#39;50.0&#39;]`  represents the continuous map smoothed at a scale of 50 Mpc/h.</span>
+</span><span id="create_smoothed_field_dict_3D-342"><a href="#create_smoothed_field_dict_3D-342"><span class="linenos">342</span></a>
+</span><span id="create_smoothed_field_dict_3D-343"><a href="#create_smoothed_field_dict_3D-343"><span class="linenos">343</span></a><span class="sd">    Raises</span>
+</span><span id="create_smoothed_field_dict_3D-344"><a href="#create_smoothed_field_dict_3D-344"><span class="linenos">344</span></a><span class="sd">    ------</span>
+</span><span id="create_smoothed_field_dict_3D-345"><a href="#create_smoothed_field_dict_3D-345"><span class="linenos">345</span></a><span class="sd">    ValueError</span>
+</span><span id="create_smoothed_field_dict_3D-346"><a href="#create_smoothed_field_dict_3D-346"><span class="linenos">346</span></a><span class="sd">        If required parameters (like bins or thickness) are missing for the specified filter type.</span>
+</span><span id="create_smoothed_field_dict_3D-347"><a href="#create_smoothed_field_dict_3D-347"><span class="linenos">347</span></a><span class="sd">    ValueError</span>
+</span><span id="create_smoothed_field_dict_3D-348"><a href="#create_smoothed_field_dict_3D-348"><span class="linenos">348</span></a><span class="sd">        If the input field dimensions do not form a cubical box.</span>
 </span><span id="create_smoothed_field_dict_3D-349"><a href="#create_smoothed_field_dict_3D-349"><span class="linenos">349</span></a><span class="sd">    ValueError</span>
-</span><span id="create_smoothed_field_dict_3D-350"><a href="#create_smoothed_field_dict_3D-350"><span class="linenos">350</span></a><span class="sd">        If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.</span>
+</span><span id="create_smoothed_field_dict_3D-350"><a href="#create_smoothed_field_dict_3D-350"><span class="linenos">350</span></a><span class="sd">        If the grid size does not match the field dimensions.</span>
 </span><span id="create_smoothed_field_dict_3D-351"><a href="#create_smoothed_field_dict_3D-351"><span class="linenos">351</span></a><span class="sd">    ValueError</span>
-</span><span id="create_smoothed_field_dict_3D-352"><a href="#create_smoothed_field_dict_3D-352"><span class="linenos">352</span></a><span class="sd">        If the input field dimensions do not form a cubical box.</span>
-</span><span id="create_smoothed_field_dict_3D-353"><a href="#create_smoothed_field_dict_3D-353"><span class="linenos">353</span></a><span class="sd">    ValueError</span>
-</span><span id="create_smoothed_field_dict_3D-354"><a href="#create_smoothed_field_dict_3D-354"><span class="linenos">354</span></a><span class="sd">        If the grid size does not match the field dimensions.</span>
-</span><span id="create_smoothed_field_dict_3D-355"><a href="#create_smoothed_field_dict_3D-355"><span class="linenos">355</span></a><span class="sd">    ValueError</span>
-</span><span id="create_smoothed_field_dict_3D-356"><a href="#create_smoothed_field_dict_3D-356"><span class="linenos">356</span></a><span class="sd">        If an unknown filter name is provided.</span>
-</span><span id="create_smoothed_field_dict_3D-357"><a href="#create_smoothed_field_dict_3D-357"><span class="linenos">357</span></a>
-</span><span id="create_smoothed_field_dict_3D-358"><a href="#create_smoothed_field_dict_3D-358"><span class="linenos">358</span></a><span class="sd">    Notes</span>
-</span><span id="create_smoothed_field_dict_3D-359"><a href="#create_smoothed_field_dict_3D-359"><span class="linenos">359</span></a><span class="sd">    -----</span>
-</span><span id="create_smoothed_field_dict_3D-360"><a href="#create_smoothed_field_dict_3D-360"><span class="linenos">360</span></a><span class="sd">    - For real-space filters (&#39;Top-Hat&#39;, &#39;Gaussian&#39;, &#39;Shell&#39;), the radial scale R must be specified.</span>
-</span><span id="create_smoothed_field_dict_3D-361"><a href="#create_smoothed_field_dict_3D-361"><span class="linenos">361</span></a><span class="sd">    - For the &#39;Shell&#39; filter, thickness must also be specified.</span>
-</span><span id="create_smoothed_field_dict_3D-362"><a href="#create_smoothed_field_dict_3D-362"><span class="linenos">362</span></a><span class="sd">    - For the &#39;Top-Hat-k&#39; filter in Fourier space, kmin and kmax must be specified, while R and thickness are ignored.</span>
-</span><span id="create_smoothed_field_dict_3D-363"><a href="#create_smoothed_field_dict_3D-363"><span class="linenos">363</span></a><span class="sd">    - Any unused parameters will trigger warnings but not stop execution.</span>
-</span><span id="create_smoothed_field_dict_3D-364"><a href="#create_smoothed_field_dict_3D-364"><span class="linenos">364</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="create_smoothed_field_dict_3D-365"><a href="#create_smoothed_field_dict_3D-365"><span class="linenos">365</span></a>    
-</span><span id="create_smoothed_field_dict_3D-366"><a href="#create_smoothed_field_dict_3D-366"><span class="linenos">366</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="create_smoothed_field_dict_3D-367"><a href="#create_smoothed_field_dict_3D-367"><span class="linenos">367</span></a>    
-</span><span id="create_smoothed_field_dict_3D-368"><a href="#create_smoothed_field_dict_3D-368"><span class="linenos">368</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> 
-</span><span id="create_smoothed_field_dict_3D-369"><a href="#create_smoothed_field_dict_3D-369"><span class="linenos">369</span></a>        <span class="n">total_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-</span><span id="create_smoothed_field_dict_3D-370"><a href="#create_smoothed_field_dict_3D-370"><span class="linenos">370</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Smoothing the density field over the radial distance scales...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-</span><span id="create_smoothed_field_dict_3D-371"><a href="#create_smoothed_field_dict_3D-371"><span class="linenos">371</span></a>
-</span><span id="create_smoothed_field_dict_3D-372"><a href="#create_smoothed_field_dict_3D-372"><span class="linenos">372</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="create_smoothed_field_dict_3D-373"><a href="#create_smoothed_field_dict_3D-373"><span class="linenos">373</span></a>
-</span><span id="create_smoothed_field_dict_3D-374"><a href="#create_smoothed_field_dict_3D-374"><span class="linenos">374</span></a>    <span class="c1">#Initializing the dictionary</span>
-</span><span id="create_smoothed_field_dict_3D-375"><a href="#create_smoothed_field_dict_3D-375"><span class="linenos">375</span></a>    <span class="n">SmoothedFieldDict</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span id="create_smoothed_field_dict_3D-352"><a href="#create_smoothed_field_dict_3D-352"><span class="linenos">352</span></a><span class="sd">        If an unknown filter name is provided.</span>
+</span><span id="create_smoothed_field_dict_3D-353"><a href="#create_smoothed_field_dict_3D-353"><span class="linenos">353</span></a>
+</span><span id="create_smoothed_field_dict_3D-354"><a href="#create_smoothed_field_dict_3D-354"><span class="linenos">354</span></a><span class="sd">    Notes</span>
+</span><span id="create_smoothed_field_dict_3D-355"><a href="#create_smoothed_field_dict_3D-355"><span class="linenos">355</span></a><span class="sd">    -----</span>
+</span><span id="create_smoothed_field_dict_3D-356"><a href="#create_smoothed_field_dict_3D-356"><span class="linenos">356</span></a><span class="sd">    - This function only works for the real space filters, so &#39;Top-Hat-k&#39; is not a valid filter for this function.</span>
+</span><span id="create_smoothed_field_dict_3D-357"><a href="#create_smoothed_field_dict_3D-357"><span class="linenos">357</span></a><span class="sd">    - For the &#39;Shell&#39; filter, thickness must be specified.</span>
+</span><span id="create_smoothed_field_dict_3D-358"><a href="#create_smoothed_field_dict_3D-358"><span class="linenos">358</span></a><span class="sd">    - Any unused parameters will trigger warnings but not stop execution.</span>
+</span><span id="create_smoothed_field_dict_3D-359"><a href="#create_smoothed_field_dict_3D-359"><span class="linenos">359</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="create_smoothed_field_dict_3D-360"><a href="#create_smoothed_field_dict_3D-360"><span class="linenos">360</span></a>    
+</span><span id="create_smoothed_field_dict_3D-361"><a href="#create_smoothed_field_dict_3D-361"><span class="linenos">361</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="create_smoothed_field_dict_3D-362"><a href="#create_smoothed_field_dict_3D-362"><span class="linenos">362</span></a>    
+</span><span id="create_smoothed_field_dict_3D-363"><a href="#create_smoothed_field_dict_3D-363"><span class="linenos">363</span></a>    <span class="c1"># This function is only for smoothing in real space</span>
+</span><span id="create_smoothed_field_dict_3D-364"><a href="#create_smoothed_field_dict_3D-364"><span class="linenos">364</span></a>    
+</span><span id="create_smoothed_field_dict_3D-365"><a href="#create_smoothed_field_dict_3D-365"><span class="linenos">365</span></a>    <span class="k">if</span> <span class="n">Filter</span> <span class="o">==</span> <span class="s1">&#39;Top-Hat-k&#39;</span><span class="p">:</span>
+</span><span id="create_smoothed_field_dict_3D-366"><a href="#create_smoothed_field_dict_3D-366"><span class="linenos">366</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown filter: </span><span class="si">{</span><span class="n">Filter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="create_smoothed_field_dict_3D-367"><a href="#create_smoothed_field_dict_3D-367"><span class="linenos">367</span></a>        
+</span><span id="create_smoothed_field_dict_3D-368"><a href="#create_smoothed_field_dict_3D-368"><span class="linenos">368</span></a>    <span class="n">kmin</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="create_smoothed_field_dict_3D-369"><a href="#create_smoothed_field_dict_3D-369"><span class="linenos">369</span></a>    <span class="n">kmax</span> <span class="o">=</span> <span class="kc">None</span>
+</span><span id="create_smoothed_field_dict_3D-370"><a href="#create_smoothed_field_dict_3D-370"><span class="linenos">370</span></a>    
+</span><span id="create_smoothed_field_dict_3D-371"><a href="#create_smoothed_field_dict_3D-371"><span class="linenos">371</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="create_smoothed_field_dict_3D-372"><a href="#create_smoothed_field_dict_3D-372"><span class="linenos">372</span></a>    
+</span><span id="create_smoothed_field_dict_3D-373"><a href="#create_smoothed_field_dict_3D-373"><span class="linenos">373</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> 
+</span><span id="create_smoothed_field_dict_3D-374"><a href="#create_smoothed_field_dict_3D-374"><span class="linenos">374</span></a>        <span class="n">total_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="create_smoothed_field_dict_3D-375"><a href="#create_smoothed_field_dict_3D-375"><span class="linenos">375</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Smoothing the density field over the radial distance scales...</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 </span><span id="create_smoothed_field_dict_3D-376"><a href="#create_smoothed_field_dict_3D-376"><span class="linenos">376</span></a>
 </span><span id="create_smoothed_field_dict_3D-377"><a href="#create_smoothed_field_dict_3D-377"><span class="linenos">377</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="create_smoothed_field_dict_3D-378"><a href="#create_smoothed_field_dict_3D-378"><span class="linenos">378</span></a>    
-</span><span id="create_smoothed_field_dict_3D-379"><a href="#create_smoothed_field_dict_3D-379"><span class="linenos">379</span></a>    <span class="c1">#Looping over the nearest neighbour indices as inferred from the length of &#39;bins&#39;</span>
-</span><span id="create_smoothed_field_dict_3D-380"><a href="#create_smoothed_field_dict_3D-380"><span class="linenos">380</span></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)):</span>
+</span><span id="create_smoothed_field_dict_3D-378"><a href="#create_smoothed_field_dict_3D-378"><span class="linenos">378</span></a>
+</span><span id="create_smoothed_field_dict_3D-379"><a href="#create_smoothed_field_dict_3D-379"><span class="linenos">379</span></a>    <span class="c1">#Initializing the dictionary</span>
+</span><span id="create_smoothed_field_dict_3D-380"><a href="#create_smoothed_field_dict_3D-380"><span class="linenos">380</span></a>    <span class="n">SmoothedFieldDict</span> <span class="o">=</span> <span class="p">{}</span>
 </span><span id="create_smoothed_field_dict_3D-381"><a href="#create_smoothed_field_dict_3D-381"><span class="linenos">381</span></a>
-</span><span id="create_smoothed_field_dict_3D-382"><a href="#create_smoothed_field_dict_3D-382"><span class="linenos">382</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="create_smoothed_field_dict_3D-383"><a href="#create_smoothed_field_dict_3D-383"><span class="linenos">383</span></a>        
-</span><span id="create_smoothed_field_dict_3D-384"><a href="#create_smoothed_field_dict_3D-384"><span class="linenos">384</span></a>        <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
-</span><span id="create_smoothed_field_dict_3D-385"><a href="#create_smoothed_field_dict_3D-385"><span class="linenos">385</span></a>
-</span><span id="create_smoothed_field_dict_3D-386"><a href="#create_smoothed_field_dict_3D-386"><span class="linenos">386</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="create_smoothed_field_dict_3D-387"><a href="#create_smoothed_field_dict_3D-387"><span class="linenos">387</span></a>        
-</span><span id="create_smoothed_field_dict_3D-388"><a href="#create_smoothed_field_dict_3D-388"><span class="linenos">388</span></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">R</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
-</span><span id="create_smoothed_field_dict_3D-389"><a href="#create_smoothed_field_dict_3D-389"><span class="linenos">389</span></a>            <span class="n">SmoothedFieldDict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">R</span><span class="p">)]</span> <span class="o">=</span> \
-</span><span id="create_smoothed_field_dict_3D-390"><a href="#create_smoothed_field_dict_3D-390"><span class="linenos">390</span></a>            <span class="n">smoothing_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">kmin</span><span class="p">,</span> <span class="n">kmax</span><span class="p">,</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">Verbose</span><span class="p">)</span>
-</span><span id="create_smoothed_field_dict_3D-391"><a href="#create_smoothed_field_dict_3D-391"><span class="linenos">391</span></a>
-</span><span id="create_smoothed_field_dict_3D-392"><a href="#create_smoothed_field_dict_3D-392"><span class="linenos">392</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="create_smoothed_field_dict_3D-393"><a href="#create_smoothed_field_dict_3D-393"><span class="linenos">393</span></a>    
-</span><span id="create_smoothed_field_dict_3D-394"><a href="#create_smoothed_field_dict_3D-394"><span class="linenos">394</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total time taken for all scales: </span><span class="si">{:.2e}</span><span class="s1"> s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">total_start</span><span class="p">))</span>
-</span><span id="create_smoothed_field_dict_3D-395"><a href="#create_smoothed_field_dict_3D-395"><span class="linenos">395</span></a>
-</span><span id="create_smoothed_field_dict_3D-396"><a href="#create_smoothed_field_dict_3D-396"><span class="linenos">396</span></a>    <span class="k">return</span> <span class="n">SmoothedFieldDict</span>
+</span><span id="create_smoothed_field_dict_3D-382"><a href="#create_smoothed_field_dict_3D-382"><span class="linenos">382</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="create_smoothed_field_dict_3D-383"><a href="#create_smoothed_field_dict_3D-383"><span class="linenos">383</span></a>    
+</span><span id="create_smoothed_field_dict_3D-384"><a href="#create_smoothed_field_dict_3D-384"><span class="linenos">384</span></a>    <span class="c1">#Looping over the nearest neighbour indices as inferred from the length of &#39;bins&#39;</span>
+</span><span id="create_smoothed_field_dict_3D-385"><a href="#create_smoothed_field_dict_3D-385"><span class="linenos">385</span></a>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">)):</span>
+</span><span id="create_smoothed_field_dict_3D-386"><a href="#create_smoothed_field_dict_3D-386"><span class="linenos">386</span></a>
+</span><span id="create_smoothed_field_dict_3D-387"><a href="#create_smoothed_field_dict_3D-387"><span class="linenos">387</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="create_smoothed_field_dict_3D-388"><a href="#create_smoothed_field_dict_3D-388"><span class="linenos">388</span></a>        
+</span><span id="create_smoothed_field_dict_3D-389"><a href="#create_smoothed_field_dict_3D-389"><span class="linenos">389</span></a>        <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+</span><span id="create_smoothed_field_dict_3D-390"><a href="#create_smoothed_field_dict_3D-390"><span class="linenos">390</span></a>
+</span><span id="create_smoothed_field_dict_3D-391"><a href="#create_smoothed_field_dict_3D-391"><span class="linenos">391</span></a>        <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="create_smoothed_field_dict_3D-392"><a href="#create_smoothed_field_dict_3D-392"><span class="linenos">392</span></a>        
+</span><span id="create_smoothed_field_dict_3D-393"><a href="#create_smoothed_field_dict_3D-393"><span class="linenos">393</span></a>        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">R</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bins</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+</span><span id="create_smoothed_field_dict_3D-394"><a href="#create_smoothed_field_dict_3D-394"><span class="linenos">394</span></a>            <span class="n">SmoothedFieldDict</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">R</span><span class="p">)]</span> <span class="o">=</span> \
+</span><span id="create_smoothed_field_dict_3D-395"><a href="#create_smoothed_field_dict_3D-395"><span class="linenos">395</span></a>            <span class="n">smoothing_3D</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Filter</span><span class="p">,</span> <span class="n">grid</span><span class="p">,</span> <span class="n">BoxSize</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">kmin</span><span class="p">,</span> <span class="n">kmax</span><span class="p">,</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">Verbose</span><span class="p">)</span>
+</span><span id="create_smoothed_field_dict_3D-396"><a href="#create_smoothed_field_dict_3D-396"><span class="linenos">396</span></a>
+</span><span id="create_smoothed_field_dict_3D-397"><a href="#create_smoothed_field_dict_3D-397"><span class="linenos">397</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="create_smoothed_field_dict_3D-398"><a href="#create_smoothed_field_dict_3D-398"><span class="linenos">398</span></a>    
+</span><span id="create_smoothed_field_dict_3D-399"><a href="#create_smoothed_field_dict_3D-399"><span class="linenos">399</span></a>    <span class="k">if</span> <span class="n">Verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Total time taken for all scales: </span><span class="si">{:.2e}</span><span class="s1"> s.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span><span class="o">-</span><span class="n">total_start</span><span class="p">))</span>
+</span><span id="create_smoothed_field_dict_3D-400"><a href="#create_smoothed_field_dict_3D-400"><span class="linenos">400</span></a>
+</span><span id="create_smoothed_field_dict_3D-401"><a href="#create_smoothed_field_dict_3D-401"><span class="linenos">401</span></a>    <span class="k">return</span> <span class="n">SmoothedFieldDict</span>
 </span></pre></div>
 
 
@@ -1180,17 +1190,13 @@ the smoothed field.</li>
 <li><strong>field</strong> (numpy float array):
 the 3D array of the continuous field that needs to be smoothed.</li>
 <li><strong>Filter</strong> (string):
-the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.</li>
+the filter to be used for smoothing. Valid filter types are: 'Top-Hat', 'Gaussian', 'Shell'.</li>
 <li><strong>grid</strong> (int):
 the grid size of the input density field, which should be field.shape[0] assuming a cubical box.</li>
 <li><strong>BoxSize</strong> (float):
 the size of the 3D box of the input density field, in Mpc/h.</li>
 <li><strong>bins</strong> (list of numpy float array):
 list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{th}$ nearest neighbour.</li>
-<li><strong>kmin</strong> (float, optional):
-the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.</li>
-<li><strong>kmax</strong> (float, optional):
-the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.</li>
 <li><strong>thickness</strong> (float, optional):
 the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.</li>
 <li><strong>Verbose</strong> (bool, optional):
@@ -1207,7 +1213,7 @@ dictionary containing the continuous field smoothed at various radial distance s
 <h6 id="raises">Raises</h6>
 
 <ul>
-<li><strong>ValueError</strong>: If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.</li>
+<li><strong>ValueError</strong>: If required parameters (like bins or thickness) are missing for the specified filter type.</li>
 <li><strong>ValueError</strong>: If the input field dimensions do not form a cubical box.</li>
 <li><strong>ValueError</strong>: If the grid size does not match the field dimensions.</li>
 <li><strong>ValueError</strong>: If an unknown filter name is provided.</li>
@@ -1216,9 +1222,8 @@ dictionary containing the continuous field smoothed at various radial distance s
 <h6 id="notes">Notes</h6>
 
 <ul>
-<li>For real-space filters ('Top-Hat', 'Gaussian', 'Shell'), the radial scale R must be specified.</li>
-<li>For the 'Shell' filter, thickness must also be specified.</li>
-<li>For the 'Top-Hat-k' filter in Fourier space, kmin and kmax must be specified, while R and thickness are ignored.</li>
+<li>This function only works for the real space filters, so 'Top-Hat-k' is not a valid filter for this function.</li>
+<li>For the 'Shell' filter, thickness must be specified.</li>
 <li>Any unused parameters will trigger warnings but not stop execution.</li>
 </ul>
 </div>
@@ -1236,39 +1241,39 @@ dictionary containing the continuous field smoothed at various radial distance s
 
     </div>
     <a class="headerlink" href="#CIC_3D_Interp"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CIC_3D_Interp-400"><a href="#CIC_3D_Interp-400"><span class="linenos">400</span></a><span class="k">def</span><span class="w"> </span><span class="nf">CIC_3D_Interp</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">):</span>
-</span><span id="CIC_3D_Interp-401"><a href="#CIC_3D_Interp-401"><span class="linenos">401</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="CIC_3D_Interp-402"><a href="#CIC_3D_Interp-402"><span class="linenos">402</span></a><span class="sd">    Interpolates a 3D field onto particle positions using Cloud-In-Cell (CIC) interpolation.</span>
-</span><span id="CIC_3D_Interp-403"><a href="#CIC_3D_Interp-403"><span class="linenos">403</span></a>
-</span><span id="CIC_3D_Interp-404"><a href="#CIC_3D_Interp-404"><span class="linenos">404</span></a><span class="sd">    Parameters</span>
-</span><span id="CIC_3D_Interp-405"><a href="#CIC_3D_Interp-405"><span class="linenos">405</span></a><span class="sd">    ----------</span>
-</span><span id="CIC_3D_Interp-406"><a href="#CIC_3D_Interp-406"><span class="linenos">406</span></a><span class="sd">    field : numpy.ndarray of shape ``(Ng, Ng, Ng)``</span>
-</span><span id="CIC_3D_Interp-407"><a href="#CIC_3D_Interp-407"><span class="linenos">407</span></a><span class="sd">        The 3D scalar field defined on a cubic grid with resolution &#39;Ng^3&#39;.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CIC_3D_Interp-405"><a href="#CIC_3D_Interp-405"><span class="linenos">405</span></a><span class="k">def</span><span class="w"> </span><span class="nf">CIC_3D_Interp</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">):</span>
+</span><span id="CIC_3D_Interp-406"><a href="#CIC_3D_Interp-406"><span class="linenos">406</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="CIC_3D_Interp-407"><a href="#CIC_3D_Interp-407"><span class="linenos">407</span></a><span class="sd">    Interpolates a 3D field onto particle positions using Cloud-In-Cell (CIC) interpolation.</span>
 </span><span id="CIC_3D_Interp-408"><a href="#CIC_3D_Interp-408"><span class="linenos">408</span></a>
-</span><span id="CIC_3D_Interp-409"><a href="#CIC_3D_Interp-409"><span class="linenos">409</span></a><span class="sd">    pos : numpy.ndarray of shape ``(Np, 3)``</span>
-</span><span id="CIC_3D_Interp-410"><a href="#CIC_3D_Interp-410"><span class="linenos">410</span></a><span class="sd">        The positions of &#39;Np&#39; particles. The columns represent x, y, and z coordinates. Units in Mpc/h</span>
-</span><span id="CIC_3D_Interp-411"><a href="#CIC_3D_Interp-411"><span class="linenos">411</span></a><span class="sd">    </span>
-</span><span id="CIC_3D_Interp-412"><a href="#CIC_3D_Interp-412"><span class="linenos">412</span></a><span class="sd">    Boxsize: float</span>
-</span><span id="CIC_3D_Interp-413"><a href="#CIC_3D_Interp-413"><span class="linenos">413</span></a><span class="sd">            The side length of the cubic volume in the same units as `pos`.</span>
-</span><span id="CIC_3D_Interp-414"><a href="#CIC_3D_Interp-414"><span class="linenos">414</span></a><span class="sd">    Returns</span>
-</span><span id="CIC_3D_Interp-415"><a href="#CIC_3D_Interp-415"><span class="linenos">415</span></a><span class="sd">    -------</span>
-</span><span id="CIC_3D_Interp-416"><a href="#CIC_3D_Interp-416"><span class="linenos">416</span></a><span class="sd">    fieldI : numpy.ndarray of shape ``(Np,)``</span>
-</span><span id="CIC_3D_Interp-417"><a href="#CIC_3D_Interp-417"><span class="linenos">417</span></a><span class="sd">        The interpolated field values at the given particle positions.</span>
-</span><span id="CIC_3D_Interp-418"><a href="#CIC_3D_Interp-418"><span class="linenos">418</span></a><span class="sd">    &#39;&#39;&#39;</span>
-</span><span id="CIC_3D_Interp-419"><a href="#CIC_3D_Interp-419"><span class="linenos">419</span></a>    
-</span><span id="CIC_3D_Interp-420"><a href="#CIC_3D_Interp-420"><span class="linenos">420</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
-</span><span id="CIC_3D_Interp-421"><a href="#CIC_3D_Interp-421"><span class="linenos">421</span></a>
-</span><span id="CIC_3D_Interp-422"><a href="#CIC_3D_Interp-422"><span class="linenos">422</span></a>    <span class="c1"># define the array containing the value of the density field at positions pos</span>
-</span><span id="CIC_3D_Interp-423"><a href="#CIC_3D_Interp-423"><span class="linenos">423</span></a>    <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="CIC_3D_Interp-424"><a href="#CIC_3D_Interp-424"><span class="linenos">424</span></a>
+</span><span id="CIC_3D_Interp-409"><a href="#CIC_3D_Interp-409"><span class="linenos">409</span></a><span class="sd">    Parameters</span>
+</span><span id="CIC_3D_Interp-410"><a href="#CIC_3D_Interp-410"><span class="linenos">410</span></a><span class="sd">    ----------</span>
+</span><span id="CIC_3D_Interp-411"><a href="#CIC_3D_Interp-411"><span class="linenos">411</span></a><span class="sd">    field : numpy.ndarray of shape ``(Ng, Ng, Ng)``</span>
+</span><span id="CIC_3D_Interp-412"><a href="#CIC_3D_Interp-412"><span class="linenos">412</span></a><span class="sd">        The 3D scalar field defined on a cubic grid with resolution &#39;Ng^3&#39;.</span>
+</span><span id="CIC_3D_Interp-413"><a href="#CIC_3D_Interp-413"><span class="linenos">413</span></a>
+</span><span id="CIC_3D_Interp-414"><a href="#CIC_3D_Interp-414"><span class="linenos">414</span></a><span class="sd">    pos : numpy.ndarray of shape ``(Np, 3)``</span>
+</span><span id="CIC_3D_Interp-415"><a href="#CIC_3D_Interp-415"><span class="linenos">415</span></a><span class="sd">        The positions of &#39;Np&#39; particles. The columns represent x, y, and z coordinates. Units in Mpc/h</span>
+</span><span id="CIC_3D_Interp-416"><a href="#CIC_3D_Interp-416"><span class="linenos">416</span></a><span class="sd">    </span>
+</span><span id="CIC_3D_Interp-417"><a href="#CIC_3D_Interp-417"><span class="linenos">417</span></a><span class="sd">    Boxsize: float</span>
+</span><span id="CIC_3D_Interp-418"><a href="#CIC_3D_Interp-418"><span class="linenos">418</span></a><span class="sd">            The side length of the cubic volume in the same units as `pos`.</span>
+</span><span id="CIC_3D_Interp-419"><a href="#CIC_3D_Interp-419"><span class="linenos">419</span></a><span class="sd">    Returns</span>
+</span><span id="CIC_3D_Interp-420"><a href="#CIC_3D_Interp-420"><span class="linenos">420</span></a><span class="sd">    -------</span>
+</span><span id="CIC_3D_Interp-421"><a href="#CIC_3D_Interp-421"><span class="linenos">421</span></a><span class="sd">    fieldI : numpy.ndarray of shape ``(Np,)``</span>
+</span><span id="CIC_3D_Interp-422"><a href="#CIC_3D_Interp-422"><span class="linenos">422</span></a><span class="sd">        The interpolated field values at the given particle positions.</span>
+</span><span id="CIC_3D_Interp-423"><a href="#CIC_3D_Interp-423"><span class="linenos">423</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="CIC_3D_Interp-424"><a href="#CIC_3D_Interp-424"><span class="linenos">424</span></a>    
 </span><span id="CIC_3D_Interp-425"><a href="#CIC_3D_Interp-425"><span class="linenos">425</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
 </span><span id="CIC_3D_Interp-426"><a href="#CIC_3D_Interp-426"><span class="linenos">426</span></a>
-</span><span id="CIC_3D_Interp-427"><a href="#CIC_3D_Interp-427"><span class="linenos">427</span></a>    <span class="c1"># find the value of the density field at the positions pos</span>
-</span><span id="CIC_3D_Interp-428"><a href="#CIC_3D_Interp-428"><span class="linenos">428</span></a>    <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="CIC_3D_Interp-427"><a href="#CIC_3D_Interp-427"><span class="linenos">427</span></a>    <span class="c1"># define the array containing the value of the density field at positions pos</span>
+</span><span id="CIC_3D_Interp-428"><a href="#CIC_3D_Interp-428"><span class="linenos">428</span></a>    <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 </span><span id="CIC_3D_Interp-429"><a href="#CIC_3D_Interp-429"><span class="linenos">429</span></a>
 </span><span id="CIC_3D_Interp-430"><a href="#CIC_3D_Interp-430"><span class="linenos">430</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
 </span><span id="CIC_3D_Interp-431"><a href="#CIC_3D_Interp-431"><span class="linenos">431</span></a>
-</span><span id="CIC_3D_Interp-432"><a href="#CIC_3D_Interp-432"><span class="linenos">432</span></a>    <span class="k">return</span> <span class="n">density_interpolated</span>
+</span><span id="CIC_3D_Interp-432"><a href="#CIC_3D_Interp-432"><span class="linenos">432</span></a>    <span class="c1"># find the value of the density field at the positions pos</span>
+</span><span id="CIC_3D_Interp-433"><a href="#CIC_3D_Interp-433"><span class="linenos">433</span></a>    <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">Boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="CIC_3D_Interp-434"><a href="#CIC_3D_Interp-434"><span class="linenos">434</span></a>
+</span><span id="CIC_3D_Interp-435"><a href="#CIC_3D_Interp-435"><span class="linenos">435</span></a>    <span class="c1">#-----------------------------------------------------------------------------------------------</span>
+</span><span id="CIC_3D_Interp-436"><a href="#CIC_3D_Interp-436"><span class="linenos">436</span></a>
+</span><span id="CIC_3D_Interp-437"><a href="#CIC_3D_Interp-437"><span class="linenos">437</span></a>    <span class="k">return</span> <span class="n">density_interpolated</span>
 </span></pre></div>
 
 
@@ -1306,81 +1311,81 @@ The interpolated field values at the given particle positions.</li>
 
     </div>
     <a class="headerlink" href="#kNN_excess_cross_corr"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="kNN_excess_cross_corr-436"><a href="#kNN_excess_cross_corr-436"><span class="linenos">436</span></a><span class="k">def</span><span class="w"> </span><span class="nf">kNN_excess_cross_corr</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">,</span> <span class="n">auto_cdf_list_2</span><span class="p">,</span> <span class="n">joint_cdf_list</span><span class="p">,</span> <span class="n">k1_k2_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-</span><span id="kNN_excess_cross_corr-437"><a href="#kNN_excess_cross_corr-437"><span class="linenos">437</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-</span><span id="kNN_excess_cross_corr-438"><a href="#kNN_excess_cross_corr-438"><span class="linenos">438</span></a><span class="sd">    Computes the excess spatial cross-correlation (Banerjee &amp; Abel 2023)[^1] between two tracers (discrete or continuous) from their joint kNN distributions (`joint_cdf_list`) and their respective kNN-CDFs (`auto_cdf_list_1`, `auto_cdf_list_2`).</span>
-</span><span id="kNN_excess_cross_corr-439"><a href="#kNN_excess_cross_corr-439"><span class="linenos">439</span></a>
-</span><span id="kNN_excess_cross_corr-440"><a href="#kNN_excess_cross_corr-440"><span class="linenos">440</span></a><span class="sd">    Parameters</span>
-</span><span id="kNN_excess_cross_corr-441"><a href="#kNN_excess_cross_corr-441"><span class="linenos">441</span></a><span class="sd">    ----------</span>
-</span><span id="kNN_excess_cross_corr-442"><a href="#kNN_excess_cross_corr-442"><span class="linenos">442</span></a><span class="sd">    auto_cdf_list_1 : list of numpy float array</span>
-</span><span id="kNN_excess_cross_corr-443"><a href="#kNN_excess_cross_corr-443"><span class="linenos">443</span></a><span class="sd">        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_1^i$NN-CDF if the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
-</span><span id="kNN_excess_cross_corr-444"><a href="#kNN_excess_cross_corr-444"><span class="linenos">444</span></a><span class="sd">    auto_cdf_list_2 : list of numpy float array</span>
-</span><span id="kNN_excess_cross_corr-445"><a href="#kNN_excess_cross_corr-445"><span class="linenos">445</span></a><span class="sd">        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_2^i$NN-CDF if where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
-</span><span id="kNN_excess_cross_corr-446"><a href="#kNN_excess_cross_corr-446"><span class="linenos">446</span></a><span class="sd">    joint_cdf_list : list of numpy float array</span>
-</span><span id="kNN_excess_cross_corr-447"><a href="#kNN_excess_cross_corr-447"><span class="linenos">447</span></a><span class="sd">        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
-</span><span id="kNN_excess_cross_corr-448"><a href="#kNN_excess_cross_corr-448"><span class="linenos">448</span></a><span class="sd">        </span>
-</span><span id="kNN_excess_cross_corr-449"><a href="#kNN_excess_cross_corr-449"><span class="linenos">449</span></a><span class="sd">    k1_k2_list : list of int tuples</span>
-</span><span id="kNN_excess_cross_corr-450"><a href="#kNN_excess_cross_corr-450"><span class="linenos">450</span></a><span class="sd">        describes the kind of cross-correlations being computed (see notes for more details), by default `None`. Should be not None only if dealing with tracer-tracer cross-correlations</span>
-</span><span id="kNN_excess_cross_corr-451"><a href="#kNN_excess_cross_corr-451"><span class="linenos">451</span></a>
-</span><span id="kNN_excess_cross_corr-452"><a href="#kNN_excess_cross_corr-452"><span class="linenos">452</span></a><span class="sd">    Returns</span>
-</span><span id="kNN_excess_cross_corr-453"><a href="#kNN_excess_cross_corr-453"><span class="linenos">453</span></a><span class="sd">    -------</span>
-</span><span id="kNN_excess_cross_corr-454"><a href="#kNN_excess_cross_corr-454"><span class="linenos">454</span></a><span class="sd">    psi_list : list of numpy float array</span>
-</span><span id="kNN_excess_cross_corr-455"><a href="#kNN_excess_cross_corr-455"><span class="linenos">455</span></a><span class="sd">        excess spatial cross-correlation between the two tracer sets.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="kNN_excess_cross_corr-441"><a href="#kNN_excess_cross_corr-441"><span class="linenos">441</span></a><span class="k">def</span><span class="w"> </span><span class="nf">kNN_excess_cross_corr</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">,</span> <span class="n">auto_cdf_list_2</span><span class="p">,</span> <span class="n">joint_cdf_list</span><span class="p">,</span> <span class="n">k1_k2_list</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+</span><span id="kNN_excess_cross_corr-442"><a href="#kNN_excess_cross_corr-442"><span class="linenos">442</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+</span><span id="kNN_excess_cross_corr-443"><a href="#kNN_excess_cross_corr-443"><span class="linenos">443</span></a><span class="sd">    Computes the excess spatial cross-correlation (Banerjee &amp; Abel 2023)[^1] between two tracers (discrete or continuous) from their joint kNN distributions (`joint_cdf_list`) and their respective kNN-CDFs (`auto_cdf_list_1`, `auto_cdf_list_2`).</span>
+</span><span id="kNN_excess_cross_corr-444"><a href="#kNN_excess_cross_corr-444"><span class="linenos">444</span></a>
+</span><span id="kNN_excess_cross_corr-445"><a href="#kNN_excess_cross_corr-445"><span class="linenos">445</span></a><span class="sd">    Parameters</span>
+</span><span id="kNN_excess_cross_corr-446"><a href="#kNN_excess_cross_corr-446"><span class="linenos">446</span></a><span class="sd">    ----------</span>
+</span><span id="kNN_excess_cross_corr-447"><a href="#kNN_excess_cross_corr-447"><span class="linenos">447</span></a><span class="sd">    auto_cdf_list_1 : list of numpy float array</span>
+</span><span id="kNN_excess_cross_corr-448"><a href="#kNN_excess_cross_corr-448"><span class="linenos">448</span></a><span class="sd">        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_1^i$NN-CDF if the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
+</span><span id="kNN_excess_cross_corr-449"><a href="#kNN_excess_cross_corr-449"><span class="linenos">449</span></a><span class="sd">    auto_cdf_list_2 : list of numpy float array</span>
+</span><span id="kNN_excess_cross_corr-450"><a href="#kNN_excess_cross_corr-450"><span class="linenos">450</span></a><span class="sd">        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_2^i$NN-CDF if where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
+</span><span id="kNN_excess_cross_corr-451"><a href="#kNN_excess_cross_corr-451"><span class="linenos">451</span></a><span class="sd">    joint_cdf_list : list of numpy float array</span>
+</span><span id="kNN_excess_cross_corr-452"><a href="#kNN_excess_cross_corr-452"><span class="linenos">452</span></a><span class="sd">        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).</span>
+</span><span id="kNN_excess_cross_corr-453"><a href="#kNN_excess_cross_corr-453"><span class="linenos">453</span></a><span class="sd">        </span>
+</span><span id="kNN_excess_cross_corr-454"><a href="#kNN_excess_cross_corr-454"><span class="linenos">454</span></a><span class="sd">    k1_k2_list : list of int tuples</span>
+</span><span id="kNN_excess_cross_corr-455"><a href="#kNN_excess_cross_corr-455"><span class="linenos">455</span></a><span class="sd">        describes the kind of cross-correlations being computed (see notes for more details), by default `None`. Should be not None only if dealing with tracer-tracer cross-correlations</span>
 </span><span id="kNN_excess_cross_corr-456"><a href="#kNN_excess_cross_corr-456"><span class="linenos">456</span></a>
-</span><span id="kNN_excess_cross_corr-457"><a href="#kNN_excess_cross_corr-457"><span class="linenos">457</span></a><span class="sd">    Raises</span>
-</span><span id="kNN_excess_cross_corr-458"><a href="#kNN_excess_cross_corr-458"><span class="linenos">458</span></a><span class="sd">    ------</span>
-</span><span id="kNN_excess_cross_corr-459"><a href="#kNN_excess_cross_corr-459"><span class="linenos">459</span></a><span class="sd">    ValueError</span>
-</span><span id="kNN_excess_cross_corr-460"><a href="#kNN_excess_cross_corr-460"><span class="linenos">460</span></a><span class="sd">        if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`</span>
-</span><span id="kNN_excess_cross_corr-461"><a href="#kNN_excess_cross_corr-461"><span class="linenos">461</span></a><span class="sd">    ValueError</span>
-</span><span id="kNN_excess_cross_corr-462"><a href="#kNN_excess_cross_corr-462"><span class="linenos">462</span></a><span class="sd">        if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`</span>
-</span><span id="kNN_excess_cross_corr-463"><a href="#kNN_excess_cross_corr-463"><span class="linenos">463</span></a>
-</span><span id="kNN_excess_cross_corr-464"><a href="#kNN_excess_cross_corr-464"><span class="linenos">464</span></a><span class="sd">    Notes</span>
-</span><span id="kNN_excess_cross_corr-465"><a href="#kNN_excess_cross_corr-465"><span class="linenos">465</span></a><span class="sd">    -----</span>
-</span><span id="kNN_excess_cross_corr-466"><a href="#kNN_excess_cross_corr-466"><span class="linenos">466</span></a><span class="sd">    The parameter `k1_k2_list` describes the kind of cross-correlations being computed. It should be set to `None` for every scenario other than tracer-tracer cross-correlation, in which case it should provide the combinations of NN indices for the two tracers sets being cross-correlated. </span>
-</span><span id="kNN_excess_cross_corr-467"><a href="#kNN_excess_cross_corr-467"><span class="linenos">467</span></a><span class="sd">    </span>
-</span><span id="kNN_excess_cross_corr-468"><a href="#kNN_excess_cross_corr-468"><span class="linenos">468</span></a><span class="sd">    For example, if you wish to compute the excess cross correlation for the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set</span>
-</span><span id="kNN_excess_cross_corr-469"><a href="#kNN_excess_cross_corr-469"><span class="linenos">469</span></a><span class="sd">            </span>
-</span><span id="kNN_excess_cross_corr-470"><a href="#kNN_excess_cross_corr-470"><span class="linenos">470</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2), (2,1)]</span>
-</span><span id="kNN_excess_cross_corr-471"><a href="#kNN_excess_cross_corr-471"><span class="linenos">471</span></a>
-</span><span id="kNN_excess_cross_corr-472"><a href="#kNN_excess_cross_corr-472"><span class="linenos">472</span></a><span class="sd">    Note that the inputs must be self-consistent, which means the following must be ``True``</span>
-</span><span id="kNN_excess_cross_corr-473"><a href="#kNN_excess_cross_corr-473"><span class="linenos">473</span></a>
-</span><span id="kNN_excess_cross_corr-474"><a href="#kNN_excess_cross_corr-474"><span class="linenos">474</span></a><span class="sd">        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2) and len(joint_cdf_list)==len(k1_k2_list)</span>
-</span><span id="kNN_excess_cross_corr-475"><a href="#kNN_excess_cross_corr-475"><span class="linenos">475</span></a><span class="sd">        </span>
-</span><span id="kNN_excess_cross_corr-476"><a href="#kNN_excess_cross_corr-476"><span class="linenos">476</span></a><span class="sd">    For example, if</span>
-</span><span id="kNN_excess_cross_corr-477"><a href="#kNN_excess_cross_corr-477"><span class="linenos">477</span></a>
-</span><span id="kNN_excess_cross_corr-478"><a href="#kNN_excess_cross_corr-478"><span class="linenos">478</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2)]</span>
-</span><span id="kNN_excess_cross_corr-479"><a href="#kNN_excess_cross_corr-479"><span class="linenos">479</span></a>
-</span><span id="kNN_excess_cross_corr-480"><a href="#kNN_excess_cross_corr-480"><span class="linenos">480</span></a><span class="sd">    then</span>
-</span><span id="kNN_excess_cross_corr-481"><a href="#kNN_excess_cross_corr-481"><span class="linenos">481</span></a><span class="sd">        </span>
-</span><span id="kNN_excess_cross_corr-482"><a href="#kNN_excess_cross_corr-482"><span class="linenos">482</span></a><span class="sd">        len(auto_cdf_list_1) == 2 and len(auto_cdf_list_2) == 2 and len(joint_cdf_list) == 2</span>
-</span><span id="kNN_excess_cross_corr-483"><a href="#kNN_excess_cross_corr-483"><span class="linenos">483</span></a>
-</span><span id="kNN_excess_cross_corr-484"><a href="#kNN_excess_cross_corr-484"><span class="linenos">484</span></a><span class="sd">    must hold, and the first (second) element of `joint_cdf_list` should be the joint {1,1}NN-CDF ({1,2}NN-CDF).</span>
-</span><span id="kNN_excess_cross_corr-485"><a href="#kNN_excess_cross_corr-485"><span class="linenos">485</span></a><span class="sd">        </span>
-</span><span id="kNN_excess_cross_corr-486"><a href="#kNN_excess_cross_corr-486"><span class="linenos">486</span></a><span class="sd">    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF).</span>
-</span><span id="kNN_excess_cross_corr-487"><a href="#kNN_excess_cross_corr-487"><span class="linenos">487</span></a>
-</span><span id="kNN_excess_cross_corr-488"><a href="#kNN_excess_cross_corr-488"><span class="linenos">488</span></a><span class="sd">    References</span>
-</span><span id="kNN_excess_cross_corr-489"><a href="#kNN_excess_cross_corr-489"><span class="linenos">489</span></a><span class="sd">    ----------</span>
-</span><span id="kNN_excess_cross_corr-490"><a href="#kNN_excess_cross_corr-490"><span class="linenos">490</span></a><span class="sd">    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868</span>
-</span><span id="kNN_excess_cross_corr-491"><a href="#kNN_excess_cross_corr-491"><span class="linenos">491</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="kNN_excess_cross_corr-457"><a href="#kNN_excess_cross_corr-457"><span class="linenos">457</span></a><span class="sd">    Returns</span>
+</span><span id="kNN_excess_cross_corr-458"><a href="#kNN_excess_cross_corr-458"><span class="linenos">458</span></a><span class="sd">    -------</span>
+</span><span id="kNN_excess_cross_corr-459"><a href="#kNN_excess_cross_corr-459"><span class="linenos">459</span></a><span class="sd">    psi_list : list of numpy float array</span>
+</span><span id="kNN_excess_cross_corr-460"><a href="#kNN_excess_cross_corr-460"><span class="linenos">460</span></a><span class="sd">        excess spatial cross-correlation between the two tracer sets.</span>
+</span><span id="kNN_excess_cross_corr-461"><a href="#kNN_excess_cross_corr-461"><span class="linenos">461</span></a>
+</span><span id="kNN_excess_cross_corr-462"><a href="#kNN_excess_cross_corr-462"><span class="linenos">462</span></a><span class="sd">    Raises</span>
+</span><span id="kNN_excess_cross_corr-463"><a href="#kNN_excess_cross_corr-463"><span class="linenos">463</span></a><span class="sd">    ------</span>
+</span><span id="kNN_excess_cross_corr-464"><a href="#kNN_excess_cross_corr-464"><span class="linenos">464</span></a><span class="sd">    ValueError</span>
+</span><span id="kNN_excess_cross_corr-465"><a href="#kNN_excess_cross_corr-465"><span class="linenos">465</span></a><span class="sd">        if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`</span>
+</span><span id="kNN_excess_cross_corr-466"><a href="#kNN_excess_cross_corr-466"><span class="linenos">466</span></a><span class="sd">    ValueError</span>
+</span><span id="kNN_excess_cross_corr-467"><a href="#kNN_excess_cross_corr-467"><span class="linenos">467</span></a><span class="sd">        if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`</span>
+</span><span id="kNN_excess_cross_corr-468"><a href="#kNN_excess_cross_corr-468"><span class="linenos">468</span></a>
+</span><span id="kNN_excess_cross_corr-469"><a href="#kNN_excess_cross_corr-469"><span class="linenos">469</span></a><span class="sd">    Notes</span>
+</span><span id="kNN_excess_cross_corr-470"><a href="#kNN_excess_cross_corr-470"><span class="linenos">470</span></a><span class="sd">    -----</span>
+</span><span id="kNN_excess_cross_corr-471"><a href="#kNN_excess_cross_corr-471"><span class="linenos">471</span></a><span class="sd">    The parameter `k1_k2_list` describes the kind of cross-correlations being computed. It should be set to `None` for every scenario other than tracer-tracer cross-correlation, in which case it should provide the combinations of NN indices for the two tracers sets being cross-correlated. </span>
+</span><span id="kNN_excess_cross_corr-472"><a href="#kNN_excess_cross_corr-472"><span class="linenos">472</span></a><span class="sd">    </span>
+</span><span id="kNN_excess_cross_corr-473"><a href="#kNN_excess_cross_corr-473"><span class="linenos">473</span></a><span class="sd">    For example, if you wish to compute the excess cross correlation for the joint {1,1}, {1,2} and {2,1}NN-CDFs, then set</span>
+</span><span id="kNN_excess_cross_corr-474"><a href="#kNN_excess_cross_corr-474"><span class="linenos">474</span></a><span class="sd">            </span>
+</span><span id="kNN_excess_cross_corr-475"><a href="#kNN_excess_cross_corr-475"><span class="linenos">475</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2), (2,1)]</span>
+</span><span id="kNN_excess_cross_corr-476"><a href="#kNN_excess_cross_corr-476"><span class="linenos">476</span></a>
+</span><span id="kNN_excess_cross_corr-477"><a href="#kNN_excess_cross_corr-477"><span class="linenos">477</span></a><span class="sd">    Note that the inputs must be self-consistent, which means the following must be ``True``</span>
+</span><span id="kNN_excess_cross_corr-478"><a href="#kNN_excess_cross_corr-478"><span class="linenos">478</span></a>
+</span><span id="kNN_excess_cross_corr-479"><a href="#kNN_excess_cross_corr-479"><span class="linenos">479</span></a><span class="sd">        len(joint_cdf_list)==len(auto_cdf_list_1) and len(joint_cdf_list)==len(auto_cdf_list_2) and len(joint_cdf_list)==len(k1_k2_list)</span>
+</span><span id="kNN_excess_cross_corr-480"><a href="#kNN_excess_cross_corr-480"><span class="linenos">480</span></a><span class="sd">        </span>
+</span><span id="kNN_excess_cross_corr-481"><a href="#kNN_excess_cross_corr-481"><span class="linenos">481</span></a><span class="sd">    For example, if</span>
+</span><span id="kNN_excess_cross_corr-482"><a href="#kNN_excess_cross_corr-482"><span class="linenos">482</span></a>
+</span><span id="kNN_excess_cross_corr-483"><a href="#kNN_excess_cross_corr-483"><span class="linenos">483</span></a><span class="sd">        k1_k2_list = [(1,1), (1,2)]</span>
+</span><span id="kNN_excess_cross_corr-484"><a href="#kNN_excess_cross_corr-484"><span class="linenos">484</span></a>
+</span><span id="kNN_excess_cross_corr-485"><a href="#kNN_excess_cross_corr-485"><span class="linenos">485</span></a><span class="sd">    then</span>
+</span><span id="kNN_excess_cross_corr-486"><a href="#kNN_excess_cross_corr-486"><span class="linenos">486</span></a><span class="sd">        </span>
+</span><span id="kNN_excess_cross_corr-487"><a href="#kNN_excess_cross_corr-487"><span class="linenos">487</span></a><span class="sd">        len(auto_cdf_list_1) == 2 and len(auto_cdf_list_2) == 2 and len(joint_cdf_list) == 2</span>
+</span><span id="kNN_excess_cross_corr-488"><a href="#kNN_excess_cross_corr-488"><span class="linenos">488</span></a>
+</span><span id="kNN_excess_cross_corr-489"><a href="#kNN_excess_cross_corr-489"><span class="linenos">489</span></a><span class="sd">    must hold, and the first (second) element of `joint_cdf_list` should be the joint {1,1}NN-CDF ({1,2}NN-CDF).</span>
+</span><span id="kNN_excess_cross_corr-490"><a href="#kNN_excess_cross_corr-490"><span class="linenos">490</span></a><span class="sd">        </span>
+</span><span id="kNN_excess_cross_corr-491"><a href="#kNN_excess_cross_corr-491"><span class="linenos">491</span></a><span class="sd">    If `None` is passed for tracer-tracer cross-correlations, the correlations are assumed to be between the same NN indices (eg. {1,1}NN-CDF, {2,2}NN-CDF).</span>
 </span><span id="kNN_excess_cross_corr-492"><a href="#kNN_excess_cross_corr-492"><span class="linenos">492</span></a>
-</span><span id="kNN_excess_cross_corr-493"><a href="#kNN_excess_cross_corr-493"><span class="linenos">493</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="kNN_excess_cross_corr-494"><a href="#kNN_excess_cross_corr-494"><span class="linenos">494</span></a>
-</span><span id="kNN_excess_cross_corr-495"><a href="#kNN_excess_cross_corr-495"><span class="linenos">495</span></a>    <span class="n">psi_list</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="kNN_excess_cross_corr-496"><a href="#kNN_excess_cross_corr-496"><span class="linenos">496</span></a>
-</span><span id="kNN_excess_cross_corr-497"><a href="#kNN_excess_cross_corr-497"><span class="linenos">497</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
-</span><span id="kNN_excess_cross_corr-498"><a href="#kNN_excess_cross_corr-498"><span class="linenos">498</span></a>    
-</span><span id="kNN_excess_cross_corr-499"><a href="#kNN_excess_cross_corr-499"><span class="linenos">499</span></a>    <span class="c1">#Check for consistency:</span>
-</span><span id="kNN_excess_cross_corr-500"><a href="#kNN_excess_cross_corr-500"><span class="linenos">500</span></a>    <span class="k">if</span> <span class="n">k1_k2_list</span><span class="p">:</span>
-</span><span id="kNN_excess_cross_corr-501"><a href="#kNN_excess_cross_corr-501"><span class="linenos">501</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">k1_k2_list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
-</span><span id="kNN_excess_cross_corr-502"><a href="#kNN_excess_cross_corr-502"><span class="linenos">502</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input shapes&#39;</span><span class="p">)</span>
-</span><span id="kNN_excess_cross_corr-503"><a href="#kNN_excess_cross_corr-503"><span class="linenos">503</span></a>    <span class="k">else</span><span class="p">:</span>
-</span><span id="kNN_excess_cross_corr-504"><a href="#kNN_excess_cross_corr-504"><span class="linenos">504</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
-</span><span id="kNN_excess_cross_corr-505"><a href="#kNN_excess_cross_corr-505"><span class="linenos">505</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input: shapes not compatible with each other&#39;</span><span class="p">)</span>
-</span><span id="kNN_excess_cross_corr-506"><a href="#kNN_excess_cross_corr-506"><span class="linenos">506</span></a>    
-</span><span id="kNN_excess_cross_corr-507"><a href="#kNN_excess_cross_corr-507"><span class="linenos">507</span></a>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)):</span>
-</span><span id="kNN_excess_cross_corr-508"><a href="#kNN_excess_cross_corr-508"><span class="linenos">508</span></a>        <span class="n">psi_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">auto_cdf_list_2</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
-</span><span id="kNN_excess_cross_corr-509"><a href="#kNN_excess_cross_corr-509"><span class="linenos">509</span></a>
-</span><span id="kNN_excess_cross_corr-510"><a href="#kNN_excess_cross_corr-510"><span class="linenos">510</span></a>    <span class="k">return</span> <span class="n">psi_list</span>
+</span><span id="kNN_excess_cross_corr-493"><a href="#kNN_excess_cross_corr-493"><span class="linenos">493</span></a><span class="sd">    References</span>
+</span><span id="kNN_excess_cross_corr-494"><a href="#kNN_excess_cross_corr-494"><span class="linenos">494</span></a><span class="sd">    ----------</span>
+</span><span id="kNN_excess_cross_corr-495"><a href="#kNN_excess_cross_corr-495"><span class="linenos">495</span></a><span class="sd">    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868</span>
+</span><span id="kNN_excess_cross_corr-496"><a href="#kNN_excess_cross_corr-496"><span class="linenos">496</span></a><span class="sd">    &#39;&#39;&#39;</span>
+</span><span id="kNN_excess_cross_corr-497"><a href="#kNN_excess_cross_corr-497"><span class="linenos">497</span></a>
+</span><span id="kNN_excess_cross_corr-498"><a href="#kNN_excess_cross_corr-498"><span class="linenos">498</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="kNN_excess_cross_corr-499"><a href="#kNN_excess_cross_corr-499"><span class="linenos">499</span></a>
+</span><span id="kNN_excess_cross_corr-500"><a href="#kNN_excess_cross_corr-500"><span class="linenos">500</span></a>    <span class="n">psi_list</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="kNN_excess_cross_corr-501"><a href="#kNN_excess_cross_corr-501"><span class="linenos">501</span></a>
+</span><span id="kNN_excess_cross_corr-502"><a href="#kNN_excess_cross_corr-502"><span class="linenos">502</span></a>    <span class="c1">#-------------------------------------------------------------------------------------------</span>
+</span><span id="kNN_excess_cross_corr-503"><a href="#kNN_excess_cross_corr-503"><span class="linenos">503</span></a>    
+</span><span id="kNN_excess_cross_corr-504"><a href="#kNN_excess_cross_corr-504"><span class="linenos">504</span></a>    <span class="c1">#Check for consistency:</span>
+</span><span id="kNN_excess_cross_corr-505"><a href="#kNN_excess_cross_corr-505"><span class="linenos">505</span></a>    <span class="k">if</span> <span class="n">k1_k2_list</span><span class="p">:</span>
+</span><span id="kNN_excess_cross_corr-506"><a href="#kNN_excess_cross_corr-506"><span class="linenos">506</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">k1_k2_list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
+</span><span id="kNN_excess_cross_corr-507"><a href="#kNN_excess_cross_corr-507"><span class="linenos">507</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input shapes&#39;</span><span class="p">)</span>
+</span><span id="kNN_excess_cross_corr-508"><a href="#kNN_excess_cross_corr-508"><span class="linenos">508</span></a>    <span class="k">else</span><span class="p">:</span>
+</span><span id="kNN_excess_cross_corr-509"><a href="#kNN_excess_cross_corr-509"><span class="linenos">509</span></a>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">auto_cdf_list_2</span><span class="p">):</span> 
+</span><span id="kNN_excess_cross_corr-510"><a href="#kNN_excess_cross_corr-510"><span class="linenos">510</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inconsistent input: shapes not compatible with each other&#39;</span><span class="p">)</span>
+</span><span id="kNN_excess_cross_corr-511"><a href="#kNN_excess_cross_corr-511"><span class="linenos">511</span></a>    
+</span><span id="kNN_excess_cross_corr-512"><a href="#kNN_excess_cross_corr-512"><span class="linenos">512</span></a>    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">)):</span>
+</span><span id="kNN_excess_cross_corr-513"><a href="#kNN_excess_cross_corr-513"><span class="linenos">513</span></a>        <span class="n">psi_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">joint_cdf_list</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="n">auto_cdf_list_1</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">*</span><span class="n">auto_cdf_list_2</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+</span><span id="kNN_excess_cross_corr-514"><a href="#kNN_excess_cross_corr-514"><span class="linenos">514</span></a>
+</span><span id="kNN_excess_cross_corr-515"><a href="#kNN_excess_cross_corr-515"><span class="linenos">515</span></a>    <span class="k">return</span> <span class="n">psi_list</span>
 </span></pre></div>
 
 
