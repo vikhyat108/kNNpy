@@ -14,7 +14,7 @@ import sys
 import os
 
 #Necessary for relative imports (see https://stackoverflow.com/questions/34478398/import-local-function-from-a-module-housed-in-another-directory-with-relative-im)
-module_path = os.path.abspath(os.path.join(''))
+module_path = os.path.abspath(os.path.join('../../'))
 '''
 @private
 '''
