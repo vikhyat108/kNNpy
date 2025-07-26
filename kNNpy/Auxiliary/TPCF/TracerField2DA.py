@@ -18,12 +18,11 @@ module_path = os.path.abspath(os.path.join(''))
 '''
 @private
 '''
-
 if module_path not in sys.path:
     sys.path.append(module_path)
 
 #Importing the required helper function
-from kNN_ASMR.HelperFunctions_2DA import create_smoothed_field_dict_2DA
+from kNNpy.HelperFunctions_2DA import create_smoothed_field_dict_2DA
 
 ####################################################################################################
 
@@ -69,9 +68,9 @@ def CorrelationFunction(BinsRad, MaskedTracerPosRad, FieldSkymap, NR_ND=10, Retu
 
     See Also
     --------
-    kNN_ASMR.Auxilliary.TPCF.TracerField2DA.CorrelationFunction_DataVector : computes a data vector of tracer-field two-point cross-correlations in 2D for multiple realisations of the tracer set.
-    kNN_ASMR.Auxilliary.TPCF.3DTPCF_Tracer-Field.CrossCorr2pt : computes tracer-field two-point cross-correlations in 3D.
-    kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA : computes 2D angular tracer-field cross-correlations using the $k$NN formalism.
+    kNNpy.Auxilliary.TPCF.TracerField2DA.CorrelationFunction_DataVector : computes a data vector of tracer-field two-point cross-correlations in 2D for multiple realisations of the tracer set.
+    kNNpy.Auxilliary.TPCF.3DTPCF_Tracer-Field.CrossCorr2pt : computes tracer-field two-point cross-correlations in 3D.
+    kNNpy.kNN_2D_Ang.TracerFieldCross2DA : computes 2D angular tracer-field cross-correlations using the $k$NN formalism.
 
     Notes
     -----
@@ -236,13 +235,13 @@ def CorrelationFunction_DataVector(BinsRad, MaskedTracerPosVectorRad, FieldSkyma
 
     See Also
     --------
-    kNN_ASMR.Auxilliary.TPCF.TracerField2DA.CorrelationFunction : computes tracer-field two-point cross-correlations in 2D for a single realisation of the tracer set.
-    kNN_ASMR.Auxilliary.TPCF.3DTPCF_Tracer-Field.CrossCorr2pt : computes tracer-field two-point cross-correlations in 3D.
-    kNN_ASMR.kNN_2D_Ang.TracerFieldCross2DA_DataVector : computes a data vector of 2D angular tracer-field cross-correlations for multiple tracer realisations using the $k$NN formalism.
+    kNNpy.Auxilliary.TPCF.TracerField2DA.CorrelationFunction : computes tracer-field two-point cross-correlations in 2D for a single realisation of the tracer set.
+    kNNpy.Auxilliary.TPCF.3DTPCF_Tracer-Field.CrossCorr2pt : computes tracer-field two-point cross-correlations in 3D.
+    kNNpy.kNN_2D_Ang.TracerFieldCross2DA_DataVector : computes a data vector of 2D angular tracer-field cross-correlations for multiple tracer realisations using the $k$NN formalism.
 
     Notes
     -----
-    Please refer to the documentation of kNN_ASMR.Auxilliary.TPCF.TracerFieldCross2DA.CorrelationFunction for important usage notes that also apply to this function and references. <Explain why cross-correlating multiple realisations of tracer with single realisation of field might be useful>
+    Please refer to the documentation of kNNpy.Auxilliary.TPCF.TracerFieldCross2DA.CorrelationFunction for important usage notes that also apply to this function and references. <Explain why cross-correlating multiple realisations of tracer with single realisation of field might be useful>
 
     References
     ----------

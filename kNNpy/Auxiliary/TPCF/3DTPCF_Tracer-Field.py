@@ -1,17 +1,22 @@
-###############################################################################################################################
+####################################################################################################
 
-#-------------------------------------------  Importing the required libraries  -----------------------------------------------
+#-------------------------------  Importing the required libraries  --------------------------------
 
 import numpy as np
-import pyfftw
-from scipy import interpolate
-import scipy.spatial
 import time
 import MAS_library as MASL
-import smoothing_library as SL
-from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_3D
 
-###############################################################################################################################
+#Necessary for relative imports (see https://stackoverflow.com/questions/34478398/import-local-function-from-a-module-housed-in-another-directory-with-relative-im)
+module_path = os.path.abspath(os.path.join(''))
+'''
+@private
+'''
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
+from kNNpy.HelperFunctions import create_smoothed_field_dict_3D
+
+####################################################################################################
 
 # Function that returns the the 2-point Cross-Correlation Function between a set of discrete tracers and a continuous field using the stacking method
 
@@ -132,4 +137,4 @@ def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, R, kmin=N
     
     return xi
 
-#--------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------
