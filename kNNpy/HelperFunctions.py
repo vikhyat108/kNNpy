@@ -147,7 +147,7 @@ def create_query_3D(query_type, query_grid, BoxSize):
         
     See Also
     --------
-    kNN_ASMR.HelperFunctions.create_query_2DA : generates query points in 2D angular coordinates.
+    kNNpy.HelperFunctions.create_query_2DA : generates query points in 2D angular coordinates.
     '''
 
     #Validating inputs

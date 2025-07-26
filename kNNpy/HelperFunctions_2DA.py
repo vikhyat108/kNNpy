@@ -55,7 +55,7 @@ def create_query_2DA(NSIDE_query, mask, tolerance, Verbose=False):
         
     See Also
     --------
-    kNN_ASMR.HelperFunctions.create_query_3D : generates query points in 3D.
+    kNNpy.HelperFunctions.create_query_3D : generates query points in 3D.
 
     Notes
     -----
@@ -203,7 +203,7 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
         
     See Also
     --------
-    kNN_ASMR.HelperFunctions.smoothing_3d : performs smoothing operations in 3D.
+    kNNpy.HelperFunctions.smoothing_3d : performs smoothing operations in 3D.
 
     Notes
     -----

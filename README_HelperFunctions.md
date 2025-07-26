@@ -1,3 +1,3 @@
-# kNNpy Helper Functions
+# kNNpy Topic-HelperFunctions branch
 
-This is a topic branch dedicated to the development of certain helper functions that are commonly used by the main package modules.
+This is a topic branch dedicated to the development of the ``kNNpy.HelperFunctions`` and ``kNNpy.HelperFunctions_2DA`` modules that contain certain helper functions commonly used by other modules.
