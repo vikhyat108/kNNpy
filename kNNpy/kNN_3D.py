@@ -3,30 +3,24 @@ import time
 import sys
 import scipy.spatial
 import os
-import gc
 import scipy
-from scipy import interpolate
-import copy
-import pyfftw
-import warnings
-import smoothing_library as SL
-import MAS_library as MASL
 
 
 # Ensure module path is correctly added for relative imports
 module_path = os.path.abspath(os.path.join(''))
+'''
+@private
+'''
 if module_path not in sys.path:
     sys.path.append(module_path)
 
 # Import necessary helper functions
-from kNN_ASMR.HelperFunctions import calc_kNN_CDF
-from kNN_ASMR.HelperFunctions import cdf_vol_knn
-from kNN_ASMR.HelperFunctions import create_query_3D
-from kNN_ASMR.HelperFunctions import CIC_3D_Interp
-from kNN_ASMR.HelperFunctions import smoothing_3D
-from kNN_ASMR.HelperFunctions import create_smoothed_field_dict_3D
+from kNNpy.HelperFunctions import calc_kNN_CDF
+from kNNpy.HelperFunctions import CIC_3D_Interp
+from kNNpy.HelperFunctions import smoothing_3D
+from kNNpy.HelperFunctions import create_smoothed_field_dict_3D
 
-#################################################################################################################
+####################################################################################################
 
 #--------------------------------------  Function Definitions  -------------------------------------
 
@@ -167,6 +161,7 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     return kNN_results
 
 ####################################################################################################
+
 def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, TracerPos_B, Verbose=False):
     
     r'''
@@ -182,7 +177,7 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     3.  $P_{\geq k_A, \geq k_B}(\theta)$:
     	the joint probability of finding at least $k_A$ set A tracers and at least $k_B$ set B tracers within a sphere of radius $r$
     		
-    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNN_ASMR.HelperFunctions.kNN_excess_cross_corr()` method to do this)
+    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this)
     	
     $$\psi_{k_A, k_B} = P_{\geq k_A, \geq k_B}/(P_{\geq k_A} \times P_{\geq k_B})$$
     		
@@ -380,7 +375,7 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     	the joint probability of finding at least $k_A$ set A tracers and at least $k_B$ set B tracers within a sphere of radius $r$, for the
         $i^{\text{th}}$ realization of Tracer A
     		
-    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNN_ASMR.HelperFunctions.kNN_excess_cross_corr()` method to do this)
+    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this)
     	
     $$\psi_{k_A, k_B} = P_{\geq k_A, \geq k_B}/(P_{\geq k_A} \times P_{\geq k_B})$$
     		
@@ -812,7 +807,7 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
 def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVector, Field, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
     
     r'''
-    Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNN_ASMR.kNN_3D.TracerFieldCross for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`TracerPosVector`] and a single realisation of the given continuous overdensity field (`Field`). Please refer to notes to understand why this might be useful.
+    Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNNpy.kNN_3D.TracerFieldCross for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`TracerPosVector`] and a single realisation of the given continuous overdensity field (`Field`). Please refer to notes to understand why this might be useful.
     	
     Parameters
     ----------
