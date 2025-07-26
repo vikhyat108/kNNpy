@@ -358,6 +358,7 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     return p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list
 
 ####################################################################################################
+
 def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A_dict, TracerPos_B, Verbose=False ):
     r'''
     Returns the probabilities $P_{\geq k_{A_i}}$, $P_{\geq k_B}$ and $P_{\geq k_{A_i}, \geq k_B}$ for ($k_{A_i}$, $k_B$) in `kA_kB_list` for various 
@@ -570,7 +571,6 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     return Realizations
 
 ####################################################################################################
-
 
 def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, FieldConstPercThreshold, ReturnSmoothedFieldDict=False, Verbose=False):
     r'''
@@ -800,9 +800,7 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
     else:
         return p_gtr_k_list, p_gtr_dt_list, p_gtr_k_dt_list
 
-
-#################################################################################################################
-
+####################################################################################################
 
 def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVector, Field, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
     
