@@ -1,4 +1,9 @@
-# <img src="logo.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
+<p align="center">
+  <img src="logo2.jpeg" alt="kNNpy Logo" width="300"/>
+</p>
+
+
+# <img src="logo2.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
 
 **kNNpy** is a Python package for computing the **k-Nearest Neighbor Distributions** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
 
@@ -17,15 +22,16 @@ kNNpy provides the following functionalities:
     - Tracer auto  
     - Tracer $\times$ tracer  
     - Tracer $\times$ field
-- **Statistics of peaks**:
-  - Analyze the high-density tail of the distribution  
 - **Helper Submodules**:
   - Shared utilities for distance calculations, binning, and file handling  
   - Designed to support both `kNN_3D` and `kNN_2D` workflows
-- **Two-point Correlation Function (2PCF)**:
-  - Standard pair-counting statistics for benchmarking  
-- **Fisher Matrix Construction**:
-  - Forecast cosmological parameter constraints  
+- **Auxiliary Modules**:
+  - **Statistics of Peaks**:  
+    Analyze the high-density tail of the distribution  
+  - **Two-point Correlation Function (2PCF)**:  
+    Standard pair-counting statistics for benchmarking  
+  - **Fisher Matrix Construction**:  
+    Forecast cosmological parameter constraints  
 
 ---
 
@@ -140,6 +146,7 @@ The idea behind kNN CDFs easily generalises to [cross correlations](https://doi.
 ## 📘 Documentation
 
 The most updated documentation with examples can be found [**here**](https://kitnenikatnivasi.github.io/kNNpy_documentation_html/kNNpy.html).
+[pdoc](https://pdoc.dev/) was used for the generation of the documentation.
 
 ---
 
@@ -152,5 +159,20 @@ For comments, questions or bug reports, feel free to reach out:
 
 ## 🌐 Website
 
-🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io)
+🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io).
+
+## Some cool images from the codes
+
+<p align="center">
+  <img src="cdfs.jpeg" alt="kNNpy Logo" width="300"/>
+</p>
+
+Image title: Comparison of CDFs for k = 1, 2, and 3 nearest neighbors.
+
+
+<p align="center">
+  <img src="spheres.jpeg" alt="kNNpy Logo" width="300"/>
+</p>
+
+Image title: Colored regions where 1st, 2nd, and 3rd NN spheres overlap.
 
