@@ -1,4 +1,4 @@
-# <img src="knnpy_logo.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
+# <img src="logo.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
 
 **kNNpy** is a Python package for computing the **k-Nearest Neighbor Cumulative Distribution Function (kNN-CDF)** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
 
