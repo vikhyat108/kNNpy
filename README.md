@@ -9,11 +9,11 @@
 kNNpy provides the following functionalities:
 
 - **Compute kNN-CDF statistics**:
-  - `$k$-NN 3D` — for 3D clustering analysis, when we have the 3-D positions and/or the 3-D field    
+  - `kNN 3D` — for 3D clustering analysis, when we have the 3-D positions and/or the 3-D field    
     - Tracer auto  
     - Tracer cross tracer  
     - Tracer cross field
-  - `$k$-NN 2D` — for angular clustering analysis, when we have the (RA, Dec) and/or the 2-D field on the sky   
+  - `$$k$$ NN 2D` — for angular clustering analysis, when we have the (RA, Dec) and/or the 2-D field on the sky   
     - Tracer auto  
     - Tracer cross tracer  
     - Tracer cross field
