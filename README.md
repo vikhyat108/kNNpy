@@ -1,4 +1,9 @@
-# <img src="logo.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
+<p align="center">
+  <img src="logo2.png" alt="kNNpy Logo" width="300"/>
+</p>
+
+# <img src="logo2.png" alt="kNNpy Logo" height="40"/> **kNNpy**
+
 
 **kNNpy** is a Python package for computing the **k-Nearest Neighbor Distributions** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
 
@@ -17,15 +22,16 @@ kNNpy provides the following functionalities:
     - Tracer auto  
     - Tracer $\times$ tracer  
     - Tracer $\times$ field
-- **Peak Statistics**:
-  - Analyze the high-density tail of the distribution  
 - **Helper Submodules**:
   - Shared utilities for distance calculations, binning, and file handling  
   - Designed to support both `kNN_3D` and `kNN_2D` workflows
-- **Two-point Correlation Function (2PCF)**:
-  - Standard pair-counting statistics for benchmarking  
-- **Fisher Matrix Construction**:
-  - Forecast cosmological parameter constraints  
+- **Auxiliary Modules**:
+  - **Statistics of Peaks**:  
+    Analyze the high-density tail of the distribution  
+  - **Two-point Correlation Function (2PCF)**:  
+    Standard pair-counting statistics for benchmarking  
+  - **Fisher Matrix Construction**:  
+    Forecast cosmological parameter constraints  
 
 ---
 
@@ -67,7 +73,7 @@ pip install numpy scipy pyfftw Pylians healpy scikit-learn matplotlib
 >
 > - First install all other dependencies (without Pylians)
 > - Then install Pylians in development mode following their official instructions:  
-> 👉 [https://github.com/franciscovillaescusa/Pylians](https://github.com/franciscovillaescusa/Pylians)
+> 👉 [Pylians_documentation](https://pylians3.readthedocs.io/en/master/installation.html#)
 
 If you **do not** want the optional dependencies, run instead:
 
@@ -125,19 +131,23 @@ import kNNpy
 
 ## 🔬 Scientific Background
 
-The `kNN distributions` are defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
+The `kNN CDFs` are defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
 
 This methodology was introduced in:
 
-> **Banerjee & Abel (2020)**  
-> *Nearest Neighbor distributions: new statistical measures for cosmological clustering*  
-> 📄 [arXiv:2007.13342](https://arxiv.org/abs/2007.13342)
+> **Banerjee & Abel (2021)**  
+> *Nearest neighbour distributions: New statistical measures for cosmological clustering*  
+> 📄 [doi.org/10.1093/mnras/staa3604](https://doi.org/10.1093/mnras/staa3604)
+
+The idea behind kNN CDFs easily generalises to [cross correlations](https://doi.org/10.1093/mnras/stab961) and [continuous fields](https://doi.org/10.1093/mnras/stac3813) as well.
 
 ---
 
 ## 📘 Documentation
 
 The most updated documentation with examples can be found [**here**](https://kitnenikatnivasi.github.io/kNNpy_documentation_html/kNNpy.html).
+
+[pdoc](https://pdoc.dev/) was used for the generation of the documentation.
 
 ---
 
@@ -150,5 +160,20 @@ For comments, questions or bug reports, feel free to reach out:
 
 ## 🌐 Website
 
-🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io)
+🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io).
 
+---
+
+## 🖼️ Some Cool Visuals from the Code
+
+<p align="center">
+  <img src="cdfs.jpeg" alt="kNN-CDF comparison" width="500"/>
+  <br>
+  <em>Figure 1: Comparison of CDFs for <code>k = 1, 2, 3</code> nearest neighbors.</em>
+</p>
+
+<p align="center">
+  <img src="spheres.jpeg" alt="kNN Overlapping Spheres" width="500"/>
+  <br>
+  <em>Figure 2: Colored regions showing overlap of 1st, 2nd, and 3rd nearest neighbor spheres.</em>
+</p>
