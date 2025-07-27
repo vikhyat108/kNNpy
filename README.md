@@ -162,6 +162,8 @@ For comments, questions or bug reports, feel free to reach out:
 
 🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io).
 
+---
+
 ## 🖼️ Some Cool Visuals from the Code
 
 <p align="center">
