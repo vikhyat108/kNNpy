@@ -1,6 +1,6 @@
 # <img src="logo.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
 
-**kNNpy** is a Python package for computing the **k-Nearest Neighbor Cumulative Distribution Function (kNN-CDF)** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
+**kNNpy** is a Python package for computing the **k-Nearest Neighbor Distributions** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
 
 ---
 
@@ -11,12 +11,12 @@ kNNpy provides the following functionalities:
 - **Compute kNN distributions**:
   - `kNN_3D` — for 3D clustering analysis, when we have the 3-D positions and/or the 3-D field    
     - Tracer auto  
-    - Tracer cross tracer  
-    - Tracer cross field
+    - Tracer $\times$ tracer  
+    - Tracer $\times$ field
   - `kNN_2D` — for angular clustering analysis, when we have the (RA, Dec) and/or the 2-D field on the sky   
     - Tracer auto  
-    - Tracer cross tracer  
-    - Tracer cross field
+    - Tracer $\times$ tracer  
+    - Tracer $\times$ field
 - **Peak Statistics**:
   - Analyze the high-density tail of the distribution  
 - **Helper Submodules**:
@@ -125,7 +125,7 @@ import kNNpy
 
 ## 🔬 Scientific Background
 
-The `kNN CDF` is defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
+The `kNN distributions` are defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
 
 This methodology was introduced in:
 
