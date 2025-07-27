@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="logo2.jpeg" alt="kNNpy Logo" width="300"/>
+  <img src="logo2.png" alt="kNNpy Logo" width="300"/>
 </p>
 
 
-# <img src="logo2.jpeg" alt="kNNpy Logo" width="30"/> **kNNpy**
+# <img src="logo2.png" alt="kNNpy Logo" width="30"/> **kNNpy**
 
 **kNNpy** is a Python package for computing the **k-Nearest Neighbor Distributions** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
 
