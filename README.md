@@ -17,7 +17,7 @@ kNNpy provides the following functionalities:
     - Tracer auto  
     - Tracer $\times$ tracer  
     - Tracer $\times$ field
-- **Peak Statistics**:
+- **Statistics of peaks**:
   - Analyze the high-density tail of the distribution  
 - **Helper Submodules**:
   - Shared utilities for distance calculations, binning, and file handling  
@@ -67,7 +67,7 @@ pip install numpy scipy pyfftw Pylians healpy scikit-learn matplotlib
 >
 > - First install all other dependencies (without Pylians)
 > - Then install Pylians in development mode following their official instructions:  
-> 👉 [https://github.com/franciscovillaescusa/Pylians](https://github.com/franciscovillaescusa/Pylians)
+> 👉 [Pylians_documentation](https://pylians3.readthedocs.io/en/master/installation.html#)
 
 If you **do not** want the optional dependencies, run instead:
 
