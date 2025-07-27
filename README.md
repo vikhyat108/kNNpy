@@ -162,18 +162,16 @@ For comments, questions or bug reports, feel free to reach out:
 
 🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io).
 
-## Some cool images from the codes
+## 🖼️ Some Cool Visuals from the Code
 
 <p align="center">
-  <img src="cdfs.jpeg" alt="kNNpy Logo" width="300"/>
+  <img src="cdfs.jpeg" alt="kNN-CDF comparison" width="500"/>
+  <br>
+  <em>Figure 1: Comparison of CDFs for <code>k = 1, 2, 3</code> nearest neighbors.</em>
 </p>
-
-Image title: Comparison of CDFs for k = 1, 2, and 3 nearest neighbors.
-
 
 <p align="center">
-  <img src="spheres.jpeg" alt="kNNpy Logo" width="300"/>
+  <img src="spheres.jpeg" alt="kNN Overlapping Spheres" width="500"/>
+  <br>
+  <em>Figure 2: Colored regions showing overlap of 1st, 2nd, and 3rd nearest neighbor spheres.</em>
 </p>
-
-Image title: Colored regions where 1st, 2nd, and 3rd NN spheres overlap.
-
