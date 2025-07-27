@@ -125,13 +125,15 @@ import kNNpy
 
 ## 🔬 Scientific Background
 
-The `kNN distributions` are defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
+The `kNN CDFs` are defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
 
 This methodology was introduced in:
 
 > **Banerjee & Abel (2021)**  
 > *Nearest neighbour distributions: New statistical measures for cosmological clustering*  
 > 📄 [doi.org/10.1093/mnras/staa3604](https://doi.org/10.1093/mnras/staa3604)
+
+The idea behind kNN CDFs easily generalises to [cross correlations](https://doi.org/10.1093/mnras/stab961) and [continuous fields](https://doi.org/10.1093/mnras/stac3813) as well.
 
 ---
 
