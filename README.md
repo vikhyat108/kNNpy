@@ -146,6 +146,7 @@ The idea behind kNN CDFs easily generalises to [cross correlations](https://doi.
 ## 📘 Documentation
 
 The most updated documentation with examples can be found [**here**](https://kitnenikatnivasi.github.io/kNNpy_documentation_html/kNNpy.html).
+
 [pdoc](https://pdoc.dev/) was used for the generation of the documentation.
 
 ---
