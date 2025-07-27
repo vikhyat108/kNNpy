@@ -129,9 +129,9 @@ The `kNN distributions` are defined as the empirical cumulative distribution of 
 
 This methodology was introduced in:
 
-> **Banerjee & Abel (2020)**  
-> *Nearest Neighbor distributions: new statistical measures for cosmological clustering*  
-> 📄 [arXiv:2007.13342](https://arxiv.org/abs/2007.13342)
+> **Banerjee & Abel (2021)**  
+> *Nearest neighbour distributions: New statistical measures for cosmological clustering*  
+> 📄 [doi.org/10.1093/mnras/staa3604](https://doi.org/10.1093/mnras/staa3604)
 
 ---
 
