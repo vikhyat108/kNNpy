@@ -1,37 +1,37 @@
-<p align="center">
+﻿<p align="center">
   <img src="logo2.png" alt="kNNpy Logo" width="300"/>
 </p>
 
-# <img src="logo2.png" alt="kNNpy Logo" height="40"/> **kNNpy**
+---
 
-
-**kNNpy** is a Python package for computing the **k-Nearest Neighbor Distributions** — a powerful statistic designed to capture the full non-Gaussian information content of cosmological clustering. It provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
+`kNNpy` is a Python package for computing the **$k$-nearest neighbour distributions** — powerful summary statistics designed to capture the full non-Gaussian information content of cosmological clustering. The package provides a modular and efficient framework to analyze both 2D and 3D large-scale structure data, going beyond traditional two-point statistics.
 
 ---
 
 ## 📦 Features
 
-kNNpy provides the following functionalities:
+`kNNpy` provides the following functionalities:
 
-- **Compute kNN distributions**:
-  - `kNN_3D` — for 3D clustering analysis, when we have the 3-D positions and/or the 3-D field    
-    - Tracer auto  
-    - Tracer $\times$ tracer  
-    - Tracer $\times$ field
-  - `kNN_2D` — for angular clustering analysis, when we have the (RA, Dec) and/or the 2-D field on the sky   
-    - Tracer auto  
-    - Tracer $\times$ tracer  
-    - Tracer $\times$ field
-- **Helper Submodules**:
-  - Shared utilities for distance calculations, binning, and file handling  
-  - Designed to support both `kNN_3D` and `kNN_2D` workflows
+- **Compute *k*NN distributions**:
+  - `kNNpy.kNN_3D` — clustering of discrete data points (tracers) and continuous overdensity fields in 3D ($x, y, z$)
+    - Tracer auto-clustering
+    - Tracer $\times$ tracer cross-clustering
+    - Tracer $\times$ field cross-clustering
+  - `kNNpy.kNN_2D_Ang` — angular clustering of discrete data points and continuous overdensity fields in the sky ($\alpha, \delta$)
+    - Tracer auto-clustering
+    - Tracer $\times$ tracer cross-clustering 
+    - Tracer $\times$ field cross-clustering
+- **Helper Submodules**: 
+	- `kNNpy.HelperFunctions`, `kNNpy.HelperFunctions_2DA`
+	- Shared utilities such as nearest-neighbour distance calculations and spatial smoothing of continuous fields
+  - Designed to support both `kNN_3D` and `kNN_2D_Ang` workflows
 - **Auxiliary Modules**:
-  - **Statistics of Peaks**:  
-    Analyze the high-density tail of the distribution  
-  - **Two-point Correlation Function (2PCF)**:  
-    Standard pair-counting statistics for benchmarking  
+  - **Statistics of Peaks**:  `kNNpy.Auxiliary.PeakStatistics`
+    Analyze the high-density tail of the matter distribution  
+  - **Two-point Correlation Function (2PCF)**: `kNNpy.Auxiliary.TPCF`
+    Standard pair-counting statistics, implemented for tracer $\times$ field cross-clustering in 3D and angular 2D coordinates
   - **Fisher Matrix Construction**:  
-    Forecast cosmological parameter constraints  
+    Forecasts for cosmological parameter constraints  
 
 ---
 
@@ -42,14 +42,14 @@ kNNpy provides the following functionalities:
 - `numpy`
 - `scipy`
 - `pyfftw`
-- `pylians`
+- `Pylians`
 - `healpy` *(optional)*
 - `scikit-learn` *(optional)*
 - `matplotlib` *(optional)*
 
 These need to be installed before using the package, preferably in a fresh virtual environment (see instructions below).  
-`healpy` and `scikit-learn` are optional, and can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang` module.  
-Similarly, `matplotlib` is optional if you do not intend to use the `kNNpy.Auxiliary.PeakStatistics` module.
+`scikit-learn` is optional, and can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang` module.  
+Similarly, `healpy` and `matplotlib` are optional if you do not intend to use the `kNNpy.kNN_2D_Ang`, `kNNpy.Auxiliary.TPCF.TracerField2D` and `kNNpy.Auxiliary.PeakStatistics` modules.
 
 ---
 
@@ -75,7 +75,7 @@ pip install numpy scipy pyfftw Pylians healpy scikit-learn matplotlib
 > - Then install Pylians in development mode following their official instructions:  
 > 👉 [Pylians_documentation](https://pylians3.readthedocs.io/en/master/installation.html#)
 
-If you **do not** want the optional dependencies, run instead:
+If you **do not** want the optional dependencies, replace the last line above by:
 
 ```bash
 pip install numpy scipy pyfftw Pylians
@@ -99,6 +99,23 @@ export PYTHONPATH="${PYTHONPATH}:/path/to/installation/directory/kNNpy/"
 
 - **Permanently** (recommended): add the line above to your `~/.bashrc` or `~/.zshrc`.
 
+### ✅ Test the installation
+
+To check if `kNNpy` is successfully installed and ready to use, run the following command:
+
+```bash
+cd /path/to/installation/directory/
+cd kNNpy/Tests/
+python3 import_all_modules.py
+```
+
+If you did not install the optional dependencies, replace the last line above by:
+
+```bash
+python3 import_required_modules.py
+```
+If no error message is returned, the installation is succesful.
+
 ---
 
 ### 🪟 Windows
@@ -121,33 +138,39 @@ Activate your virtual environment:
 source /path/to/virtual/environment/bin/activate
 ```
 
-Set the `PYTHONPATH` (if not already done) and then in your Python scripts or notebooks, you can now:
+Set the `PYTHONPATH` (if not already done) and in your Python scripts or notebooks, you can now:
 
 ```python
 import kNNpy
 ```
 
+💡 **Note**: If you skipped the optional dependencies, use the `from kNNpy import <MODULE NAME>` idiom instead of `import kNNpy`.
+
 ---
 
 ## 🔬 Scientific Background
 
-The `kNN CDFs` are defined as the empirical cumulative distribution of distances from volume-filling random points to their *k*-th nearest data point. It captures **all connected N-point functions** present in the data and is particularly sensitive to **non-Gaussian features** on small scales, making it a powerful alternative to traditional summary statistics like the correlation function or power spectrum.
+Mapping and characterizing the large-scale structure of the universe is a key scientific enterprise in modern Cosmology. The spatial clustering of celestial object such as galaxies, binary black holes and clouds of neutral hydrogen that trace structure formation contains a wealth of information about cosmology and tracer astrophysics.
 
-This methodology was introduced in:
+Traditionally, clustering is measured using two-point summary statistics that provide a complete description for tracers of Gaussian random fields. However, on small spatial scales accessible with modern cosmological surveys such as DESI, LSST and Euclid, where the effect of gravitational non-linearities cannot be neglected, the cosmological matter field can no longer be approximated as a Gaussian random field. Therefore, we need to move beyond two-point statistics to fully utilize the information contained in the data.
+
+For a given set of discrete data points (for example, galaxies from an astronomical survey), the $k$-nearest neigbour (*k*NN) distributions are defined as the empirical cumulative distribution functions of distances from volume-filling random points to their $k^{\rm th}$ nearest data point. These distributions are robust summary statistics for quantifying spatial clustering in discrete data.
+
+ The *k*NN distributions are formally sensitive to **all connected $N$-point functions** and can extract information from **non-Gaussian features** present in the data on small scales, making them powerful alternatives to traditional summary statistics like the correlation function or power spectrum. They are easy to compute from data and computationally more efficient than individual higher-order clustering statistics such as the bispectrum and the trispectrum. They have been shown to significantly boost the detection of spatial clustering in observed and simulated data over two-point statistics; improve cosmological constraints for fisher forecasts; and are more robust in the presence of large statistical scatter in data.
+
+*k*NN distributions and the methods implemented in `kNNpy` were first introduced for discrete data in:
 
 > **Banerjee & Abel (2021)**  
 > *Nearest neighbour distributions: New statistical measures for cosmological clustering*  
 > 📄 [doi.org/10.1093/mnras/staa3604](https://doi.org/10.1093/mnras/staa3604)
 
-The idea behind kNN CDFs easily generalises to [cross correlations](https://doi.org/10.1093/mnras/stab961) and [continuous fields](https://doi.org/10.1093/mnras/stac3813) as well.
+and were later generalised to [cross-correlations](https://doi.org/10.1093/mnras/stab961) and [continuous fields](https://doi.org/10.1093/mnras/stac3813).
 
 ---
 
 ## 📘 Documentation
 
-The most updated documentation with examples can be found [**here**](https://kitnenikatnivasi.github.io/kNNpy_documentation_html/kNNpy.html).
-
-[pdoc](https://pdoc.dev/) was used for the generation of the documentation.
+The latest documentation for `kNNpy`, generated using [pdoc](https://pdoc.dev/), can be found [**here**](https://kitnenikatnivasi.github.io/kNNpy_documentation_html/kNNpy.html).
 
 ---
 
@@ -160,20 +183,20 @@ For comments, questions or bug reports, feel free to reach out:
 
 ## 🌐 Website
 
-🌍 You can find more about the codes and the team [**here**](https://kitnenikatnivasi.github.io).
+🌍 You can find more about the code, the science, and the team [**here**](https://kitnenikatnivasi.github.io).
 
 ---
 
-## 🖼️ Some Cool Visuals from the Code
+## 🖼️ Some Cool Visualisations
 
 <p align="center">
   <img src="cdfs.jpeg" alt="kNN-CDF comparison" width="500"/>
   <br>
-  <em>Figure 1: Comparison of CDFs for <code>k = 1, 2, 3</code> nearest neighbors.</em>
+  <em>Figure 1: Comparison of CDFs for <code>k = 1, 2, 3</code> nearest neighbours.</em>
 </p>
 
 <p align="center">
   <img src="spheres.jpeg" alt="kNN Overlapping Spheres" width="500"/>
   <br>
-  <em>Figure 2: Colored regions showing overlap of 1st, 2nd, and 3rd nearest neighbor spheres.</em>
+  <em>Figure 2: Colored regions showing overlap of 1st, 2nd, and 3rd nearest neighbour spheres.</em>
 </p>
