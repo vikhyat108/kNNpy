@@ -1,0 +1,3 @@
+'''
+kNNpy serves to provide a suite of high-performance routines to quickly calculate the higher-order statistics called k Nearest Neighbour Cumulative Distribution Functions (hereby referred to as k NN CDFs). k NN CDFs are sensitive to all N point correlation functions, are inexpensive to compute, and have been shown to be more powerful than the standard two-point correlation function. Refer to the papers mentioned here (https://kitnenikatnivasi.github.io/).
+'''
