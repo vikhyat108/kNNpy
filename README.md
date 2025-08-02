@@ -42,14 +42,17 @@
 - `numpy`
 - `scipy`
 - `pyfftw`
-- `Pylians`
+- `pylians`
 - `healpy` *(optional)*
 - `scikit-learn` *(optional)*
+- `astropy-healpix` *(optional)*
 - `matplotlib` *(optional)*
 
 These need to be installed before using the package, preferably in a fresh virtual environment (see instructions below).  
-`scikit-learn` is optional, and can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang` module.  
-Similarly, `healpy` and `matplotlib` are optional if you do not intend to use the `kNNpy.kNN_2D_Ang`, `kNNpy.Auxiliary.TPCF.TracerField2D` and `kNNpy.Auxiliary.PeakStatistics` modules.
+> 💡 **Optional dependencies**  
+> - `scikit-learn` can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang` module
+> - `astropy-healpix` can be skipped if you do not intend to use the `Auxiliary.TPCF.TracerField2D` module. 
+> - `healpy` and `matplotlib` can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang`, `kNNpy.Auxiliary.TPCF.TracerField2D` and `kNNpy.Auxiliary.PeakStatistics` modules.
 
 ---
 
@@ -65,7 +68,7 @@ Change to your preferred installation directory, create a Python virtual environ
 cd /path/to/installation/directory
 python3 -m venv kNNpy_env
 source kNNpy_env/bin/activate
-pip install numpy scipy pyfftw Pylians healpy scikit-learn matplotlib
+pip install numpy scipy pyfftw Pylians healpy scikit-learn astropy-healpix matplotlib
 ```
 
 > 💡 **Note on Pylians installation**  
@@ -145,6 +148,7 @@ import kNNpy
 ```
 
 💡 **Note**: If you skipped the optional dependencies, use the `from kNNpy import <MODULE NAME>` idiom instead of `import kNNpy`.
+
 
 ---
 
