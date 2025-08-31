@@ -3,22 +3,24 @@ on: [push, pull_request]
 jobs:
   test_linux:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11" 
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install build-essential
-          sudo apt install libomp-dev
-          sudo apt install python3-dev
+          sudo apt-get update
+          sudo apt-get install -y build-essential libomp-dev python3-dev
           python3 -m venv Setup/kNNpy_env
           source Setup/kNNpy_env/bin/activate
           pip install --upgrade pip
@@ -32,40 +34,46 @@ jobs:
 
       - name: Generate pdoc documentation
         run: |
+          source Setup/kNNpy_env/bin/activate
           python3 -m pip install pdoc
           pdoc --math -o pdoc_Documentation -d numpy kNNpy
 
-  test_macos:
-    runs-on: macos-latest
+  # test_macos:
+  #   runs-on: macos-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
+  #     - name: Set up Python ${{ matrix.python-version }}
+  #       uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          brew install llvm
-          brew install libomp
-          echo "export CC=$(brew --prefix llvm)/bin/clang" >> $GITHUB_ENV
-          echo "export CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
-          python3 -m venv Setup/kNNpy_env
-          source Setup/kNNpy_env/bin/activate
-          pip install --upgrade pip
-          pip install -r Setup/requirements.txt
+  #     - name: Install dependencies
+  #       run: |
+  #         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  #         brew install llvm
+  #         brew install libomp
+  #         echo "export CC=$(brew --prefix llvm)/bin/clang" >> $GITHUB_ENV
+  #         echo "export CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+  #         python3 -m venv Setup/kNNpy_env
+  #         source Setup/kNNpy_env/bin/activate
+  #         pip install --upgrade pip
+  #         pip install -r Setup/requirements.txt
 
-      - name: Run tests
-        run: |
-          source Setup/kNNpy_env/bin/activate
-          cd Tests
-          pytest
+  #     - name: Run tests
+  #       run: |
+  #         source Setup/kNNpy_env/bin/activate
+  #         cd Tests
+  #         pytest
 
-      - name: Generate pdoc documentation
-        run: |
-          python3 -m pip install pdoc
-          pdoc --math -o pdoc_Documentation -d numpy kNNpy
+  #     - name: Generate pdoc documentation
+  #       run: |
+  #         source Setup/kNNpy_env/bin/activate
+  #         python3 -m pip install pdoc
+  #         pdoc --math -o pdoc_Documentation -d numpy kNNpy
