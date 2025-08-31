@@ -1,7 +1,7 @@
 on: [push, pull_request] 
 
 jobs:
-  test:
+  test_linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -11,10 +11,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.13.7" 
+          python-version: ["3.13.7"] 
 
       - name: Install dependencies
         run: |
+          sudo apt install build-essential
+          sudo apt install libgomp-dev
           python3 -m venv Setup/kNNpy_env
           source Setup/kNNpy_env/bin/activate
           pip install --upgrade pip
@@ -28,4 +30,39 @@ jobs:
 
       - name: Generate pdoc documentation
         run: |
+          python3 -m pip install pdoc
           pdoc --math -o pdoc_Documentation -d numpy kNNpy
+
+    test_macos:
+      runs-on: macos-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: ["3.13.7"] 
+
+        - name: Install dependencies
+          run: |
+            xcode-select --install
+            /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+            brew install llvm
+            brew install libomp
+            python3 -m venv Setup/kNNpy_env
+            source Setup/kNNpy_env/bin/activate
+            pip install --upgrade pip
+            pip install -r Setup/requirements.txt
+
+        - name: Run tests
+          run: |
+            source Setup/kNNpy_env/bin/activate
+            cd Tests
+            pytest
+
+        - name: Generate pdoc documentation
+          run: |
+            python3 -m pip install pdoc
+            pdoc --math -o pdoc_Documentation -d numpy kNNpy
