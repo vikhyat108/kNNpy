@@ -63,6 +63,7 @@ jobs:
           python3 -m venv Setup/kNNpy_env
           source Setup/kNNpy_env/bin/activate
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install openssl
           brew install llvm
           brew install libomp
           pip install --upgrade pip
