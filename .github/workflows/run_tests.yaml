@@ -69,7 +69,7 @@ jobs:
           pip install -r Setup/requirements_no_Pylians.txt
           git clone https://github.com/franciscovillaescusa/Pylians3.git
           cd Pylians3
-          sed -i 's/-fopenmp//g' setup.py
+          sed -i '' 's/-fopenmp//g' setup.py
           python -m pip install .
 
       - name: Run tests
