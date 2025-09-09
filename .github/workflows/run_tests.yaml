@@ -64,8 +64,11 @@ jobs:
           source Setup/kNNpy_env/bin/activate
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           brew install llvm
+          export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
           brew install libomp
-          export OMP_PREFIX=$(brew --prefix libomp)
+          export LDFLAGS="-L/opt/homebrew/opt/libomp/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
           pip install --upgrade pip
           pip install -r Setup/requirements_no_Pylians.txt
           git clone https://github.com/franciscovillaescusa/Pylians3.git
