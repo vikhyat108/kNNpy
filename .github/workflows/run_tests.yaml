@@ -31,7 +31,8 @@ jobs:
         run: |
           source Setup/kNNpy_env/bin/activate
           cd Tests
-          export PYTHONPATH="${PYTHONPATH}:./"
+          parent_path=$(dirname "$PWD")
+          export PYTHONPATH="${parent_path}:$PYTHONPATH"   
           python3 import_all_modules.py
           pytest
 
@@ -73,6 +74,8 @@ jobs:
   #       run: |
   #         source Setup/kNNpy_env/bin/activate
   #         cd Tests
+  #         parent_path=$(dirname "$PWD")
+  #         export PYTHONPATH="${parent_path}:$PYTHONPATH"
   #         python3 import_all_modules.py
   #         pytest
 
