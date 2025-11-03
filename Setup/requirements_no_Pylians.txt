@@ -1,0 +1,8 @@
+pytest
+numpy
+scipy
+pyfftw
+healpy
+scikit-learn
+astropy-healpix
+matplotlib

@@ -1,0 +1,95 @@
+on: [push, pull_request] 
+
+jobs:
+
+  test_macos:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-13, macos-14, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv Setup/kNNpy_env
+          source Setup/kNNpy_env/bin/activate
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install llvm
+          export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+          brew install libomp
+          export LDFLAGS="-L/opt/homebrew/opt/libomp/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
+          brew install hdf5
+          pip install --upgrade pip
+          pip install -r Setup/requirements_no_Pylians.txt
+          git clone https://github.com/franciscovillaescusa/Pylians3.git
+          cd Pylians3
+          sed -i '' 's/-fopenmp//g' setup.py
+          python3 -m pip install .
+
+      - name: Run tests
+        run: |
+          source Setup/kNNpy_env/bin/activate
+          cd Tests
+          parent_path=$(dirname "$PWD")
+          export PYTHONPATH="${parent_path}:$PYTHONPATH"
+          python3 import_all_modules.py
+          pytest
+
+      - name: Generate pdoc documentation
+        run: |
+          source Setup/kNNpy_env/bin/activate
+          python3 -m pip install pdoc
+          pdoc --math -o pdoc_Documentation -d numpy kNNpy
+
+  test_linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04, ubuntu-latest]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libomp-dev python3-dev
+          python3 -m venv Setup/kNNpy_env
+          source Setup/kNNpy_env/bin/activate
+          pip install --upgrade pip
+          pip install -r Setup/requirements.txt
+
+      - name: Run tests
+        run: |
+          source Setup/kNNpy_env/bin/activate
+          cd Tests
+          parent_path=$(dirname "$PWD")
+          export PYTHONPATH="${parent_path}:$PYTHONPATH"   
+          python3 import_all_modules.py
+          pytest
+
+      - name: Generate pdoc documentation
+        run: |
+          source Setup/kNNpy_env/bin/activate
+          python3 -m pip install pdoc
+          pdoc --math -o pdoc_Documentation -d numpy kNNpy
