@@ -4,6 +4,7 @@
 
 import numpy as np
 import time
+import pyfftw
 import MAS_library as MASL
 import sys
 import os
@@ -121,21 +122,49 @@ def CrossCorr2pt(boxsize, bins, QueryPos, TracerPos, delta, thickness, R, kmin=N
     shape = np.shape(delta)
     if len(shape) != 3 or shape[0] != shape[1] or shape[1] != shape[2]:
         raise ValueError("Error: Input array is not cubical (n, n, n).")
+    ngrid = shape[0]
+
+    # Calculating the grid cell size
+    grid_cell_size = boxsize / ngrid  
+
+    # Fourier Transforming the delta overdensity field
+    pyfftw.interfaces.cache.enable()
+    delta_k = pyfftw.interfaces.numpy_fft.rfftn(delta, threads=threads)
+
+    # Initialize output array
+    delta_smooth = np.zeros((len(bins), ngrid, ngrid, ngrid), dtype=np.float32)
+
+    # Compute smoothed field for each R value in bins
+    for i, R in enumerate(bins):
+        # Defining a spherical shell window function in real space
+        W = np.zeros((ngrid, ngrid, ngrid), dtype=np.float32)
+        coords = (np.arange(ngrid) - ngrid // 2) * grid_cell_size
+        X, Y, Z = np.meshgrid(coords, coords, coords, indexing='ij')
+        r_grid = np.sqrt(X**2 + Y**2 + Z**2)
+
+        W[(r_grid >= R - thickness / 2) & (r_grid <= R + thickness / 2)] = 1.0
+        W /= np.sum(W)  # Normalize before FFT (avoids NaNs)
+        W_shifted = np.fft.ifftshift(W)  # Center to corner for FFT alignment
+
+        # Taking convolution of window function with overdensity field delta
+        W_k = pyfftw.interfaces.numpy_fft.rfftn(W_shifted, threads=threads)
+        delta_k_smooth = delta_k * W_k
+        delta_smooth[i] = pyfftw.interfaces.numpy_fft.irfftn(delta_k_smooth, threads=threads) / np.sum(W)  
+        # Normalized by number of points in the spherical shell, np.sum(W)
     
-    smoothed_delta_dict= create_smoothed_field_dict_3D(field=delta, Filter='Shell', grid=QueryPos, Boxsize=boxsize, bins=bins, kmin=kmin, kmax=kmax, thickness=thickness, Verbose=Verbose)
-    
-    delta_interp = np.zeros((len(bins), len(TracerPos)))  # Shape (number_of_bins, number_of_tracers)
+    # Interpolating the field at the tracer (galaxy) positions
+    delta_interp = np.zeros((len(bins), len(pos)))  # Shape (number_of_bins, number_of_tracers)
 
     # Perform interpolation for each smoothed field
     for i, R in enumerate(bins):
-        density_interpolated = np.zeros(TracerPos.shape[0], dtype=np.float32)
-        MASL.CIC_interp(smoothed_delta_dict[str(R)][i], boxsize, TracerPos, density_interpolated)
-        delta_interp[i] = density_interpolated
+        density_interpolated = np.zeros(pos.shape[0], dtype=np.float32)
+        MASL.CIC_interp(delta_smooth[i], boxsize, pos.astype(np.float32), density_interpolated)
+        delta_interp[i] = density_interpolated #delta_interp is a 10^5*11 array
 
     # Computing the 2-point Cross-Correlation Function by averaging over the interpolated field at the tracer positions
     xi = np.zeros_like(bins)
     for i, R in enumerate(bins):
-        xi[i] = np.mean(delta_interp[i])
+        xi[i] = np.mean(delta_interp[i]) #averaging gives 10^5*11 to 11*1 array.
     
     return xi
 
