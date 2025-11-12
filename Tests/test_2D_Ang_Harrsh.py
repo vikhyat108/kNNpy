@@ -73,7 +73,7 @@ def test_TracerTracerCross2DA_DataVector_invalid_shape():
     tracers_B = make_positions(6)
     with pytest.raises(ValueError, match="spatial dimension"):
         kNN_2D_Ang.TracerTracerCross2DA_DataVector(kList, BinsRad, queries, tracers_A_vec, tracers_B)
-'''
+
 # 4. TracerFieldCross2DA
 def test_TracerFieldCross2DA_valid():
     kList = [1]
@@ -96,7 +96,7 @@ def test_TracerFieldCross2DA_invalid_ra():
     threshold = 75.0
     with pytest.raises(ValueError, match="right ascension"):
         kNN_2D_Ang.TracerFieldCross2DA(kList, BinsRad, queries, tracers, field, mask, threshold)
-'''
+
 # 5. TracerFieldCross2DA_DataVector
 def test_TracerFieldCross2DA_DataVector_valid():
     kList = [1]
