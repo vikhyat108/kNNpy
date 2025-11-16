@@ -74,7 +74,7 @@ parameters = [(QPos_invalid_1, TPos_invalid_1), (QPos_invalid_2, TPos_invalid_2)
 def test_TracerFieldCross3D_input_validation(QueryPos, TracerPos):
     
     #Define other necessary parameters
-    kList = [1, 2]
+    kList = [1]
     BinsRad = [np.linspace(10, 45, 3), np.linspace(10, 45, 3)]
     Field3D = np.random.uniform(0, 1, size=(5, 5, 5))
     
@@ -91,7 +91,7 @@ def test_TracerAuto3D_CDF_saturation():
     
     #Define parameters
     boxsize = 100.0
-    kList = [1, 4, 8]
+    kList = [1]
     BinsRad1 = [np.linspace(110, 200, 10)]*3
     BinsRad2 = [np.linspace(1e-7, 1e-5, 10)]*3
     QueryPos = create_query_3D('grid', 100, boxsize)

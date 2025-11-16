@@ -24,7 +24,7 @@ from kNNpy.HelperFunctions import create_smoothed_field_dict_3D
 
 #--------------------------------------  Function Definitions  -------------------------------------
 
-def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=False, Verbose=False):
+def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, n_threads=1, ReturnNNdist=False, Verbose=False):
     
     r'''
     Computes the $k$NN-CDFs in 3D coordinates (Banerjee & Abel (2021)[^1]) of the provided discrete tracer set (`TracerPos`), 
@@ -48,6 +48,8 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     TracerPos : numpy float array of shape ``(n_tracer, 3)``
         array of 3D locations for the discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. 
         Please ensure $0<x,y,z<boxsize$.
+    n_threads : int, optional
+        number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
     ReturnNNdist : bool, optional
         if set to ``True``, the sorted arrays of NN distances will be returned along with the $k$NN-CDFs, by default ``False``.
     Verbose : bool, optional
@@ -130,8 +132,7 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
-    dists, _= xtree.query(QueryPos, k=max(kList), workers=-1)
-    vol = dists[:, np.array(kList)-1]
+    vol, _= xtree.query(QueryPos, k=kList, workers=n_threads)
     
     
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
@@ -162,7 +163,7 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, ReturnNNdist=Fals
 
 ####################################################################################################
 
-def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, TracerPos_B, Verbose=False):
+def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, TracerPos_B, n_threads=1, Verbose=False):
     
     r'''
     Returns the probabilities $P_{\geq k_A}$, $P_{\geq k_B}$ and $P_{\geq k_A, \geq k_B}$ for ($k_A$, $k_B$) in `kA_kB_list` 
@@ -199,6 +200,8 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     TracerPos_B : numpy float array of shape ``(n_tracer, 3)``
         array of 3D locations for the second set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. 
         Please ensure $0<x,y,z<boxsize$.
+    n_threads : int, optional
+        number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
     Verbose : bool, optional
         if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
@@ -298,7 +301,6 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     for kA, kB in kA_kB_list:
         kList_A.append(kA)
         kList_B.append(kB)
-    kMax_A, kMax_B = max(kList_A), max(kList_B)
 
     #-----------------------------------------------------------------------------------------------
         
@@ -322,10 +324,8 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
-    vol_A, _ = xtree_A.query(QueryPos, k=kMax_A)
-    vol_B, _ = xtree_B.query(QueryPos, k=kMax_B)
-    req_vol_A = vol_A[:, np.array(kList_A)-1]
-    req_vol_B = vol_B[:, np.array(kList_B)-1]
+    req_vol_A, _ = xtree_A.query(QueryPos, k=kList_A, workers=n_threads)
+    req_vol_B, _ = xtree_B.query(QueryPos, k=kList_B, workers=n_threads)
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
     #-----------------------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     if Verbose: 
         start_time = time.perf_counter()
         print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
-    joint_vol = np.zeros((vol_A.shape[0], len(kA_kB_list)))
+    joint_vol = np.zeros((req_vol_A.shape[0], len(kA_kB_list)))
     for i, _ in enumerate(kA_kB_list):
         joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
     p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
@@ -359,7 +359,7 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
 
 ####################################################################################################
 
-def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A_dict, TracerPos_B, Verbose=False ):
+def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A_dict, TracerPos_B, n_threads=1, Verbose=False ):
     r'''
     Returns the probabilities $P_{\geq k_{A_i}}$, $P_{\geq k_B}$ and $P_{\geq k_{A_i}, \geq k_B}$ for ($k_{A_i}$, $k_B$) in `kA_kB_list` for various 
     realizations of Tracer A, while keeping the set Tracer B constant. Refer to Notes to understand why this might be useful. These quantify
@@ -399,6 +399,8 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     TracerPos_B : numpy float array of shape ``(n_tracer, 3)``
         array of 3D locations for the second set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. 
         Please ensure $0<x,y,z<boxsize$.
+    n_threads : int, optional
+        number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
     Verbose : bool, optional
         if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
@@ -503,7 +505,6 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     for kA, kB in kA_kB_list:
         kList_A.append(kA)
         kList_B.append(kB)
-    kMax_A, kMax_B = max(kList_A), max(kList_B)
 
     #-----------------------------------------------------------------------------------------------
         
@@ -533,10 +534,8 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
         if Verbose: 
             start_time = time.perf_counter()
             print('\ncomputing the tracer NN distances ...')
-        vol_A, _ = xtree_A.query(QueryPos, k=kMax_A)
-        vol_B, _ = xtree_B.query(QueryPos, k=kMax_B)
-        req_vol_A = vol_A[:, np.array(kList_A)-1]
-        req_vol_B = vol_B[:, np.array(kList_B)-1]
+        req_vol_A, _ = xtree_A.query(QueryPos, k=kList_A, workers=n_threads)
+        req_vol_B, _ = xtree_B.query(QueryPos, k=kList_B, workers=n_threads)
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
         #-----------------------------------------------------------------------------------------------
@@ -555,7 +554,7 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
         if Verbose: 
             start_time = time.perf_counter()
             print('\ncomputing the joint-CDFs P_{>=kA, >=kB} ...')
-        joint_vol = np.zeros((vol_A.shape[0], len(kA_kB_list)))
+        joint_vol = np.zeros((req_vol_A.shape[0], len(kA_kB_list)))
         for i, _ in enumerate(kA_kB_list):
             joint_vol[:, i] = np.maximum(req_vol_A[:, i], req_vol_B[:, i])
         p_gtr_kA_kB_list = calc_kNN_CDF(joint_vol, BinsRad)
@@ -572,7 +571,7 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
 
 ####################################################################################################
 
-def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, FieldConstPercThreshold, ReturnSmoothedFieldDict=False, Verbose=False):
+def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, FieldConstPercThreshold, n_threads=1, ReturnSmoothedFieldDict=False, Verbose=False):
     r'''
     Returns the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ for $k$ in `kList`, that quantify the extent of the spatial cross-correlation between the given discrete tracer positions (`TracerPos`) and the given continuous overdensity field (`SmoothedFieldDict`) in three-dimensional space.
     
@@ -614,6 +613,9 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
 
     ReturnSmoothedFieldDict : bool, optional
         if set to ``True``, the dictionary containing the continuous field smoothed at the provided radial bins, will be returned along with the nearest-neighbour measurements, by default ``False``.
+    
+    n_threads : int, optional
+        number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
     
     Verbose : bool, optional
         If True, prints timing information for each step. Default is False.
@@ -697,8 +699,7 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
     #-------------------------------------------------------------------------------------------------
 
     Nquery = QueryPos.shape[0]
-    dists, _ = xtree.query(QueryPos, k=max(kList), workers=-1)
-    vol = dists[:, np.array(kList)-1]
+    vol, _ = xtree.query(QueryPos, k=kList, workers=n_threads)
     
     #------------------------------------------------------------------------------------------------
 
@@ -802,7 +803,7 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
 
 ####################################################################################################
 
-def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVector, Field, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
+def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVector, Field, FieldConstPercThreshold, n_threads=1, ReturnSmoothedDict=False, Verbose=False):
     
     r'''
     Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNNpy.kNN_3D.TracerFieldCross for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`TracerPosVector`] and a single realisation of the given continuous overdensity field (`Field`). Please refer to notes to understand why this might be useful.
@@ -829,6 +830,9 @@ def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVect
 
     FieldConstPercThreshold : float
         The percentile threshold for identifying overdense regions in the continuous field. For example, ``75.0`` indicates the 75th percentile.
+
+    n_threads : int, optional
+        number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
 
     ReturnSmoothedFieldDict : bool, optional
         if set to ``True``, the dictionary containing the continuous field smoothed at the provided radial bins, will be returned along with the nearest-neighbour measurements, by default ``False``.
@@ -969,8 +973,7 @@ def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVect
         if Verbose: 
             start_time_NN = time.perf_counter()
             print('\ncomputing the tracer NN distances ...')
-        dists, _ = xtree.query(QueryPos, k=max(kList))
-        vol = dists[:, np.array(kList)-1]
+        vol, _ = xtree.query(QueryPos, k=kList, workers=n_threads)
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_NN))
 
         #-------------------------------------------------------------------------------------------
