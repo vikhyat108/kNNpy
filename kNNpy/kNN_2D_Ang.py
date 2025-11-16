@@ -91,13 +91,13 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
     if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
     
-    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
     
     if np.any((MaskedTracerPosRad[:, 0]<-np.pi/2) | (MaskedTracerPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
     
-    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
     
     if MaskedTracerPosRad.shape[1]!=2: 
@@ -251,13 +251,13 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if np.any((MaskedTracerPosRad_A[:, 0]<-np.pi/2) | (MaskedTracerPosRad_A[:, 0]>np.pi/2) | (MaskedTracerPosRad_B[:, 0]<-np.pi/2) | (MaskedTracerPosRad_B[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedTracerPosRad_A[:, 1]<0) | (MaskedTracerPosRad_A[:, 0]>2*np.pi) | (MaskedTracerPosRad_B[:, 1]<0) | (MaskedTracerPosRad_B[:, 0]>2*np.pi)):
+    if np.any((MaskedTracerPosRad_A[:, 1]<0) | (MaskedTracerPosRad_A[:, 1]>2*np.pi) | (MaskedTracerPosRad_B[:, 1]<0) | (MaskedTracerPosRad_B[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if (MaskedTracerPosRad_A.shape[1]!=2) | (MaskedTracerPosRad_B.shape[1]!=2): 
@@ -413,13 +413,13 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if np.any((MaskedTracerPosVectorRad_A[:, :, 0]<-np.pi/2) | (MaskedTracerPosVectorRad_A[:, :, 0]>np.pi/2) | (MaskedTracerPosRad_B[:, 0]<-np.pi/2) | (MaskedTracerPosRad_B[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedTracerPosVectorRad_A[:, :, 1]<0) | (MaskedTracerPosVectorRad_A[:, :, 0]>2*np.pi) | (MaskedTracerPosRad_B[:, 1]<0) | (MaskedTracerPosRad_B[:, 0]>2*np.pi)):
+    if np.any((MaskedTracerPosVectorRad_A[:, :, 1]<0) | (MaskedTracerPosVectorRad_A[:, :, 1]>2*np.pi) | (MaskedTracerPosRad_B[:, 1]<0) | (MaskedTracerPosRad_B[:, 0]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if (MaskedTracerPosVectorRad_A.shape[2]!=2) | (MaskedTracerPosRad_B.shape[1]!=2): 
@@ -571,7 +571,7 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
         array of sky locations for the discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
     FieldSkymap : numpy float array
-        the healpy map of the continuous field. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+        the healpy map of the continuous field. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
     QueryMask : numpy float array of shape ``FieldSkymap.shape``
         the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see kNNpy.HelperFunctions.create_query_2DA for how to compute this mask from an observational mask, and for a detailed description).
     FieldConstPercThreshold : float
@@ -644,13 +644,13 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if np.any((MaskedTracerPosRad[:, 0]<-np.pi/2) | (MaskedTracerPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedTracerPosRad[:, 1]<0) | (MaskedTracerPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if MaskedTracerPosRad.shape[1]!=2: 
@@ -797,7 +797,7 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
     MaskedTracerPosVectorRad : numpy float array of shape ``(n_realisations, n_tracer, 2)``
         array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
     FieldSkymap : numpy float array
-        the healpy map of the continuous field. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+        the healpy map of the continuous field. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
     QueryMask : numpy float array of shape ``FieldSkymap.shape``
         the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see kNNpy.HelperFunctions.create_query_2DA for how to compute this mask from an observational mask, and for a detailed description).
     FieldConstPercThreshold : float
@@ -862,13 +862,13 @@ def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTrac
     if np.any((MaskedQueryPosRad[:, 0]<-np.pi/2) | (MaskedQueryPosRad[:, 0]>np.pi/2)):
         raise ValueError('Invalid query point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 0]>2*np.pi)):
+    if np.any((MaskedQueryPosRad[:, 1]<0) | (MaskedQueryPosRad[:, 1]>2*np.pi)):
         raise ValueError('Invalid query point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if np.any((MaskedTracerPosVectorRad[:, :, 0]<-np.pi/2) | (MaskedTracerPosVectorRad[:, :, 0]>np.pi/2)):
         raise ValueError('Invalid tracer point position(s): please ensure -pi/2 <= declination <= pi/2.')
 
-    if np.any((MaskedTracerPosVectorRad[:, :, 1]<0) | (MaskedTracerPosVectorRad[:, :, 0]>2*np.pi)):
+    if np.any((MaskedTracerPosVectorRad[:, :, 1]<0) | (MaskedTracerPosVectorRad[:, :, 1]>2*np.pi)):
         raise ValueError('Invalid tracer point position(s): please ensure 0 <= right ascension <= 2*pi.')
 
     if MaskedTracerPosVectorRad.shape[2]!=2: 

@@ -2,8 +2,16 @@ import numpy as np
 import pytest
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
+
+#The module that needs to be tested
+
+#Necessary for relative imports (see https://stackoverflow.com/questions/34478398/import-local-function-from-a-module-housed-in-another-directory-with-relative-im)
+module_path = os.path.abspath(os.path.join('../'))           # '../' is needed because the parent directory is one directory upstream of this test directory
+if module_path not in sys.path:
+    sys.path.append(module_path)
+
 from kNNpy import kNN_2D_Ang
+from kNNpy.HelperFunctions_2DA import create_query_2DA, create_smoothed_field_dict_2DA
 
 def make_positions(n, seed=0):
     np.random.seed(seed)
@@ -78,12 +86,12 @@ def test_TracerTracerCross2DA_DataVector_invalid_shape():
 def test_TracerFieldCross2DA_valid():
     kList = [1]
     BinsRad = make_bins(kList)
-    queries = make_positions(5)
-    tracers = make_positions(10)
-    field = np.random.rand(12*3*3)
+    field = np.random.rand(12*32**2)
     mask = np.ones_like(field)
+    qmask, queries = create_query_2DA(32, mask, tolerance=0)
+    tracers = make_positions(10)
     threshold = 75.0
-    out = kNN_2D_Ang.TracerFieldCross2DA(kList, BinsRad, queries, tracers, field, mask, threshold)
+    out = kNN_2D_Ang.TracerFieldCross2DA(kList, BinsRad, queries, tracers, field, qmask, threshold)
     assert isinstance(out, tuple) and len(out) == 3
 
 def test_TracerFieldCross2DA_invalid_ra():
@@ -91,7 +99,8 @@ def test_TracerFieldCross2DA_invalid_ra():
     BinsRad = make_bins(kList)
     queries = np.array([[0.1, 18.0]])  # Invalid RA
     tracers = make_positions(5)
-    field = np.random.rand(12*3*3)
+    # field = np.random.rand(12*32**2)
+    field = np.ones(12*32**2)
     mask = np.ones_like(field)
     threshold = 75.0
     with pytest.raises(ValueError, match="right ascension"):
@@ -101,12 +110,12 @@ def test_TracerFieldCross2DA_invalid_ra():
 def test_TracerFieldCross2DA_DataVector_valid():
     kList = [1]
     BinsRad = make_bins(kList)
-    queries = make_positions(5)
-    tracers_vec = np.array([make_positions(6, seed=i) for i in range(3)])
-    field = np.random.rand(12*3*3)
+    field = np.random.rand(12*32**2)
     mask = np.ones_like(field)
+    qmask, queries = create_query_2DA(32, mask, tolerance=0)
+    tracers_vec = np.array([make_positions(6, seed=i) for i in range(3)])
     threshold = 75.0
-    out = kNN_2D_Ang.TracerFieldCross2DA_DataVector(kList, BinsRad, queries, tracers_vec, field, mask, threshold)
+    out = kNN_2D_Ang.TracerFieldCross2DA_DataVector(kList, BinsRad, queries, tracers_vec, field, qmask, threshold)
     assert isinstance(out, tuple) and len(out) == 3
 
 def test_TracerFieldCross2DA_DataVector_invalid_dec():
@@ -114,7 +123,8 @@ def test_TracerFieldCross2DA_DataVector_invalid_dec():
     BinsRad = make_bins(kList)
     queries = np.array([[2.0, 0.1]])  # Invalid Declination
     tracers_vec = np.array([make_positions(6, seed=i) for i in range(3)])
-    field = np.random.rand(12*3*3)
+    # field = np.random.rand(12*32**2)
+    field = np.ones(12*32**2)
     mask = np.ones_like(field)
     threshold = 75.0
     with pytest.raises(ValueError, match="declination"):

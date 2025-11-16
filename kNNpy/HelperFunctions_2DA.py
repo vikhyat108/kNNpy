@@ -185,7 +185,7 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
     Parameters
     ----------
     skymap : numpy float array
-        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
+        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
     scale : float
         angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.
     Verbose : bool, optional
@@ -301,7 +301,7 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
     Parameters
     ----------
     skymap : numpy float array
-        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
+        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
     bins : list of numpy float array
         list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
     query_mask : numpy float array of shape ``skymap.shape``

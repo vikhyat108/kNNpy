@@ -272,7 +272,7 @@
 </span><span id="L-185"><a href="#L-185"><span class="linenos">185</span></a><span class="sd">    Parameters</span>
 </span><span id="L-186"><a href="#L-186"><span class="linenos">186</span></a><span class="sd">    ----------</span>
 </span><span id="L-187"><a href="#L-187"><span class="linenos">187</span></a><span class="sd">    skymap : numpy float array</span>
-</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
+</span><span id="L-188"><a href="#L-188"><span class="linenos">188</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
 </span><span id="L-189"><a href="#L-189"><span class="linenos">189</span></a><span class="sd">    scale : float</span>
 </span><span id="L-190"><a href="#L-190"><span class="linenos">190</span></a><span class="sd">        angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.</span>
 </span><span id="L-191"><a href="#L-191"><span class="linenos">191</span></a><span class="sd">    Verbose : bool, optional</span>
@@ -388,7 +388,7 @@
 </span><span id="L-301"><a href="#L-301"><span class="linenos">301</span></a><span class="sd">    Parameters</span>
 </span><span id="L-302"><a href="#L-302"><span class="linenos">302</span></a><span class="sd">    ----------</span>
 </span><span id="L-303"><a href="#L-303"><span class="linenos">303</span></a><span class="sd">    skymap : numpy float array</span>
-</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
+</span><span id="L-304"><a href="#L-304"><span class="linenos">304</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
 </span><span id="L-305"><a href="#L-305"><span class="linenos">305</span></a><span class="sd">    bins : list of numpy float array</span>
 </span><span id="L-306"><a href="#L-306"><span class="linenos">306</span></a><span class="sd">        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.</span>
 </span><span id="L-307"><a href="#L-307"><span class="linenos">307</span></a><span class="sd">    query_mask : numpy float array of shape ``skymap.shape``</span>
@@ -744,7 +744,7 @@ angular scale (in radians) at which the field is to be smoothed.</li>
 </span><span id="top_hat_smoothing_2DA-186"><a href="#top_hat_smoothing_2DA-186"><span class="linenos">186</span></a><span class="sd">    Parameters</span>
 </span><span id="top_hat_smoothing_2DA-187"><a href="#top_hat_smoothing_2DA-187"><span class="linenos">187</span></a><span class="sd">    ----------</span>
 </span><span id="top_hat_smoothing_2DA-188"><a href="#top_hat_smoothing_2DA-188"><span class="linenos">188</span></a><span class="sd">    skymap : numpy float array</span>
-</span><span id="top_hat_smoothing_2DA-189"><a href="#top_hat_smoothing_2DA-189"><span class="linenos">189</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
+</span><span id="top_hat_smoothing_2DA-189"><a href="#top_hat_smoothing_2DA-189"><span class="linenos">189</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
 </span><span id="top_hat_smoothing_2DA-190"><a href="#top_hat_smoothing_2DA-190"><span class="linenos">190</span></a><span class="sd">    scale : float</span>
 </span><span id="top_hat_smoothing_2DA-191"><a href="#top_hat_smoothing_2DA-191"><span class="linenos">191</span></a><span class="sd">        angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.</span>
 </span><span id="top_hat_smoothing_2DA-192"><a href="#top_hat_smoothing_2DA-192"><span class="linenos">192</span></a><span class="sd">    Verbose : bool, optional</span>
@@ -859,7 +859,7 @@ angular scale (in radians) at which the field is to be smoothed.</li>
 
 <ul>
 <li><strong>skymap</strong> (numpy float array):
-the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to <code>healpy.UNSEEN</code>. <code>healpy.UNSEEN = -1.6375e+30</code> is a special value for masked pixels used by the <code>healpy</code> package.</li>
+the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be <code>(12*NSIDE**2, )</code>, where <code>NSIDE</code> is a power of 2. The values of the masked pixels, if any, should be set to <code>healpy.UNSEEN</code>. <code>healpy.UNSEEN = -1.6375e+30</code> is a special value for masked pixels used by the <code>healpy</code> package.</li>
 <li><strong>scale</strong> (float):
 angular scale (in radians) at which the field is to be smoothed. Please ensure <code>scale</code> is between <code>0</code> and <code>2*np.pi</code>.</li>
 <li><strong>Verbose</strong> (bool, optional):
@@ -927,7 +927,7 @@ The smoothed field is reconstructed from $\alpha^{\theta}_{\ell m}$ using healpy
 </span><span id="create_smoothed_field_dict_2DA-302"><a href="#create_smoothed_field_dict_2DA-302"><span class="linenos">302</span></a><span class="sd">    Parameters</span>
 </span><span id="create_smoothed_field_dict_2DA-303"><a href="#create_smoothed_field_dict_2DA-303"><span class="linenos">303</span></a><span class="sd">    ----------</span>
 </span><span id="create_smoothed_field_dict_2DA-304"><a href="#create_smoothed_field_dict_2DA-304"><span class="linenos">304</span></a><span class="sd">    skymap : numpy float array</span>
-</span><span id="create_smoothed_field_dict_2DA-305"><a href="#create_smoothed_field_dict_2DA-305"><span class="linenos">305</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
+</span><span id="create_smoothed_field_dict_2DA-305"><a href="#create_smoothed_field_dict_2DA-305"><span class="linenos">305</span></a><span class="sd">        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.</span>
 </span><span id="create_smoothed_field_dict_2DA-306"><a href="#create_smoothed_field_dict_2DA-306"><span class="linenos">306</span></a><span class="sd">    bins : list of numpy float array</span>
 </span><span id="create_smoothed_field_dict_2DA-307"><a href="#create_smoothed_field_dict_2DA-307"><span class="linenos">307</span></a><span class="sd">        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.</span>
 </span><span id="create_smoothed_field_dict_2DA-308"><a href="#create_smoothed_field_dict_2DA-308"><span class="linenos">308</span></a><span class="sd">    query_mask : numpy float array of shape ``skymap.shape``</span>
@@ -996,7 +996,7 @@ The smoothed field is reconstructed from $\alpha^{\theta}_{\ell m}$ using healpy
 
 <ul>
 <li><strong>skymap</strong> (numpy float array):
-the healpy map of the continuous field that needs to be smoothed. The values of the masked pixels, if any, should be set to <code>healpy.UNSEEN</code>. <code>healpy.UNSEEN = -1.6375e+30</code> is a special value for masked pixels used by the <code>healpy</code> package.</li>
+the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be <code>(12*NSIDE**2, )</code>, where <code>NSIDE</code> is a power of 2. The values of the masked pixels, if any, should be set to <code>healpy.UNSEEN</code>. <code>healpy.UNSEEN = -1.6375e+30</code> is a special value for masked pixels used by the <code>healpy</code> package.</li>
 <li><strong>bins</strong> (list of numpy float array):
 list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.</li>
 <li><strong>query_mask</strong> (numpy float array of shape <code>skymap.shape</code>):
