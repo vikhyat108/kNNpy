@@ -5,6 +5,7 @@
 import numpy as np
 import scipy
 import healpy as hp
+from astropy.coordinates import SkyCoord
 import time
 import copy
 
@@ -361,6 +362,154 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
     if Verbose: print('\ntotal time taken: {:.2e} s.'.format(time.perf_counter()-total_start))
 
     return SmoothedFieldDict
+
+####################################################################################################
+
+def change_coord(m, coord):
+    '''
+    A function to change coordinates of a HEALPIX map (for example, from galactic to equatorial).
+
+    Parameters
+    ----------
+    m : map or array of maps
+        map(s) to be rotated
+    coord : sequence of two character
+        First character is the coordinate system of `m`, second character is the coordinate system of the output map. As in HEALPIX, allowed coordinate systems are 'G' (galactic), 'E' (ecliptic) or 'C' (equatorial)
+
+    Returns
+    -------
+    m : map or array of maps
+        rotated map(s)
+
+    Example
+    -------
+    The following rotates `m` from galactic to equatorial coordinates. Notice that `m` can contain both temperature and polarization.
+    >>>> change_coord(m, ['G', 'C'])
+    '''
+    
+    #Basic HEALPix parameters
+    npix = m.shape[-1]
+    nside = hp.npix2nside(npix)
+    ang = hp.pix2ang(nside, np.arange(npix))
+
+    #Select the coordinate transformation
+    rot = hp.Rotator(coord=reversed(coord))
+
+    #Convert the coordinates
+    new_ang = rot(*ang)
+    new_pix = hp.ang2pix(nside, *new_ang)
+
+    return m[..., new_pix]
+
+####################################################################################################
+
+def cat2hpx(lon, lat, nside, radec=False):
+    '''
+    Function to convert a catalogue of point sources into a HEALPix map of number counts per resolution element. Always returns the output map in Galactic coordinates.
+
+    Parameters
+    ----------
+    lon, lat : (ndarray, ndarray)
+        Coordinates of the sources in degree. If ``radec=True``, assumes input is in the ICRS coordinate system. Otherwise assumes input is glon, glat.
+
+    nside : int
+        HEALPix nside of the target map.
+
+    radec : bool
+        If `True`, assumes input is in the ICRS coordinate system, otherwise assumes input is glon, glat, by default `False`.
+
+    Returns
+    -------
+    hpx_map : ndarray
+        HEALPix map of the catalogue number counts in Galactic coordinates.
+    '''
+
+    npix = hp.nside2npix(nside)
+
+    if radec:
+        eq = SkyCoord(lon, lat, frame='icrs', unit='deg')
+        l, b = eq.galactic.l.value, eq.galactic.b.value
+    else:
+        l, b = lon, lat
+
+    # conver to theta, phi
+    theta = np.radians(90. - b)
+    phi = np.radians(l)
+
+    # convert to HEALPix indices
+    indices = hp.ang2pix(nside, theta, phi)
+
+    idx, counts = np.unique(indices, return_counts=True)
+
+    # fill the fullsky map
+    hpx_map = np.zeros(npix, dtype=int)
+    hpx_map[idx] = counts
+
+    return hpx_map
+
+####################################################################################################
+
+def cartesian_corner_to_angles_centre(x, y, z, boxsize, r_max):
+
+    '''
+    Function to convert cartesian coordinates of point sources in a box (eg. from a cosmological simulation) to projected sky (angular) coordinates, assuming the observer is at the centre of the box.
+
+    Parameters
+    ----------
+    x, y, z : (ndarray, ndarray, ndarray)
+        cartesian coordinates of the sources in the box.
+
+    boxsize : float
+        size of the box in which the sources are located.
+
+    r_max : float
+        maximum distance from the observer to consider sources.
+
+    Returns
+    -------
+    ang_pos : ndarray
+        angular positions of the sources in radians as they appear on the sky for an observer at the centre of the box.
+    '''
+
+    new_x, new_y, new_z = x - boxsize/2, y - boxsize/2, z - boxsize/2
+    r = np.sqrt(new_x**2+new_y**2+new_z**2)
+    ind = np.where(r<=r_max)
+    ang_pos = np.zeros((len(ind[0]), 2))
+    ang_pos[:, 0] = np.arcsin(new_z[ind]/r[ind])
+    ang_pos[:, 1] = np.arctan2(new_y[ind], new_x[ind])+np.pi
+    
+    return ang_pos
+
+####################################################################################################
+
+def PoissonUniformCDFs(a, n, kNN):
+    '''
+    Function to compute the expected (analytical) auto kNN-CDFs of data points drawn from a uniform 2D Poisson distribution over the sky.
+
+    Parameters
+    ----------
+    a : float
+        area of the region in steradians.
+
+    n : float
+        mean number density of points.
+
+    kNN : int
+        the nearest neighbor to compute the CDF for.
+
+    Returns
+    -------
+    CDF : float
+        The expected CDF value for the kNN distance.
+    '''
+
+    mean=n*a
+    sum=0
+    for i in range(kNN):
+        sum+=(mean**i/np.math.factorial(i))*np.exp(-1*mean)
+    CDF = 1 - sum
+
+    return CDF
 
 ####################################################################################################
 

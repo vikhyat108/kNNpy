@@ -1,8 +1,11 @@
 pytest
 numpy
 scipy
+pandas
 pyfftw
 healpy
 scikit-learn
 astropy-healpix
+astrotools
 matplotlib
+jupyter
