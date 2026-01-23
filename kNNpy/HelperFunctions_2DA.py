@@ -506,7 +506,7 @@ def PoissonUniformCDFs(a, n, kNN):
     mean=n*a
     sum=0
     for i in range(kNN):
-        sum+=(mean**i/np.math.factorial(i))*np.exp(-1*mean)
+        sum+=(mean**i/scipy.special.factorial(i))*np.exp(-1*mean)
     CDF = 1 - sum
 
     return CDF
