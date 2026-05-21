@@ -9,6 +9,7 @@ import pyfftw
 import warnings
 import smoothing_library as SL
 import MAS_library as MASL
+from numba import njit, prange
 
 ####################################################################################################
 
@@ -519,7 +520,62 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
         psi_list.append(joint_cdf_list[k]/(auto_cdf_list_1[k]*auto_cdf_list_2[k]))
 
     return psi_list
-        
+
+########################################
+#TPCF3D Helper functions
+@njit(parallel=True, fastmath=True, cache=True)
+def compute_mean_parallel(arr):
+    """Compute mean using Numba parallel reduction with fastmath."""
+    n = arr.shape[0]
+    return np.sum(arr) / np.float32(n)
+
+
+@njit(parallel=True, fastmath=True, cache=True)
+def create_spherical_shell(r_grid, R, thickns, grid):
+    """Create spherical shell filter using Numba. Pre-compute bounds and use vectorized operations."""
+    W = np.zeros((grid, grid, grid), dtype=np.float32)
+    r_min = R - thickns / 2.0
+    r_max = R + thickns / 2.0
+    
+    # Single pass: mark and sum simultaneously
+    for i in prange(grid):
+        for j in range(grid):
+            for k in range(grid):
+                r_val = r_grid[i, j, k]
+                if r_min <= r_val <= r_max:
+                    W[i, j, k] = 1.0
+    
+    # Normalize with single sum
+    sum_W = np.sum(W)
+    if sum_W > 0.0:
+        W /= sum_W
+    
+    return W
+
+@njit(parallel=True, fastmath=True, cache=True)
+def compute_r_grid(coords, grid):
+    """Compute radial distance grid using Numba. Optimized with fastmath and caching."""
+    r_grid = np.empty((grid, grid, grid), dtype=np.float32)
+    # Pre-compute squares to avoid repeated computation
+    coords_sq = coords ** 2
+    
+    for i in prange(grid):
+        for j in range(grid):
+            for k in range(grid):
+                r_grid[i, j, k] = np.sqrt(coords_sq[i] + coords_sq[j] + coords_sq[k])
+    return r_grid
+
+def make_W_k_list(bins, thickns, grid, r_grid, threads):
+    '''Creating Fourier space filters for fast convolution'''
+    W_k_list=[]
+    for R in bins:
+        W = create_spherical_shell(r_grid, R, thickns, grid)
+        W_shifted = np.fft.ifftshift(W)
+        W_k = pyfftw.interfaces.numpy_fft.rfftn(W_shifted, threads=threads)
+        W_k_list.append(np.ascontiguousarray(W_k, dtype=np.complex64))
+        del W, W_shifted
+    return W_k_list
+
 ####################################################################################################
 
 #----------------------------------------  END OF PROGRAM!  ----------------------------------------
