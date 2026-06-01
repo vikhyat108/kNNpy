@@ -10,6 +10,7 @@ import warnings
 import smoothing_library as SL
 import MAS_library as MASL
 from numba import njit, prange
+import scipy
 
 ####################################################################################################
 
@@ -575,6 +576,37 @@ def make_W_k_list(bins, thickns, grid, r_grid, threads):
         W_k_list.append(np.ascontiguousarray(W_k, dtype=np.complex64))
         del W, W_shifted
     return W_k_list
+
+#####################################################################################################
+def PoissonUniformCDFs_3D(v, n, kNN):
+    '''
+    Function to compute the expected (analytical) auto kNN-CDFs of data points drawn from a uniform 3D Poisson distribution.
+
+    Parameters
+    ----------
+    v : float
+        volume of the region in steradians.
+
+    n : float
+        mean number density of points.
+
+    kNN : int
+        the nearest neighbor to compute the CDF for.
+
+    Returns
+    -------
+    CDF : float
+        The expected CDF value for the kNN distance.
+    '''
+
+    mean=n*v
+    sum=0
+    for i in range(kNN):
+        sum+=(mean**i/scipy.special.factorial(i))*np.exp(-1*mean)
+    CDF = 1 - sum
+
+    return CDF
+
 
 ####################################################################################################
 
