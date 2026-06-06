@@ -1,60 +1,22 @@
 import numpy as np
 
-def constructingFishermatrix(data_vectors, covariance_matrix, dtheta, n_params_p_m, n_params_p=0):
+def constructingFishermatrix(cov_matrix, der_matrix, n_cov):
     """
-    Constructs the Fisher matrix from data vectors and a covariance matrix.
+    Caluclated the Fisher information matrix given the covariance matrix and the derivative matrix. The covariance matrix is the covariance of the data, and the derivative matrix is the derivative of the data with respect to the parameters. The Fisher information matrix is given by the formula:
 
-    Parameters:
-    data_vectors (list of numpy arrays): The data vectors for which the Fisher matrix is to be constructed. The ith element is an array containing two vectors:
-        - The first vector corresponds to the simulation for parameter p.
-        - The second vector corresponds to the simulation for parameter m OR The second vector corresponds to the simulation for fiducial parameters.
-        Also, if n_params_p!=0, all such parameters, must necessarily come after the parameters with both simulations for p and m.
-    covariance_matrix (numpy array): The covariance matrix associated with the data vectors.
-    n_params_p_m (int): The number of parameters with both simulations for p and m.
-    n_params_p (int): The number of parameters with just simulations for p.
-    dtheta (list of float): The parameter step sizes for the derivatives. Also, if n_params_p!=0, all such parameters, must necessarily come after the parameters
-    with both simulations for p and m.
-    n (int): The number of realizations.
+    Inputs:
+    cov_matrix: The covariance matrix of the data. This should be a square matrix of shape (n, n), where n is the number of data points.
+    der_matrix: The derivative of the data with respect to the parameters. This should be a matrix of shape (n, m), where n is the number of data points and m is the number of parameters.
+    n_cov: The number of realizations the covariance matrix is estimated from.
 
     Returns:
-    numpy array: The constructed Fisher matrix. #Give the expression
-
-    Raises ValueError:
-    -If the length of data_vectors are not of equal length
-    -If the covariance matrix is not square or does not match the length of data_vectors
-    - If length of dtheta and n_params_p_m + n_params_p do not match
+    fisher_matrix: The Fisher information matrix. This will be a square matrix of shape (m, m), where m is the number of parameters.
     """
-    # Checking all the input parameters
-    p=len(data_vectors[0][0])
-    for i in range(len(data_vectors)):
-        for j in range(2):
-            if len(data_vectors[i][j]) != p:
-                raise ValueError("All data vectors must be of equal length.")
-    if np.shape(covariance_matrix)[0] != np.shape(covariance_matrix)[1]:
-        raise ValueError("Covariance matrix must be square.")
-    if np.shape(covariance_matrix)[0] != len(data_vectors):
-        raise ValueError("Covariance matrix must match the length of data vectors.")
-    if len(dtheta) != n_params_p_m + n_params_p:
-        raise ValueError("Length of dtheta must match n_params_p_m + n_params_p.")
-    # Constructing the derivatives
-    d = np.zeros([n_params_p_m+n_params_p,len(data_vectors)])
-    for i in range(n_params_p_m):
-
-        d_p = data_vectors[i][0]
-        d_m = data_vectors[i][1]
-        delt = d_p - d_m
-        d[i] = delt/(2*dtheta[i])
-
-    if n_params_p > 0:
-        for j in range(n_params_p_m, n_params_p_m + n_params_p):
-            d_p= data_vectors[i][0]
-            d_0= data_vectors[i][1]
-            delt = d_p - d_0
-            d[j] =  delt/(dtheta[j])
-    
-    # The Fisher matrix
-    c_inv=np.linalg.inv(covariance_matrix)
-    F = np.zeros([n_params_p+n_params_p_m,n_params_p_m+n_params_p])
-    for i in range(0, n_params_p_m + n_params_p):
-        for j in range(0, n_params_p_m + n_params_p):
-            F[i][j] = (np.transpose(d[i])).dot(c_inv).dot(d[j])
+    # Calculating the hartlap factor
+    hartlap = (n_cov - cov_matrix.shape[0] - 2) / (n_cov - 1)
+    c_inv = hartlap*np.linalg.inv(cov_matrix)
+    F = np.zeros([der_matrix.shape[1], der_matrix.shape[1]])
+    for i in range(der_matrix.shape[1]):
+        for j in range(der_matrix.shape[1]):
+            F[i][j] = (np.transpose(der_matrix[i])).dot(c_inv).dot(der_matrix[j])
+    return F
