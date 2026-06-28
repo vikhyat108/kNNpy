@@ -2,13 +2,17 @@
 
 #-------------------  These libraries are required for evaluating the functions  -------------------
 
+from tabnanny import verbose
+
 import numpy as np
 
 import healpy as hp
 
 import pandas as pd
-
+import readgadget
 from astrotools import healpytools as hpt
+import MAS_library as MASL
+
 
 import os
 import sys
@@ -232,6 +236,48 @@ def Sample2DPoissonTracers(mask, N_realisations, n_tracers, seed=None, map_NSIDE
 
 ####################################################################################################
 
+def Sample3DPoissonTracers(N_realisations, n_tracers, boxsize=1000, starting_seed=42):
+    '''
+    Creates a number of realisations of discrete tracers sampled from a uniform Poisson distribution in 3D space.
+
+    Parameters
+    ----------
+    N_realisations : int
+        total number of realisations to be sampled.
+
+    n_tracers : int
+        total number of tracers to be sampled.
+
+    boxsize : float, optional
+        size of the cubic box in which the tracers are to be sampled, by default 1000.0 Mpc/h.
+
+    starting_seed : int, optional
+        random seed for reproducibility, by default 42. This is the seed set for the first realisation,
+        Henceforth, the next ith realisation has seed = starting_seed + i.
+
+    Returns
+    -------
+    
+    randoms_pos_ds_arr : float ndarray
+        array of shape (``N_realisations``, ``n_tracers``, 3) containing the sampled tracer positions in Mpc/h.
+    '''
+
+    #-----------------------------------------------------------------------------------------------
+
+    randoms_pos_ds_arr = []
+
+    np.random.seed(starting_seed)
+
+    for i in range(N_realisations):
+
+        randoms_pos_ds_arr.append(np.random.uniform(low=0, high=boxsize, size=(n_tracers, 3)))
+    
+    randoms_pos_ds_arr = np.array(randoms_pos_ds_arr)
+
+    return randoms_pos_ds_arr
+
+################################################################################################
+
 def Sample2DTracersFromQuijoteBox(sim_num, tracer_type, mask, N_realisations, n_tracers, seed=None, map_NSIDE=64, DataPath='../kNNpy/Data'):
     '''
     Creates a number of realisations of discrete tracers sampled from dark-matter halo catalogues created using the Quijote simulation hight-resolution boxes[^1]. The 3D tracer positions are converted to angular 2D coordinates by projecting them onto the sky of a hypothetical observer at the centre of the simulation box. Currently supports two types of tracers, namely 'Galaxies' and 'Clusters' delineated based on a simple mass cut; galaxies are halos with mass ``M_halo >= 3e13 Msun/h and M_halo <= 1e14 Msun/h``, while clusters are halos with mass ``M_halo >= 1e14 Msun/h and M_halo <= 2.5e14 Msun/h``.
@@ -345,6 +391,35 @@ def Sample2DTracersFromQuijoteBox(sim_num, tracer_type, mask, N_realisations, n_
 
 ####################################################################################################
 
+def Sample3DTracersFromQuijoteBox(tracer_type, N_realisations, n_tracers, ptype=[1],DataPath='../kNNpy/Data', starting_seed=42):
+    '''
+    For now it only supports one tracer_type: 'particles'. Other types like 'halos', can be included if and when necessry.
+    ptype is an optional parameter only required for the 'particles' tracer type.
+    '''
+    np.random.seed(starting_seed)
+    pos_array=[]
+    if tracer_type=='particles':
+        for i in range(N_realisations):
+            snapshot=f'{DataPath}/Quijote_simulations/fiducial_LR/{i}/snapdir_004/snap_004'
+            pos = readgadget.read_block(snapshot, 'POS ', ptype)/1e3 # Mpc/h
+            pos = pos[np.random.choice(len(pos), n_tracers, replace=False)]
+            pos_array.append(pos)
+        pos_array=np.array(pos_array)
+    else: 
+        raise ValueError("Invalid tracer type specified. Supported types are 'Halos' and 'Particles'.")
+    return pos_array
+
+#########################################################################################################
+
+def make_overdensity_3D(N_realisations, grid, ptype, do_RSD=False, MAS='CIC', axis=0, verbose=False, DataPath='../kNNpy/Data'):
+    overdensity_list=[]
+    for i in range(N_realisations):
+        snapshot = f'{DataPath}/Quijote_simulations/fiducial_LR/{i}/snapdir_004/snap_004'
+        delta = MASL.density_field_gadget(snapshot, ptype, grid, MAS, do_RSD, axis, verbose)
+        delta /= np.mean(delta, dtype=np.float64);  delta -= 1.0
+        overdensity_list.append(delta)
+    overdensity_list=np.array(overdensity_list)
+    return overdensity_list
 #----------------------------------------  END OF PROGRAM!  ----------------------------------------
 
 ####################################################################################################
