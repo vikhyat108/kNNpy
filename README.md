@@ -35,120 +35,153 @@
 
 ---
 
-## 📚 Dependencies
+📚 Dependencies
+---------------
 
 `kNNpy` makes use of the following packages:
 
-- `numpy`
-- `scipy`
-- `pyfftw`
-- `pylians`
-- `healpy` *(optional)*
-- `scikit-learn` *(optional)*
-- `astropy-healpix` *(optional)*
-- `matplotlib` *(optional)*
+*   `astropy`
+*   `astropy-healpix`
+*   `astrotools`
+*   `getdist`
+*   `healpy`
+*   `jupyter`
+*   `matplotlib`
+*   `numba`
+*   `numpy`
+*   `pandas`
+*   `pyfftw`
+*   `Pylians`
+*   `pytest`
+*   `scikit-learn`
+*   `scipy`
 
-These need to be installed before using the package, preferably in a fresh virtual environment (see instructions below).  
-> 💡 **Optional dependencies**  
-> - `scikit-learn` can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang` module
-> - `astropy-healpix` can be skipped if you do not intend to use the `Auxiliary.TPCF.TracerField2D` module. 
-> - `healpy` and `matplotlib` can be skipped if you do not intend to use the `kNNpy.kNN_2D_Ang`, `kNNpy.Auxiliary.TPCF.TracerField2D` and `kNNpy.Auxiliary.PeakStatistics` modules.
+These need to be installed before using the package, preferably in a fresh virtual environment (see instructions below).
 
----
+* * *
 
-## 🛠 Installation
+🛠 Installation
+---------------
 
-### 🐧 Linux/macOS
+### 🖥️ macOS
 
-Change to your preferred installation directory, create a Python virtual environment and install the dependencies.
-
-**⚠️ Warning**: Do **not** use `anaconda` or `miniconda` for the virtual environment as it may cause conflicts with `Pylians`. Also, do **not** name the virtual environment `kNNpy` to avoid namespace issues.
-
-```bash
-cd /path/to/installation/directory
-python3 -m venv kNNpy_env
-source kNNpy_env/bin/activate
-pip install numpy scipy pyfftw Pylians healpy scikit-learn astropy-healpix matplotlib
-```
-
-> 💡 **Note on Pylians installation**  
-> Sometimes, the Pylians installation fails when using `pip` (especially on macOS). If that happens:
->
-> - First install all other dependencies (without Pylians)
-> - Then install Pylians in development mode following their official instructions:  
-> 👉 [Pylians_documentation](https://pylians3.readthedocs.io/en/master/installation.html#)
-
-If you **do not** want the optional dependencies, replace the last line above by:
-
-```bash
-pip install numpy scipy pyfftw Pylians
-```
+Change to your preferred installation directory.
 
 ### 📥 Clone this repository
 
 ```bash
-git clone https://github.com/vikhyat108/kNNpy.git
+    git clone https://github.com/vikhyat108/kNNpy.git
+    cd kNNpy
 ```
 
-### 🧭 Set your `PYTHONPATH`
-
-Export the path to the installed repository to your Python path:
-
-- **Temporarily** (for current shell session):
+### 🏃‍♂️ Run these commands
 
 ```bash
-export PYTHONPATH="${PYTHONPATH}:/path/to/installation/directory/kNNpy/"
+    python3 -m venv Setup/kNNpy_env
+    source Setup/kNNpy_env/bin/activate
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    brew install llvm
+    export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+    brew install libomp
+    export LDFLAGS="-L/opt/homebrew/opt/libomp/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
+    brew install hdf5
+    pip install --upgrade pip
+    pip install "setuptools<82"
+    pip install -r Setup/requirements_no_Pylians.txt
+    git clone https://github.com/franciscovillaescusa/Pylians3.git
+    cd Pylians3
+    sed -i '' 's/-fopenmp//g' setup.py
+    python3 -m pip install .
+    cd ..
 ```
 
-- **Permanently** (recommended): add the line above to your `~/.bashrc` or `~/.zshrc`.
+**⚠️ Warning**: these installation steps have only been tested on macOS-14, 15 and 26 using python 3.11, 3.12, 3.13 and 3.14.
 
-### ✅ Test the installation
+* * *
 
-To check if `kNNpy` is successfully installed and ready to use, run the following command:
+### 🐧 Linux
+
+Change to your preferred installation directory.
+
+### 📥 Clone this repository
 
 ```bash
-cd /path/to/installation/directory/
-cd kNNpy/Tests/
-python3 import_all_modules.py
+    git clone https://github.com/vikhyat108/kNNpy.git
+    cd kNNpy
 ```
 
-If you did not install the optional dependencies, replace the last line above by:
+### 🏃‍♂️ Run these commands
 
 ```bash
-python3 import_required_modules.py
+    sudo apt-get update
+    sudo apt-get install -y build-essential libomp-dev python3-dev
+    python3 -m venv Setup/kNNpy_env
+    source Setup/kNNpy_env/bin/activate
+    pip install --upgrade pip
+    pip install -r Setup/requirements.txt
 ```
-If no error message is returned, the installation is succesful.
 
----
+**⚠️ Warning**: these installation steps have only been tested on ubuntu (enter versions) using python 3.11, 3.12, 3.13 and 3.14.
+
+* * *
 
 ### 🪟 Windows
 
 Unfortunately, `kNNpy` is currently not supported on Windows. Future support may be added in later releases.
 
----
+* * *
 
-## ▶️ Usage
+🧭 Set your `PYTHONPATH`
+------------------------
+
+Export the path to the installed repository to your Python path:
+
+*   **Temporarily** (for current shell session):
+
+```bash
+    export PYTHONPATH="${PYTHONPATH}:/path/to/installation/directory/kNNpy/"
+```
+
+*   **Permanently** (recommended): add the line above to your `~/.bashrc` or `~/.zshrc`.
+
+✅ Test the installation
+------------------------
+
+To check if `kNNpy` is successfully installed and ready to use, run the following command:
+
+```bash
+    cd /path/to/installation/directory/
+    cd kNNpy/Tests/
+    python3 import_all_modules.py
+```
+
+If no error message is returned, the installation is succesful.
+
+* * *
+
+▶️ Usage
+--------
 
 Change to your working directory:
 
+
 ```bash
-cd /my/working/directory
+    cd /my/working/directory
 ```
 
 Activate your virtual environment:
 
 ```bash
-source /path/to/virtual/environment/bin/activate
-```
+    source /path/to/virtual/environment/bin/activate
+```    
 
 Set the `PYTHONPATH` (if not already done) and in your Python scripts or notebooks, you can now:
 
 ```python
-import kNNpy
+    import kNNpy
 ```
-
-💡 **Note**: If you skipped the optional dependencies, use the `from kNNpy import <MODULE NAME>` idiom instead of `import kNNpy`.
-
 
 ---
 
