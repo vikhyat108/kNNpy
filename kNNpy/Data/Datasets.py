@@ -400,7 +400,7 @@ def Sample3DTracersFromQuijoteBox(tracer_type, N_realisations, n_tracers, ptype=
     pos_array=[]
     if tracer_type=='particles':
         for i in range(N_realisations):
-            snapshot=f'{DataPath}/Quijote_simulations/fiducial_LR/{i}/snapdir_004/snap_004'
+            snapshot=f'{DataPath}/fiducial_LR/{i}/snapdir_004/snap_004'
             pos = readgadget.read_block(snapshot, 'POS ', ptype)/1e3 # Mpc/h
             pos = pos[np.random.choice(len(pos), n_tracers, replace=False)]
             pos_array.append(pos)
@@ -414,7 +414,7 @@ def Sample3DTracersFromQuijoteBox(tracer_type, N_realisations, n_tracers, ptype=
 def make_overdensity_3D(N_realisations, grid, ptype, do_RSD=False, MAS='CIC', axis=0, verbose=False, DataPath='../kNNpy/Data'):
     overdensity_list=[]
     for i in range(N_realisations):
-        snapshot = f'{DataPath}/Quijote_simulations/fiducial_LR/{i}/snapdir_004/snap_004'
+        snapshot = f'{DataPath}/fiducial_LR/{i}/snapdir_004/snap_004'
         delta = MASL.density_field_gadget(snapshot, ptype, grid, MAS, do_RSD, axis, verbose)
         delta /= np.mean(delta, dtype=np.float64);  delta -= 1.0
         overdensity_list.append(delta)
