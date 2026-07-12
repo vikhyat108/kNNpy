@@ -94,7 +94,6 @@ Change to your preferred installation directory.
     cd Pylians3
     sed -i '' 's/-fopenmp//g' setup.py
     python3 -m pip install .
-    cd ..
 ```
 
 **⚠️ Warning**: these installation steps have only been tested on macOS-14, 15 and 26 using python 3.11, 3.12, 3.13 and 3.14.
