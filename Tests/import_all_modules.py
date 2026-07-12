@@ -9,3 +9,4 @@ from kNNpy.Auxiliary import PeakStatistics
 from kNNpy.Auxiliary import Fisher
 from kNNpy.Auxiliary.TPCF import TracerField2DA
 from kNNpy.Auxiliary.TPCF import TracerField3D
+from kNNpy.Data import Datasets
