@@ -174,7 +174,7 @@ Change to your working directory:
 Activate your virtual environment:
 
 ```bash
-    source /path/to/virtual/environment/bin/activate
+    source /path/to/installation/directory/kNNpy/Setup/kNNpy_env/bin/activate
 ```    
 
 Set the `PYTHONPATH` (if not already done) and in your Python scripts or notebooks, you can now:
