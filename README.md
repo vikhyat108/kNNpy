@@ -96,7 +96,7 @@ Change to your preferred installation directory.
     python3 -m pip install .
 ```
 
-**⚠️ Warning**: these installation steps have only been tested on macOS-14, 15 and 26 using python 3.11, 3.12, 3.13 and 3.14.
+**⚠️ Warning**: these installation steps have only been tested on macOS-14, 15 and 26 using python 3.11, 3.12, 3.13 and 3.14. Kindly raise an issue if you run into problems installing on other versions.
 
 * * *
 
@@ -119,10 +119,14 @@ Change to your preferred installation directory.
     python3 -m venv Setup/kNNpy_env
     source Setup/kNNpy_env/bin/activate
     pip install --upgrade pip
-    pip install -r Setup/requirements.txt
+    pip install "setuptools<82"
+    pip install -r Setup/requirements_no_Pylians.txt
+    git clone https://github.com/franciscovillaescusa/Pylians3.git
+    cd Pylians3
+    python -m pip install .
 ```
 
-**⚠️ Warning**: these installation steps have only been tested on ubuntu (enter versions) using python 3.11, 3.12, 3.13 and 3.14.
+**⚠️ Warning**: these installation steps have only been tested on ubuntu-22.04, 24.04 and 26.04 LTS using python 3.11, 3.12, 3.13 and 3.14. Kindly raise an issue if you run into problems installing on other versions.
 
 * * *
 
