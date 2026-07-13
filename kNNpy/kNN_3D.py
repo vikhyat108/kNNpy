@@ -133,7 +133,8 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, n_threads=1, Retu
         start_time = time.perf_counter()
         print('\ncomputing the tracer NN distances ...')
     vol, _= xtree.query(QueryPos, k=kList, workers=n_threads)
-    
+    if vol.ndim == 1:
+        vol = vol[:, np.newaxis]
     
     if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time))
 
@@ -700,6 +701,8 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
 
     Nquery = QueryPos.shape[0]
     vol, _ = xtree.query(QueryPos, k=kList, workers=n_threads)
+    if vol.ndim == 1:
+        vol = vol[:, np.newaxis]  # Ensure vol is 2D for consistency
     
     #------------------------------------------------------------------------------------------------
 
@@ -974,6 +977,8 @@ def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVect
             start_time_NN = time.perf_counter()
             print('\ncomputing the tracer NN distances ...')
         vol, _ = xtree.query(QueryPos, k=kList, workers=n_threads)
+        if vol.ndim == 1:
+            vol = vol[:, np.newaxis]
         if Verbose: print('\tdone; time taken: {:.2e} s.'.format(time.perf_counter()-start_time_NN))
 
         #-------------------------------------------------------------------------------------------

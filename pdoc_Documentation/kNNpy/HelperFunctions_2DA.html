@@ -114,7 +114,7 @@
 </span><span id="L-15"><a href="#L-15"><span class="linenos"> 15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos"> 16</span></a><span class="c1">####################################################################################################</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos"> 17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_query_2DA</span><span class="p">(</span><span class="n">NSIDE_query</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos"> 18</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_query_2DA</span><span class="p">(</span><span class="n">NSIDE_query</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos"> 19</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos"> 20</span></a><span class="sd">    Computes the usable query points for the given mask (ie., query points at least a user-defined </span>
 </span><span id="L-21"><a href="#L-21"><span class="linenos"> 21</span></a><span class="sd">    threshold distance away from the mask edge) and returns the same, along with a HEALPix </span>
@@ -132,7 +132,7 @@
 </span><span id="L-33"><a href="#L-33"><span class="linenos"> 33</span></a><span class="sd">        array encoding the observational footprint associated with the data. The value of the mask should be ``1.0`` for HEALPixels inside the observational footprint and ``healpy.UNSEEN`` for HEALPixels outside the observational footprint. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package. If there is no observational footprint (for example, data such as gravitational wave catalogs that are all-sky, or simulated datasets), please enter an array with all values equal to ``1.0``.</span>
 </span><span id="L-34"><a href="#L-34"><span class="linenos"> 34</span></a><span class="sd">    tolerance : float</span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos"> 35</span></a><span class="sd">        the minimum angular distance (in radians) a query point needs to be away from the mask edge</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        to be considered usable.</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos"> 36</span></a><span class="sd">        to be considered usable, by default equal to 0</span>
 </span><span id="L-37"><a href="#L-37"><span class="linenos"> 37</span></a><span class="sd">    Verbose : bool, optional</span>
 </span><span id="L-38"><a href="#L-38"><span class="linenos"> 38</span></a><span class="sd">        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.</span>
 </span><span id="L-39"><a href="#L-39"><span class="linenos"> 39</span></a>
@@ -624,13 +624,13 @@
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">create_query_2DA</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">NSIDE_query</span>, </span><span class="param"><span class="n">mask</span>, </span><span class="param"><span class="n">tolerance</span>, </span><span class="param"><span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
+        <span class="name">create_query_2DA</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">NSIDE_query</span>, </span><span class="param"><span class="n">mask</span>, </span><span class="param"><span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span>, </span><span class="param"><span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span></span><span class="return-annotation">):</span></span>
 
                 <label class="view-source-button" for="create_query_2DA-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#create_query_2DA"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="create_query_2DA-19"><a href="#create_query_2DA-19"><span class="linenos"> 19</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_query_2DA</span><span class="p">(</span><span class="n">NSIDE_query</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="create_query_2DA-19"><a href="#create_query_2DA-19"><span class="linenos"> 19</span></a><span class="k">def</span><span class="w"> </span><span class="nf">create_query_2DA</span><span class="p">(</span><span class="n">NSIDE_query</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">Verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 </span><span id="create_query_2DA-20"><a href="#create_query_2DA-20"><span class="linenos"> 20</span></a><span class="w">    </span><span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 </span><span id="create_query_2DA-21"><a href="#create_query_2DA-21"><span class="linenos"> 21</span></a><span class="sd">    Computes the usable query points for the given mask (ie., query points at least a user-defined </span>
 </span><span id="create_query_2DA-22"><a href="#create_query_2DA-22"><span class="linenos"> 22</span></a><span class="sd">    threshold distance away from the mask edge) and returns the same, along with a HEALPix </span>
@@ -648,7 +648,7 @@
 </span><span id="create_query_2DA-34"><a href="#create_query_2DA-34"><span class="linenos"> 34</span></a><span class="sd">        array encoding the observational footprint associated with the data. The value of the mask should be ``1.0`` for HEALPixels inside the observational footprint and ``healpy.UNSEEN`` for HEALPixels outside the observational footprint. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package. If there is no observational footprint (for example, data such as gravitational wave catalogs that are all-sky, or simulated datasets), please enter an array with all values equal to ``1.0``.</span>
 </span><span id="create_query_2DA-35"><a href="#create_query_2DA-35"><span class="linenos"> 35</span></a><span class="sd">    tolerance : float</span>
 </span><span id="create_query_2DA-36"><a href="#create_query_2DA-36"><span class="linenos"> 36</span></a><span class="sd">        the minimum angular distance (in radians) a query point needs to be away from the mask edge</span>
-</span><span id="create_query_2DA-37"><a href="#create_query_2DA-37"><span class="linenos"> 37</span></a><span class="sd">        to be considered usable.</span>
+</span><span id="create_query_2DA-37"><a href="#create_query_2DA-37"><span class="linenos"> 37</span></a><span class="sd">        to be considered usable, by default equal to 0</span>
 </span><span id="create_query_2DA-38"><a href="#create_query_2DA-38"><span class="linenos"> 38</span></a><span class="sd">    Verbose : bool, optional</span>
 </span><span id="create_query_2DA-39"><a href="#create_query_2DA-39"><span class="linenos"> 39</span></a><span class="sd">        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.</span>
 </span><span id="create_query_2DA-40"><a href="#create_query_2DA-40"><span class="linenos"> 40</span></a>
@@ -786,7 +786,7 @@ the HEALPix NSIDE of the query grid (needs to be the same as that of the continu
 array encoding the observational footprint associated with the data. The value of the mask should be <code>1.0</code> for HEALPixels inside the observational footprint and <code>healpy.UNSEEN</code> for HEALPixels outside the observational footprint. <code>healpy.UNSEEN = -1.6375e+30</code> is a special value for masked pixels used by the <code>healpy</code> package. If there is no observational footprint (for example, data such as gravitational wave catalogs that are all-sky, or simulated datasets), please enter an array with all values equal to <code>1.0</code>.</li>
 <li><strong>tolerance</strong> (float):
 the minimum angular distance (in radians) a query point needs to be away from the mask edge
-to be considered usable.</li>
+to be considered usable, by default equal to 0</li>
 <li><strong>Verbose</strong> (bool, optional):
 if set to <code>True</code>, the time taken to complete each step of the calculation will be printed, by default <code>False</code>.</li>
 </ul>
