@@ -240,3 +240,7 @@ For comments, questions or bug reports, feel free to reach out:
   <br>
   <em>Figure 2: Colored regions showing overlap of 1st, 2nd, and 3rd nearest neighbour spheres.</em>
 </p>
+
+## Information about obtaining snapshots used in Tutorials:
+Visit: https://quijote-simulations.readthedocs.io/en/latest/access.html
+You need to have globus setup in your system to download the data.
