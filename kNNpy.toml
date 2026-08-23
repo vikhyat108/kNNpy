@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kNNpy"
+version = "0.1.0"
+description = "kNN analysis package for astrophysics/cosmology data"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "astropy>=5.0",
+    "astropy-healpix",
+    "astrotools",
+    "getdist",
+    "healpy",
+    "matplotlib",
+    "numba",
+    "numpy",
+    "pandas",
+    "pyFFTW",
+    "scikit-learn",
+    "scipy",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
