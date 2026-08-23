@@ -10,6 +10,7 @@ numpy
 pandas
 pyfftw
 Pylians
-pytest
+pytest>=8.0
+pytest-benchmark>=4.0
 scikit-learn
 scipy

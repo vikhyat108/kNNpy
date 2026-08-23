@@ -1,0 +1,78 @@
+{
+    "machine_info": {
+        "node": "CTWH9P5GVW",
+        "processor": "arm",
+        "machine": "arm64",
+        "python_compiler": "Clang 13.0.0 (clang-1300.0.29.30)",
+        "python_implementation": "CPython",
+        "python_implementation_version": "3.12.7",
+        "python_version": "3.12.7",
+        "python_build": [
+            "v3.12.7:0b05ead877f",
+            "Sep 30 2024 23:18:00"
+        ],
+        "release": "25.6.0",
+        "system": "Darwin",
+        "cpu": {
+            "python_version": "3.12.7.final.0 (64 bit)",
+            "cpuinfo_version": [
+                9,
+                0,
+                0
+            ],
+            "cpuinfo_version_string": "9.0.0",
+            "arch": "ARM_8",
+            "bits": 64,
+            "count": 14,
+            "arch_string_raw": "arm64",
+            "brand_raw": "Apple M4 Max"
+        }
+    },
+    "commit_info": {
+        "id": "3f90ee3ebffa9c6be0ba23ce78e3830545aabece",
+        "time": "2026-07-28T15:44:06+05:30",
+        "author_time": "2026-07-28T15:44:06+05:30",
+        "dirty": true,
+        "project": "kNNpy",
+        "branch": "Topic-benchmarking"
+    },
+    "benchmarks": [
+        {
+            "group": null,
+            "name": "test_compute_TracerAuto2DA",
+            "fullname": "test_kNN_2D_Ang.py::test_compute_TracerAuto2DA",
+            "params": null,
+            "param": null,
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 2.8920495420006773,
+                "max": 3.3094256660006067,
+                "mean": 3.087265153349981,
+                "stddev": 0.07878150155659532,
+                "rounds": 100,
+                "median": 3.1011787715005994,
+                "iqr": 0.09599706250082818,
+                "q1": 3.0425970419992154,
+                "q3": 3.1385941045000436,
+                "iqr_outliers": 2,
+                "stddev_outliers": 30,
+                "outliers": "30;2",
+                "ld15iqr": 2.902989666999929,
+                "hd15iqr": 3.3094256660006067,
+                "ops": 0.32391127756386695,
+                "total": 308.7265153349981,
+                "iterations": 1
+            }
+        }
+    ],
+    "datetime": "2026-08-23T10:51:15.196583+00:00",
+    "version": "5.2.3"
+}
