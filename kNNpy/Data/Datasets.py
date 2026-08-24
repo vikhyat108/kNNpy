@@ -1,6 +1,8 @@
-####################################################################################################
+r'''
+# Datasets & Mock Catalog Sampling
 
-#-------------------  These libraries are required for evaluating the functions  -------------------
+Functions for generating Poisson tracer distributions, loading simulation catalogs, and building mock benchmark datasets.
+'''
 
 from tabnanny import verbose
 
@@ -39,14 +41,14 @@ def Load_forecast_LSSTy1_galaxy_field(masked=False, NSIDE=512, DataPath='../kNNp
 
     Parameters
     ----------
-    masked : bool, optional
+    masked : bool, optional, default=False
         whether to load the masked overdensity field, by default, loads the unmasked version. Set to ``True`` to load the field masked using a realistic forecast for the LSST y1 observational footprint.
 
-    NSIDE : int, optional
-        HEALPix nside of the target map, by default 512.
+    NSIDE : int, optional, default=512
+        HEALPix nside of the target map.
 
-    DataPath : str, optional
-        path to the kNNpy Data directory, by default '../kNNpy/Data/'.
+    DataPath : str, optional, default='../kNNpy/Data'
+        path to the kNNpy Data directory.
 
     Returns
     -------
@@ -87,11 +89,11 @@ def Load_WSC_mask(NSIDE=256, DataPath='../kNNpy/Data'):
 
     Parameters
     ----------
-    NSIDE : int, optional
-        HEALPix nside of the target map, by default 256.
+    NSIDE : int, optional, default=256
+        HEALPix nside of the target map.
 
-    DataPath : str, optional
-        path to the kNNpy Data directory, by default '../kNNpy/Data/'.
+    DataPath : str, optional, default='../kNNpy/Data'
+        path to the kNNpy Data directory.
 
     Returns
     -------
@@ -393,8 +395,33 @@ def Sample2DTracersFromQuijoteBox(sim_num, tracer_type, mask, N_realisations, n_
 
 def Sample3DTracersFromQuijoteBox(tracer_type, N_realisations, n_tracers, ptype=[1],DataPath='../kNNpy/Data', starting_seed=42):
     '''
-    For now it only supports one tracer_type: 'particles'. Other types like 'halos', can be included if and when necessry.
-    ptype is an optional parameter only required for the 'particles' tracer type.
+    Samples 3D tracer particles or halos from Quijote simulation snapshots.
+    For now it only supports one tracer_type: 'particles'. Other types like 'halos', can be included if and when necessary.
+    
+    Parameters
+    ----------
+    tracer_type : str
+        type of tracers to sample ('particles' or 'halos').
+
+    N_realisations : int
+        total number of realisations to be sampled.
+
+    n_tracers : int
+        total number of tracers to be sampled.
+
+    ptype : list of int, optional, default=[1]
+        particle type list required for the 'particles' tracer type.
+
+    DataPath : str, optional, default='../kNNpy/Data'
+        path to the kNNpy Data directory.
+
+    starting_seed : int, optional, default=42
+        random seed for reproducibility set for the first realization.
+
+    Returns
+    -------
+    pos_array : float ndarray
+        array of shape (``N_realisations``, ``n_tracers``, 3) containing 3D tracer positions in Mpc/h.
     '''
     np.random.seed(starting_seed)
     pos_array=[]
@@ -412,6 +439,40 @@ def Sample3DTracersFromQuijoteBox(tracer_type, N_realisations, n_tracers, ptype=
 #########################################################################################################
 
 def make_overdensity_3D(N_realisations, grid, ptype, do_RSD=False, MAS='CIC', axis=0, verbose=False, DataPath='../kNNpy/Data'):
+    '''
+    Constructs 3D overdensity fields from Gadget simulation snapshots using Mass Assignment Schemes (MAS).
+
+    Parameters
+    ----------
+    N_realisations : int
+        total number of realisations/snapshots to process.
+
+    grid : int
+        number of grid points along each axis for the 3D density field.
+
+    ptype : list of int
+        gadget particle type list to construct overdensity field.
+
+    do_RSD : bool, optional, default=False
+        whether to apply Redshift-Space Distortions (RSD).
+
+    MAS : str, optional, default='CIC'
+        Mass Assignment Scheme to use (e.g. 'NGP', 'CIC', 'TSC').
+
+    axis : int, optional, default=0
+        line-of-sight axis for RSD.
+
+    verbose : bool, optional, default=False
+        whether to print progress messages.
+
+    DataPath : str, optional, default='../kNNpy/Data'
+        path to the kNNpy Data directory.
+
+    Returns
+    -------
+    overdensity_list : float ndarray
+        array of shape (``N_realisations``, ``grid``, ``grid``, ``grid``) containing 3D overdensity fields.
+    '''
     overdensity_list=[]
     for i in range(N_realisations):
         snapshot = f'{DataPath}/fiducial_LR/{i}/snapdir_004/snap_004'

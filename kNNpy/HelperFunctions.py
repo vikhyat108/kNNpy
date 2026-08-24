@@ -1,6 +1,8 @@
-####################################################################################################
+r'''
+# 3D Helper Functions
 
-#-------------------  These libraries are required for evaluating the functions  -------------------
+Helper routines for 3D query point generation, spatial smoothing, Cloud-In-Cell (CIC) interpolation, and kNN-CDF calculations.
+'''
 
 import numpy as np
 from scipy import interpolate
@@ -24,12 +26,12 @@ def cdf_vol_knn(vol):
     
     Parameters
     ----------
-    vol : numpy float array of shape ``(n_query, n_kNN)``
+    vol : numpy float array of shape (n_query, n_kNN)
         Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
 
     Returns
     -------
-    cdf: list of function objects
+    cdf : list of function objects
         list of interpolated empirical CDF functions that can be evaluated at desired distance bins.
     '''
     
@@ -193,22 +195,30 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
     ----------
     field : numpy float array
         the 3D array of the continuous field that needs to be smoothed. 
+
     Filter : string
         the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.
+
     grid : int
         the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
+
     BoxSize : float
         the size of the 3D box of the input density field, in Mpc/h.
+
     R : float, optional
         radial scale (in Mpc/h) at which the field is to be smoothed. Only use this parameter for real space smoothing.
+
     kmin : float, optional
         the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+
     kmax : float, optional
         the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+
     thickness : float, optional
         the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
-    Verbose : bool, optional
-        if set to True, the time taken to complete each step of the calculation will be printed, by default False.
+
+    Verbose : bool, optional, default=False
+        if set to True, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
@@ -330,23 +340,29 @@ def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, thickness=
     ----------
     field : numpy float array
         the 3D array of the continuous field that needs to be smoothed. 
+
     Filter : string
         the filter to be used for smoothing. Valid filter types are: 'Top-Hat', 'Gaussian', 'Shell'. 
+
     grid : int
         the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
+
     BoxSize : float
         the size of the 3D box of the input density field, in Mpc/h.
+
     bins : list of numpy float array
-        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{th}$ nearest neighbour.
+        list of distances for each nearest neighbour. The i-th element of the list should contain a numpy array of the desired distance scales for the k_i-th nearest neighbour.
+
     thickness : float, optional
         the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
-    Verbose : bool, optional
-        if set to True, the time taken to complete each step of the calculation will be printed, by default False.
+
+    Verbose : bool, optional, default=False
+        if set to True, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
     SmoothedFieldDict : dict
-        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict['50.0']`  represents the continuous map smoothed at a scale of 50 Mpc/h.
+        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict['50.0']` represents the continuous map smoothed at a scale of 50 Mpc/h.
 
     Raises
     ------
@@ -416,17 +432,18 @@ def CIC_3D_Interp(pos, field, Boxsize):
 
     Parameters
     ----------
-    field : numpy.ndarray of shape ``(Ng, Ng, Ng)``
+    field : numpy.ndarray of shape (Ng, Ng, Ng)
         The 3D scalar field defined on a cubic grid with resolution 'Ng^3'.
 
-    pos : numpy.ndarray of shape ``(Np, 3)``
-        The positions of 'Np' particles. The columns represent x, y, and z coordinates. Units in Mpc/h
-    
-    Boxsize: float
-            The side length of the cubic volume in the same units as `pos`.
+    pos : numpy.ndarray of shape (Np, 3)
+        The positions of 'Np' particles. The columns represent x, y, and z coordinates. Units in Mpc/h.
+
+    Boxsize : float
+        The side length of the cubic volume in the same units as `pos`.
+
     Returns
     -------
-    fieldI : numpy.ndarray of shape ``(Np,)``
+    fieldI : numpy.ndarray of shape (Np,)
         The interpolated field values at the given particle positions.
     '''
     
@@ -453,14 +470,16 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
     Parameters
     ----------
     auto_cdf_list_1 : list of numpy float array
-        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_1^i$NN-CDF if the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not `None`, the i-th element should be the k1_i NN-CDF if the i-th element of `k1_k2_list` is (k1_i, k2_i).
+
     auto_cdf_list_2 : list of numpy float array
-        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the $k_2^i$NN-CDF if where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not `None`, the i-th element should be the k2_i NN-CDF where the i-th element of `k1_k2_list` is (k1_i, k2_i).
+
     joint_cdf_list : list of numpy float array
-        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not ``None``, The $i^{th}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{th}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
-        
-    k1_k2_list : list of int tuples
-        describes the kind of cross-correlations being computed (see notes for more details), by default `None`. Should be not None only if dealing with tracer-tracer cross-correlations
+        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not `None`, the i-th element should be the joint {k1_i, k2_i} NN-CDF, where the i-th element of `k1_k2_list` is (k1_i, k2_i).
+
+    k1_k2_list : list of int tuples, optional, default=None
+        describes the kind of cross-correlations being computed (see notes for more details). Should be not None only if dealing with tracer-tracer cross-correlations.
 
     Returns
     -------
@@ -500,7 +519,7 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
 
     References
     ----------
-    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868
+    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868
     '''
 
     #-------------------------------------------------------------------------------------------
@@ -526,14 +545,44 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
 #TPCF3D Helper functions
 @njit(parallel=True, fastmath=True, cache=True)
 def compute_mean_parallel(arr):
-    """Compute mean using Numba parallel reduction with fastmath."""
+    """
+    Compute mean using Numba parallel reduction with fastmath.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        Input array.
+
+    Returns
+    -------
+    mean : float
+        Mean of array elements.
+    """
     n = arr.shape[0]
     return np.sum(arr) / np.float32(n)
 
 
 @njit(parallel=True, fastmath=True, cache=True)
 def create_spherical_shell(r_grid, R, thickns, grid):
-    """Create spherical shell filter using Numba. Pre-compute bounds and use vectorized operations."""
+    """
+    Create spherical shell filter using Numba. Pre-compute bounds and use vectorized operations.
+
+    Parameters
+    ----------
+    r_grid : numpy.ndarray
+        Radial distance grid.
+    R : float
+        Radial scale.
+    thickns : float
+        Shell thickness.
+    grid : int
+        Grid size along each axis.
+
+    Returns
+    -------
+    W : numpy.ndarray
+        Normalized spherical shell filter.
+    """
     W = np.zeros((grid, grid, grid), dtype=np.float32)
     r_min = R - thickns / 2.0
     r_max = R + thickns / 2.0
@@ -555,7 +604,21 @@ def create_spherical_shell(r_grid, R, thickns, grid):
 
 @njit(parallel=True, fastmath=True, cache=True)
 def compute_r_grid(coords, grid):
-    """Compute radial distance grid using Numba. Optimized with fastmath and caching."""
+    """
+    Compute radial distance grid using Numba. Optimized with fastmath and caching.
+
+    Parameters
+    ----------
+    coords : numpy.ndarray
+        Coordinates array along axes.
+    grid : int
+        Grid size along each axis.
+
+    Returns
+    -------
+    r_grid : numpy.ndarray
+        3D radial distance grid array.
+    """
     r_grid = np.empty((grid, grid, grid), dtype=np.float32)
     # Pre-compute squares to avoid repeated computation
     coords_sq = coords ** 2
@@ -567,7 +630,27 @@ def compute_r_grid(coords, grid):
     return r_grid
 
 def make_W_k_list(bins, thickns, grid, r_grid, threads):
-    '''Creating Fourier space filters for fast convolution'''
+    '''
+    Creating Fourier space filters for fast convolution.
+
+    Parameters
+    ----------
+    bins : list of float
+        Radial bin scales.
+    thickns : float
+        Shell thickness.
+    grid : int
+        Grid resolution.
+    r_grid : numpy.ndarray
+        3D radial distance grid array.
+    threads : int
+        Number of FFT threads.
+
+    Returns
+    -------
+    W_k_list : list of numpy.ndarray
+        List of Fourier space filters.
+    '''
     W_k_list=[]
     for R in bins:
         W = create_spherical_shell(r_grid, R, thickns, grid)

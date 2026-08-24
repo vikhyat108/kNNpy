@@ -10,36 +10,48 @@ def PeakCurves(DensityFields=[], Nreals=10, MaxThreshold=16, Nthresh=101, Type=0
     
     Parameters
     ----------
-    DensityFields: float array of shape ''(nCosmo, NofRealizations, XdfDim, YdfDim)''
+    DensityFields : float array of shape (nCosmo, NofRealizations, XdfDim, YdfDim)
         4D Array of the 2D (over)density fields of the various cosmologies to be compared. The array should of shape (nCosmo, NofRealizations, XdfDim, YdfDim) 
         where 'nCosmo' is the number of cosmologies to be compared, 'NofRealizations' is the number of realizations of each input cosmology 
         (NofRealizations >= Nreals), and 'XdfDim' and 'YdfDim' are the dimensions of the 2D density fields in pixels.
         Example: np.array(DensityFields).shape = (3, 10, 512, 512) - 3 cosmologies containing 10 realisations each of (512x512) pixel 2D density fields.
-    Nreals: int
+
+    Nreals : int
         Number of realisations of the density fields to be used for the peak curves' statistics. Naturally, cannot be larger than the inherent number 
         of realisations of the 2D density fields contained within the (.npy) data files input, i.e. in the above example, Nreals <=10. Any non-int values 
         are type-cast to int.
-    MaxThreshold: float
+
+    MaxThreshold : float
         Maximum overdensity threshold for which the peak values are to be plotted.
-    Nthresh: int
+
+    Nthresh : int
         Number of overdensity threshold (X-axis) values to be computed in the closed interval [-1,MaxThreshold]. Any non-int values are type-cast to int.
-    Type: int: 0 or 1, optional
+
+    Type : int (0 or 1), optional
         Type of peak curve to be plotted - 0 for raw peak curve plot; 1 for peak curves normalized by the first input cosmology's peak curve.
-    Plot: int: 0 or 1, optional
+
+    Plot : int (0 or 1), optional
         1 to plot the output and return results, 0 to skip plotting and only return results. Any values other than 1 will skip plotting.
-    LogScale: int: 0 or 1, optional
+
+    LogScale : int (0 or 1), optional
         1 to plot the peak curves on log Y-axis, 0 to not use log Y-axis. Any values other than 1 will not output the log scale.
-    CosmoLabels: str array of shape ''(nCosmo)''
+
+    CosmoLabels : str array of shape (nCosmo)
         List of the names/labels to be assigned to the respective input cosmologies. Must have length equal to the number of cosmologies input ('nCosmo').
         Example: ['CDM', 'SIDM', 'FDM']
             
     Returns
     -------
-    thresh, tmean, tstddev: 3 numpy arrays containing the threshold values, mean peak values and std. dev. of the peak values
-        For (Type = 0): Peak curve plot of the various input comologies' density fields.
-        For (Type = 1): Peak curve plot of the various input comologies' density fields normalized by the first input cosmology's density field.
-        In both cases, the threshold values array (X-axis, 1D) 'thresh', the peaks array (Y-axis, 2D) 'tmean' containing the number of peaks corresponding to 
-        the thresholds array for each input cosmology and their corresponding standard deviations (error, 2D) 'tstddev' are also returned.
+    thresh : numpy array
+        Threshold values array (X-axis, 1D).
+
+    tmean : numpy array
+        Peaks array (Y-axis, 2D) containing the number of peaks corresponding to the thresholds array for each input cosmology.
+        For (Type = 0): Peak curve plot of the various input cosmologies' density fields.
+        For (Type = 1): Peak curve plot of the various input cosmologies' density fields normalized by the first input cosmology's density field.
+
+    tstddev : numpy array
+        Corresponding standard deviations (error, 2D) of the peak values.
 
     Raises
     ------
@@ -123,41 +135,53 @@ def spherical_peaks(denslice,MaxThreshold,Nthresh):
 
 def PeakCurves_Healpix(DensityFields=[], Nreals=10, MaxThreshold=16, Nthresh=101, Type=0, Plot=1, LogScale=1, CosmoLabels=['null']):
     '''
-    Gives the peak curves for the given cosmologies' square (over)density fields.
+    Gives the peak curves for the given cosmologies' Healpix projected (over)density fields.
     
     Parameters
     ----------
-    DensityFields: float array of shape ''(nCosmo, NofRealizations, nPixels)''
+    DensityFields : float array of shape (nCosmo, NofRealizations, nPixels)
         3D Array of the healpix (over)density fields of the various cosmologies to be compared. The array should of shape (nCosmo, NofRealizations, nPixels) 
         where 'nCosmo' is the number of cosmologies to be compared, 'NofRealizations' is the number of realizations of each input cosmology 
         (NofRealizations >= Nreals), and 'nPixels' is the number of pixels in the healpix projected (over)density field such that [nPixels = 12*res*res], 
         where 'res' is the resolution of the healpix map.
         Example: np.array(DensityFields).shape = (3, 10, 512, 512) - 3 cosmologies containing 10 realisations each of (512x512) pixel 2D density fields.
-    Nreals: int
+
+    Nreals : int
         Number of realisations of the density fields to be used for the peak curves' statistics. Naturally, cannot be larger than the inherent number 
         of realisations of the 2D density fields contained within the (.npy) data files input, i.e. in the above example, Nreals <=10. Any non-int values 
         are type-cast to int.
-    MaxThreshold: float
+
+    MaxThreshold : float
         Maximum overdensity threshold for which the peak values are to be plotted.
-    Nthresh: int
+
+    Nthresh : int
         Number of overdensity threshold (X-axis) values to be computed in the closed interval [-1,MaxThreshold]. Any non-int values are type-cast to int.
-    Type: int: 0 or 1, optional
+
+    Type : int (0 or 1), optional
         Type of peak curve to be plotted - 0 for raw peak curve plot; 1 for peak curves normalized by the first input cosmology's peak curve.
-    Plot: int: 0 or 1, optional
+
+    Plot : int (0 or 1), optional
         1 to plot the output and return results, 0 to skip plotting and only return results. Any values other than 1 will skip plotting.
-    LogScale: int: 0 or 1, optional
+
+    LogScale : int (0 or 1), optional
         1 to plot the peak curves on log Y-axis, 0 to not use log Y-axis. Any values other than 1 will not output the log scale.
-    CosmoLabels: str array of shape ''(nCosmo)''
+
+    CosmoLabels : str array of shape (nCosmo)
         List of the names/labels to be assigned to the respective input cosmologies. Must have length equal to the number of cosmologies input ('nCosmo').
         Example: ['CDM', 'SIDM', 'FDM']
     
     Returns
     -------
-    thresh, tmean, tstddev: 3 numpy arrays containing the threshold values, mean peak values and std. dev. of the peak values
-        For (Type = 0): Peak curve plot of the various input comologies' density fields.
-        For (Type = 1): Peak curve plot of the various input comologies' density fields normalized by the first input cosmology's density field.
-        In both cases, the threshold values array (X-axis, 1D) 'thresh', the peaks array (Y-axis, 2D) 'tmean' containing the number of peaks corresponding
-        to the thresholds array for each input cosmology and their corresponding standard deviations (error, 2D) 'tstddev' are also returned.
+    thresh : numpy array
+        Threshold values array (X-axis, 1D).
+
+    tmean : numpy array
+        Peaks array (Y-axis, 2D) containing the number of peaks corresponding to the thresholds array for each input cosmology.
+        For (Type = 0): Peak curve plot of the various input cosmologies' density fields.
+        For (Type = 1): Peak curve plot of the various input cosmologies' density fields normalized by the first input cosmology's density field.
+
+    tstddev : numpy array
+        Corresponding standard deviations (error, 2D) of the peak values.
 
     Raises
     ------

@@ -1,6 +1,8 @@
-####################################################################################################
+r'''
+# 2D Angular Helper Functions
 
-#-------------------  These libraries are required for evaluating the functions  -------------------
+Routines for 2D angular query mask creation, spherical harmonic top-hat smoothing, coordinate transformations, and catalog conversions.
+'''
 
 import numpy as np
 import scipy
@@ -208,12 +210,15 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
 
     Notes
     -----
-    The following expression is used to compute the the spherical harmonic expansion coefficients $\alpha^{\theta}_{\ell m}$ of the field smoothed at angular scale $\theta$ using a top hat window function (See Devaraju (2015)[^1] and Gupta & Banerjee (2024)[^2] for derivations and a detailed discussion)
-    $$\alpha^{\theta}_{\ell m} = 4\pi\frac{b_{\ell}} {2\ell+1}\alpha_{\ell m},$$
-    where $b_{\ell}$ are the the Legedre expansion coefficients of the top hat function, given by
-    $$b_{\ell} = \frac{1}{4\pi(1-\cos\theta)}\left[P_{\ell-1}(\cos\theta)-P_{\ell+1}(\cos\theta)\right].$$
-    The smoothed field is reconstructed from $\alpha^{\theta}_{\ell m}$ using healpy's `alm2map` method.
+    The following expression is used to compute the spherical harmonic expansion coefficients \\(\\alpha^{\\theta}_{\\ell m}\\) of the field smoothed at angular scale \\(\\theta\\) using a top hat window function (See Devaraju (2015)[^1] and Gupta & Banerjee (2024)[^2] for derivations and a detailed discussion):
 
+    \\[ \\alpha^{\\theta}_{\\ell m} = 4\\pi \\frac{b_{\\ell}}{2\\ell+1} \\alpha_{\\ell m} \\]
+
+    where \\(b_{\\ell}\\) are the Legendre expansion coefficients of the top hat function, given by:
+
+    \\[ b_{\\ell} = \\frac{1}{4\\pi(1-\\cos\\theta)} \\left[ P_{\\ell-1}(\\cos\\theta) - P_{\\ell+1}(\\cos\\theta) \\right] \\]
+
+    The smoothed field is reconstructed from \\(\\alpha^{\\theta}_{\\ell m}\\) using healpy's `alm2map` method.
 
     References
     ----------
@@ -303,12 +308,15 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
     ----------
     skymap : numpy float array
         the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
+
     bins : list of numpy float array
-        list of distances for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distance scales for the $i^{th}$ nearest neighbour.
-    query_mask : numpy float array of shape ``skymap.shape``
+        list of distances for each nearest neighbour. The i-th element of the list should contain a numpy array of the desired distance scales for the i-th nearest neighbour.
+
+    query_mask : numpy float array of shape skymap.shape
         the HEALPix query mask.
-    Verbose : bool, optional
-        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
+
+    Verbose : bool, optional, default=False
+        if set to `True`, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
@@ -372,9 +380,10 @@ def change_coord(m, coord):
     Parameters
     ----------
     m : map or array of maps
-        map(s) to be rotated
+        map(s) to be rotated.
+
     coord : sequence of two character
-        First character is the coordinate system of `m`, second character is the coordinate system of the output map. As in HEALPIX, allowed coordinate systems are 'G' (galactic), 'E' (ecliptic) or 'C' (equatorial)
+        First character is the coordinate system of `m`, second character is the coordinate system of the output map. As in HEALPIX, allowed coordinate systems are 'G' (galactic), 'E' (ecliptic) or 'C' (equatorial).
 
     Returns
     -------
