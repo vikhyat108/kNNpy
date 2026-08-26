@@ -68,6 +68,7 @@ def calc_kNN_CDF(vol, bins):
     ----------
     vol : numpy float array of shape ``(n_query, n_kNN)``
         2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried. `vol[:, i]` should be the array with the sorted $k_i^{th}$ nearest-neighbour distances.
+
     bins : list of numpy float array
         list of distance scale arrays at which the CDFs need to be evaluated (units must be same as in `vol`).
 
@@ -132,8 +133,10 @@ def create_query_3D(query_type, query_grid, BoxSize):
     ----------
     query_type : {'grid', 'random'}, str
         the type of query points to be generated; should be 'grid' for query points defined on a uniform grid and 'random' for query points drawn from a uniform random distribution.
+
     query_grid : int
         the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
+
     BoxSize : float
         the size of the 3D box of the input density field, in Mpc/h. Must be a positive real number, and must not be ``np.inf`` or ``np.nan``.
 
@@ -146,6 +149,7 @@ def create_query_3D(query_type, query_grid, BoxSize):
     ------
     ValueError
         if `BoxSize` is not a positive real number less than infinity.
+
     ValueError
         if an unknown query type is provided.
         
@@ -560,8 +564,6 @@ def compute_mean_parallel(arr):
     """
     n = arr.shape[0]
     return np.sum(arr) / np.float32(n)
-
-
 @njit(parallel=True, fastmath=True, cache=True)
 def create_spherical_shell(r_grid, R, thickns, grid):
     """
@@ -571,10 +573,13 @@ def create_spherical_shell(r_grid, R, thickns, grid):
     ----------
     r_grid : numpy.ndarray
         Radial distance grid.
+
     R : float
         Radial scale.
+
     thickns : float
         Shell thickness.
+
     grid : int
         Grid size along each axis.
 
@@ -611,6 +616,7 @@ def compute_r_grid(coords, grid):
     ----------
     coords : numpy.ndarray
         Coordinates array along axes.
+
     grid : int
         Grid size along each axis.
 
@@ -637,12 +643,16 @@ def make_W_k_list(bins, thickns, grid, r_grid, threads):
     ----------
     bins : list of float
         Radial bin scales.
+
     thickns : float
         Shell thickness.
+
     grid : int
         Grid resolution.
+
     r_grid : numpy.ndarray
         3D radial distance grid array.
+
     threads : int
         Number of FFT threads.
 

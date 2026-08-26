@@ -67,10 +67,13 @@ def CorrelationFunction(BinsRad, MaskedTracerPosRad, FieldSkymap, NR_ND=10, Retu
     ------
     ValueError
         If declination of any tracer point is not in `[-np.pi/2, np.pi/2]`.
+
     ValueError
         If right ascension of any tracer point is not in `[0, 2*np.pi]`.
+
     ValueError
         If tracer points are not on a 2D grid.
+
     ValueError
         If NR_ND is not an integer.
 
@@ -212,14 +215,19 @@ def CorrelationFunction_DataVector(BinsRad, MaskedTracerPosVectorRad, FieldSkyma
     ----------
     BinsRad : list of numpy float array
         array of angular distances (in radians) to compute the cross-correlation function at
+
     MaskedTracerPosVectorRad : numpy float array of shape ``(n_realisations, n_tracer, 2)``
         array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+
     FieldSkymap : numpy float array
         the healpy map of the continuous field. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+
     NR_ND : int
         ratio of number of randoms to number of data points used in the 2PCF calculation to remove biases caused by the presence of an observational mask, by default ``10``. This is similar to the ratio of number of randoms to number data points used in the usual Landy-Szalay estimator of the 2PCF[^1]. See notes for a more detailed explanation of this parameter and how to set it appropriately.
+
     ReturnSmoothedDict : bool, optional
         if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements, by default ``False``.
+
     Verbose : bool, optional
         if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
@@ -227,6 +235,7 @@ def CorrelationFunction_DataVector(BinsRad, MaskedTracerPosVectorRad, FieldSkyma
     -------
     w_theta_vector: numpy float array of shape ``(n_realisations, len(BinsRad)-1)``
         data vector containing the tracer-field two-point cross-correlation function for multiple realisations of the discrete tracer set evaluated at the desired distance bins. Note that the 2PCF can't be estimated at the last bin due to the nature of the algorithm (refer to notes for details).
+
     SmoothedFieldDict : dict
         dictionary containing the continuous field masked within the observational footprint and smoothed at the provided angular distance scales, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
 
@@ -234,10 +243,13 @@ def CorrelationFunction_DataVector(BinsRad, MaskedTracerPosVectorRad, FieldSkyma
     ------
     ValueError
         if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+
     ValueError
         if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+
     ValueError
         if the given tracer points are not on a two-dimensional grid.
+
     ValueError
         if the `NR_ND` is not an integer.
 

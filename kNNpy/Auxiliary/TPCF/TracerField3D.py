@@ -36,17 +36,22 @@ def CrossCorr2pt(bins, pos, delta, boxsize, threads, W_k_list):
     ----------
     bins : numpy array
         Radial bins for correlation function
+
     pos : numpy array
         Tracer positions of shape (N, 3), must be float32
+
     delta : numpy array
         Density field array of shape (ngrid, ngrid, ngrid)
+
     boxsize : float
         Size of simulation box
+
     threads : int
         Number of threads for FFT
+
     W_k_list : list
         List of window functions in k-space
-        
+
     Returns
     -------
     xi : numpy array

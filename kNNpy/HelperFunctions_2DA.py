@@ -31,11 +31,14 @@ def create_query_2DA(NSIDE_query, mask, tolerance=0, Verbose=False):
     ----------
     NSIDE_query : int
         the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.).
+
     mask : numpy float array of shape ``(12*NSIDE_query**2, )``
         array encoding the observational footprint associated with the data. The value of the mask should be ``1.0`` for HEALPixels inside the observational footprint and ``healpy.UNSEEN`` for HEALPixels outside the observational footprint. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package. If there is no observational footprint (for example, data such as gravitational wave catalogs that are all-sky, or simulated datasets), please enter an array with all values equal to ``1.0``.
+
     tolerance : float
         the minimum angular distance (in radians) a query point needs to be away from the mask edge
         to be considered usable, by default equal to 0
+
     Verbose : bool, optional
         if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
@@ -51,8 +54,10 @@ def create_query_2DA(NSIDE_query, mask, tolerance=0, Verbose=False):
     ------
     ValueError
         if `tolerance` is not in `[0, 2*np.pi]`
+
     ValueError
         if `NSIDE_query` is not a power of 2
+
     ValueError
         if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
         
@@ -189,8 +194,10 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
     ----------
     skymap : numpy float array
         the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
+
     scale : float
         angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.
+
     Verbose : bool, optional
         if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
 
