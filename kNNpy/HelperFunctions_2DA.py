@@ -29,37 +29,21 @@ def create_query_2DA(NSIDE_query, mask, tolerance=0, Verbose=False):
 
     Parameters
     ----------
-    NSIDE_query : int
-        the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.).
-
-    mask : numpy float array of shape ``(12*NSIDE_query**2, )``
-        array encoding the observational footprint associated with the data. The value of the mask should be ``1.0`` for HEALPixels inside the observational footprint and ``healpy.UNSEEN`` for HEALPixels outside the observational footprint. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package. If there is no observational footprint (for example, data such as gravitational wave catalogs that are all-sky, or simulated datasets), please enter an array with all values equal to ``1.0``.
-
-    tolerance : float
-        the minimum angular distance (in radians) a query point needs to be away from the mask edge
-        to be considered usable, by default equal to 0
-
-    Verbose : bool, optional
-        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+    * **NSIDE_query** (int): the HEALPix NSIDE of the query grid (needs to be the same as that of the continuous field and the mask). Must be a power of 2 (eg. 128, 256, 512, etc.).
+    * **mask** (numpy float array of shape ``(12*NSIDE_query**2, )``): array encoding the observational footprint associated with the data. The value of the mask should be ``1.0`` for HEALPixels inside the observational footprint and ``healpy.UNSEEN`` for HEALPixels outside the observational footprint. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package. If there is no observational footprint (for example, data such as gravitational wave catalogs that are all-sky, or simulated datasets), please enter an array with all values equal to ``1.0``.
+    * **tolerance** (float): the minimum angular distance (in radians) a query point needs to be away from the mask edge to be considered usable, by default equal to 0
+    * **Verbose** (bool, optional): if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
 
     Returns
     -------
-    query_mask : numpy int array of shape ``mask.shape``
-        the HEALPix query mask, i.e., an array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the observational footprint, too close to mask boundary and sufficiently inside the observational footprint (far from the boundary), respectively.
-
-    QueryPositions : numpy float array of shape ``(N_usable_pix, 2)``
-        array of usable query point positions, where 'N_usable_pix' is the number of pixels that are sufficiently far away from the mask edge, as determined by this method. For each query point in the array, the first (second) coordinate is the declination (right ascension) in radians.
+    * **query_mask** (numpy int array of shape ``mask.shape``): the HEALPix query mask, i.e., an array with 0, 1 and 2 indicating that the corresponding HEALPixel is outside the observational footprint, too close to mask boundary and sufficiently inside the observational footprint (far from the boundary), respectively.
+    * **QueryPositions** (numpy float array of shape ``(N_usable_pix, 2)``): array of usable query point positions, where 'N_usable_pix' is the number of pixels that are sufficiently far away from the mask edge, as determined by this method. For each query point in the array, the first (second) coordinate is the declination (right ascension) in radians.
 
     Raises
     ------
-    ValueError
-        if `tolerance` is not in `[0, 2*np.pi]`
-
-    ValueError
-        if `NSIDE_query` is not a power of 2
-
-    ValueError
-        if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
+    * **ValueError**: if `tolerance` is not in `[0, 2*np.pi]`
+    * **ValueError**: if `NSIDE_query` is not a power of 2
+    * **ValueError**: if `NSIDE_query` is not the same as the NSIDE of the continuous field and the mask
         
     See Also
     --------
@@ -167,15 +151,12 @@ def bl_th(l, ss):
 
     Parameters
     ----------
-    l : numpy int array
-        array of multipole numbers.
-    ss : float
-        angular scale (in radians) at which the field is to be smoothed.
+    * **l** (numpy int array): array of multipole numbers.
+    * **ss** (float): angular scale (in radians) at which the field is to be smoothed.
 
     Returns
     -------
-    numpy float array of shape ``l.shape``
-        array of Legendre expansion coefficients at each input multipole number.
+    * **bl** (numpy float array of shape ``l.shape``): array of Legendre expansion coefficients at each input multipole number.
     '''
 
     plm1 = scipy.special.eval_legendre(l-1, np.cos(ss))
@@ -192,24 +173,17 @@ def top_hat_smoothing_2DA(skymap, scale, Verbose=False):
 
     Parameters
     ----------
-    skymap : numpy float array
-        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
-
-    scale : float
-        angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.
-
-    Verbose : bool, optional
-        if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
+    * **skymap** (numpy float array): the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
+    * **scale** (float): angular scale (in radians) at which the field is to be smoothed. Please ensure `scale` is between `0` and `2*np.pi`.
+    * **Verbose** (bool, optional): if set to `True`, the time taken to complete each step of the calculation will be printed, by default `False`.
 
     Returns
     -------
-    smoothed_map_masked : numpy float array of shape ``skymap.shape``
-        the smoothed healpy map, keeping the masked pixels of the original map masked.
+    * **smoothed_map_masked** (numpy float array of shape ``skymap.shape``): the smoothed healpy map, keeping the masked pixels of the original map masked.
 
     Raises
     ------
-    ValueError
-        if `scale` is not in `[0, 2*np.pi]`
+    * **ValueError**: if `scale` is not in `[0, 2*np.pi]`
         
     See Also
     --------
@@ -313,22 +287,14 @@ def create_smoothed_field_dict_2DA(skymap, bins, query_mask, Verbose=False):
 
     Parameters
     ----------
-    skymap : numpy float array
-        the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
-
-    bins : list of numpy float array
-        list of distances for each nearest neighbour. The i-th element of the list should contain a numpy array of the desired distance scales for the i-th nearest neighbour.
-
-    query_mask : numpy float array of shape skymap.shape
-        the HEALPix query mask.
-
-    Verbose : bool, optional, default=False
-        if set to `True`, the time taken to complete each step of the calculation will be printed.
+    * **skymap** (numpy float array): the healpy map of the continuous field that needs to be smoothed. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `healpy.UNSEEN`. ``healpy.UNSEEN = -1.6375e+30`` is a special value for masked pixels used by the ``healpy`` package.
+    * **bins** (list of numpy float array): list of distances for each nearest neighbour. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distance scales for the $i^{\text{th}}$ nearest neighbour.
+    * **query_mask** (numpy float array of shape skymap.shape): the HEALPix query mask.
+    * **Verbose** (bool, optional, default=False): if set to `True`, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field masked within the observational footprint and smoothed at various angular distance scales. For example, `SmoothedFieldDict['0.215']`  represents the continuous map smoothed at a scale of 0.215 radians.
+    * **SmoothedFieldDict** (dict): dictionary containing the continuous field masked within the observational footprint and smoothed at various angular distance scales. For example, `SmoothedFieldDict['0.215']`  represents the continuous map smoothed at a scale of 0.215 radians.
 
     Notes
     -----
@@ -386,16 +352,12 @@ def change_coord(m, coord):
 
     Parameters
     ----------
-    m : map or array of maps
-        map(s) to be rotated.
-
-    coord : sequence of two character
-        First character is the coordinate system of `m`, second character is the coordinate system of the output map. As in HEALPIX, allowed coordinate systems are 'G' (galactic), 'E' (ecliptic) or 'C' (equatorial).
+    * **m** (map or array of maps): map(s) to be rotated.
+    * **coord** (sequence of two character): First character is the coordinate system of `m`, second character is the coordinate system of the output map. As in HEALPIX, allowed coordinate systems are 'G' (galactic), 'E' (ecliptic) or 'C' (equatorial).
 
     Returns
     -------
-    m : map or array of maps
-        rotated map(s)
+    * **m** (map or array of maps): rotated map(s)
 
     Example
     -------
@@ -425,19 +387,13 @@ def cat2hpx(lon, lat, nside, radec=False):
 
     Parameters
     ----------
-    lon, lat : (ndarray, ndarray)
-        Coordinates of the sources in degree. If ``radec=True``, assumes input is in the ICRS coordinate system. Otherwise assumes input is glon, glat.
-
-    nside : int
-        HEALPix nside of the target map.
-
-    radec : bool
-        If `True`, assumes input is in the ICRS coordinate system, otherwise assumes input is glon, glat, by default `False`.
+    * **lon, lat** ((ndarray, ndarray)): Coordinates of the sources in degree. If ``radec=True``, assumes input is in the ICRS coordinate system. Otherwise assumes input is glon, glat.
+    * **nside** (int): HEALPix nside of the target map.
+    * **radec** (bool): If `True`, assumes input is in the ICRS coordinate system, otherwise assumes input is glon, glat, by default `False`.
 
     Returns
     -------
-    hpx_map : ndarray
-        HEALPix map of the catalogue number counts in Galactic coordinates.
+    * **hpx_map** (ndarray): HEALPix map of the catalogue number counts in Galactic coordinates.
     '''
 
     npix = hp.nside2npix(nside)
@@ -472,19 +428,13 @@ def cartesian_corner_to_angles_centre(x, y, z, boxsize, r_max):
 
     Parameters
     ----------
-    x, y, z : (ndarray, ndarray, ndarray)
-        cartesian coordinates of the sources in the box.
-
-    boxsize : float
-        size of the box in which the sources are located.
-
-    r_max : float
-        maximum distance from the observer to consider sources.
+    * **x, y, z** ((ndarray, ndarray, ndarray)): cartesian coordinates of the sources in the box.
+    * **boxsize** (float): size of the box in which the sources are located.
+    * **r_max** (float): maximum distance from the observer to consider sources.
 
     Returns
     -------
-    ang_pos : ndarray
-        angular positions of the sources in radians as they appear on the sky for an observer at the centre of the box.
+    * **ang_pos** (ndarray): angular positions of the sources in radians as they appear on the sky for an observer at the centre of the box.
     '''
 
     new_x, new_y, new_z = x - boxsize/2, y - boxsize/2, z - boxsize/2
@@ -504,19 +454,13 @@ def PoissonUniformCDFs(a, n, kNN):
 
     Parameters
     ----------
-    a : float
-        area of the region in steradians.
-
-    n : float
-        mean number density of points.
-
-    kNN : int
-        the nearest neighbor to compute the CDF for.
+    * **a** (float): area of the region in steradians.
+    * **n** (float): mean number density of points.
+    * **kNN** (int): the nearest neighbor to compute the CDF for.
 
     Returns
     -------
-    CDF : float
-        The expected CDF value for the kNN distance.
+    * **CDF** (float): The expected CDF value for the kNN distance.
     '''
 
     mean=n*a

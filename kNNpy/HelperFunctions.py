@@ -26,13 +26,11 @@ def cdf_vol_knn(vol):
     
     Parameters
     ----------
-    vol : numpy float array of shape (n_query, n_kNN)
-        Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
+    * **vol** (numpy float array of shape (n_query, n_kNN)): Sorted array of nearest neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest neighbours queried.
 
     Returns
     -------
-    cdf : list of function objects
-        list of interpolated empirical CDF functions that can be evaluated at desired distance bins.
+    * **cdf** (list of function objects): list of interpolated empirical CDF functions that can be evaluated at desired distance bins.
     '''
     
     #-----------------------------------------------------------------------------------------------
@@ -66,16 +64,12 @@ def calc_kNN_CDF(vol, bins):
 
     Parameters
     ----------
-    vol : numpy float array of shape ``(n_query, n_kNN)``
-        2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried. `vol[:, i]` should be the array with the sorted $k_i^{th}$ nearest-neighbour distances.
-
-    bins : list of numpy float array
-        list of distance scale arrays at which the CDFs need to be evaluated (units must be same as in `vol`).
+    * **vol** (numpy float array of shape ``(n_query, n_kNN)``): 2D array containing sorted 1D arrays of nearest-neighbour distances, where 'n_query' is the number of query points and 'n_kNN' is the number of nearest-neighbours queried. `vol[:, i]` should be the array with the sorted $i^{\text{th}}$ nearest-neighbour distances.
+    * **bins** (list of numpy float array): list of distance scale arrays at which the CDFs need to be evaluated (units must be same as in `vol`).
 
     Returns
     -------
-    data : list of numpy float array
-        kNN-CDFs evaluated at the desired distance bins. ``data[i]`` is the $k_i$NN-CDF if ``vol[:, i]`` containts the $k_i^{th}$ nearest-neigbour distances.
+    * **data** (list of numpy float array): kNN-CDFs evaluated at the desired distance bins. ``data[i]`` is the $k_i$NN-CDF if ``vol[:, i]`` containts the $i^{\text{th}}$ nearest-neigbour distances.
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -131,27 +125,18 @@ def create_query_3D(query_type, query_grid, BoxSize):
 
     Parameters
     ----------
-    query_type : {'grid', 'random'}, str
-        the type of query points to be generated; should be 'grid' for query points defined on a uniform grid and 'random' for query points drawn from a uniform random distribution.
-
-    query_grid : int
-        the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
-
-    BoxSize : float
-        the size of the 3D box of the input density field, in Mpc/h. Must be a positive real number, and must not be ``np.inf`` or ``np.nan``.
+    * **query_type** ({'grid', 'random'}, str): the type of query points to be generated; should be 'grid' for query points defined on a uniform grid and 'random' for query points drawn from a uniform random distribution.
+    * **query_grid** (int): the 1D size of the query points array; the total number of query points generated will be ``query_grid**3``.
+    * **BoxSize** (float): the size of the 3D box of the input density field, in Mpc/h. Must be a positive real number, and must not be ``np.inf`` or ``np.nan``.
 
     Returns
     -------
-    query_pos : numpy float array of shape ``(query_grid**3, 3)``
-        array of query point positions. For each query point in the array, the first, second and third entries are the x, y and z coordinates respectively, in Mpc/h.
+    * **query_pos** (numpy float array of shape ``(query_grid**3, 3)``): array of query point positions. For each query point in the array, the first, second and third entries are the x, y and z coordinates respectively, in Mpc/h.
 
     Raises
     ------
-    ValueError
-        if `BoxSize` is not a positive real number less than infinity.
-
-    ValueError
-        if an unknown query type is provided.
+    * **ValueError**: if `BoxSize` is not a positive real number less than infinity.
+    * **ValueError**: if an unknown query type is provided.
         
     See Also
     --------
@@ -197,48 +182,26 @@ def smoothing_3D(field, Filter, grid, BoxSize, R=None, kmin=None, kmax=None, thi
     
     Parameters
     ----------
-    field : numpy float array
-        the 3D array of the continuous field that needs to be smoothed. 
-
-    Filter : string
-        the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.
-
-    grid : int
-        the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
-
-    BoxSize : float
-        the size of the 3D box of the input density field, in Mpc/h.
-
-    R : float, optional
-        radial scale (in Mpc/h) at which the field is to be smoothed. Only use this parameter for real space smoothing.
-
-    kmin : float, optional
-        the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
-
-    kmax : float, optional
-        the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
-
-    thickness : float, optional
-        the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
-
-    Verbose : bool, optional, default=False
-        if set to True, the time taken to complete each step of the calculation will be printed.
+    * **field** (numpy float array): the 3D array of the continuous field that needs to be smoothed. 
+    * **Filter** (string): the filter to be used for smoothing. 'Top-Hat', 'Gaussian', 'Shell' are for real space, and 'Top-Hat-k' is a top-hat filter in k-space.
+    * **grid** (int): the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
+    * **BoxSize** (float): the size of the 3D box of the input density field, in Mpc/h.
+    * **R** (float, optional): radial scale (in Mpc/h) at which the field is to be smoothed. Only use this parameter for real space smoothing.
+    * **kmin** (float, optional): the minimum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    * **kmax** (float, optional): the maximum value of the wavenumber. Only use this parameter when 'Top-Hat-k' filter is used.
+    * **thickness** (float, optional): the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
+    * **Verbose** (bool, optional, default=False): if set to True, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    smoothed_field : numpy float array of shape field.shape
-        the smoothed field.
+    * **smoothed_field** (numpy float array of shape field.shape): the smoothed field.
 
     Raises
     ------
-    ValueError
-        If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.
-    ValueError
-        If the input field dimensions do not form a cubical box.
-    ValueError
-        If the grid size does not match the field dimensions.
-    ValueError
-        If an unknown filter name is provided.
+    * **ValueError**: If required parameters (like R, kmin, kmax, or thickness) are missing for the specified filter type.
+    * **ValueError**: If the input field dimensions do not form a cubical box.
+    * **ValueError**: If the grid size does not match the field dimensions.
+    * **ValueError**: If an unknown filter name is provided.
 
     Notes
     -----
@@ -342,42 +305,24 @@ def create_smoothed_field_dict_3D(field, Filter, grid, BoxSize, bins, thickness=
 
     Parameters
     ----------
-    field : numpy float array
-        the 3D array of the continuous field that needs to be smoothed. 
-
-    Filter : string
-        the filter to be used for smoothing. Valid filter types are: 'Top-Hat', 'Gaussian', 'Shell'. 
-
-    grid : int
-        the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
-
-    BoxSize : float
-        the size of the 3D box of the input density field, in Mpc/h.
-
-    bins : list of numpy float array
-        list of distances for each nearest neighbour. The i-th element of the list should contain a numpy array of the desired distance scales for the k_i-th nearest neighbour.
-
-    thickness : float, optional
-        the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
-
-    Verbose : bool, optional, default=False
-        if set to True, the time taken to complete each step of the calculation will be printed.
+    * **field** (numpy float array): the 3D array of the continuous field that needs to be smoothed. 
+    * **Filter** (string): the filter to be used for smoothing. Valid filter types are: 'Top-Hat', 'Gaussian', 'Shell'. 
+    * **grid** (int): the grid size of the input density field, which should be field.shape[0] assuming a cubical box.
+    * **BoxSize** (float): the size of the 3D box of the input density field, in Mpc/h.
+    * **bins** (list of numpy float array): list of distances for each nearest neighbour. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distance scales for the $k_i^{\text{th}}$ nearest neighbour.
+    * **thickness** (float, optional): the thickness of the shell used for smoothing. Only use this parameter when 'Shell' filter is used. The smoothing is done using a shell with inner radius R-thickness/2 and outer radius R+thickness/2.
+    * **Verbose** (bool, optional, default=False): if set to True, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict['50.0']` represents the continuous map smoothed at a scale of 50 Mpc/h.
+    * **SmoothedFieldDict** (dict): dictionary containing the continuous field smoothed at various radial distance scales. For example, `SmoothedFieldDict['50.0']` represents the continuous map smoothed at a scale of 50 Mpc/h.
 
     Raises
     ------
-    ValueError
-        If required parameters (like bins or thickness) are missing for the specified filter type.
-    ValueError
-        If the input field dimensions do not form a cubical box.
-    ValueError
-        If the grid size does not match the field dimensions.
-    ValueError
-        If an unknown filter name is provided.
+    * **ValueError**: If required parameters (like bins or thickness) are missing for the specified filter type.
+    * **ValueError**: If the input field dimensions do not form a cubical box.
+    * **ValueError**: If the grid size does not match the field dimensions.
+    * **ValueError**: If an unknown filter name is provided.
 
     Notes
     -----
@@ -436,19 +381,13 @@ def CIC_3D_Interp(pos, field, Boxsize):
 
     Parameters
     ----------
-    field : numpy.ndarray of shape (Ng, Ng, Ng)
-        The 3D scalar field defined on a cubic grid with resolution 'Ng^3'.
-
-    pos : numpy.ndarray of shape (Np, 3)
-        The positions of 'Np' particles. The columns represent x, y, and z coordinates. Units in Mpc/h.
-
-    Boxsize : float
-        The side length of the cubic volume in the same units as `pos`.
+    * **field** (numpy.ndarray of shape (Ng, Ng, Ng)): The 3D scalar field defined on a cubic grid with resolution 'Ng^3'.
+    * **pos** (numpy.ndarray of shape (Np, 3)): The positions of 'Np' particles. The columns represent x, y, and z coordinates. Units in Mpc/h.
+    * **Boxsize** (float): The side length of the cubic volume in the same units as `pos`.
 
     Returns
     -------
-    fieldI : numpy.ndarray of shape (Np,)
-        The interpolated field values at the given particle positions.
+    * **fieldI** (numpy.ndarray of shape (Np,)): The interpolated field values at the given particle positions.
     '''
     
     #-----------------------------------------------------------------------------------------------
@@ -473,29 +412,19 @@ def kNN_excess_cross_corr(auto_cdf_list_1, auto_cdf_list_2, joint_cdf_list, k1_k
 
     Parameters
     ----------
-    auto_cdf_list_1 : list of numpy float array
-        auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not `None`, the i-th element should be the k1_i NN-CDF if the i-th element of `k1_k2_list` is (k1_i, k2_i).
-
-    auto_cdf_list_2 : list of numpy float array
-        auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not `None`, the i-th element should be the k2_i NN-CDF where the i-th element of `k1_k2_list` is (k1_i, k2_i).
-
-    joint_cdf_list : list of numpy float array
-        joint kNN distributions of the two tracer sets. If `k1_k2_list` is not `None`, the i-th element should be the joint {k1_i, k2_i} NN-CDF, where the i-th element of `k1_k2_list` is (k1_i, k2_i).
-
-    k1_k2_list : list of int tuples, optional, default=None
-        describes the kind of cross-correlations being computed (see notes for more details). Should be not None only if dealing with tracer-tracer cross-correlations.
+    * **auto_cdf_list_1** (list of numpy float array): auto kNN-CDFs of the first set of tracers. If `k1_k2_list` is not `None`, the $i^{\text{th}}$ element should be the $k_1^i$NN-CDF if the $i^{\text{th}}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+    * **auto_cdf_list_2** (list of numpy float array): auto kNN-CDFs of the second set of tracers. If `k1_k2_list` is not `None`, the $i^{\text{th}}$ element should be the $k_2^i$NN-CDF where the $i^{\text{th}}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+    * **joint_cdf_list** (list of numpy float array): joint kNN distributions of the two tracer sets. If `k1_k2_list` is not `None`, the $i^{\text{th}}$ element should be the joint {$k_1^i$, $k_2^i$}NN-CDF, where the $i^{\text{th}}$ element of `k1_k2_list` is ($k_1^i$, $k_2^i$).
+    * **k1_k2_list** (list of int tuples, optional, default=None): describes the kind of cross-correlations being computed (see notes for more details). Should be not None only if dealing with tracer-tracer cross-correlations.
 
     Returns
     -------
-    psi_list : list of numpy float array
-        excess spatial cross-correlation between the two tracer sets.
+    * **psi_list** (list of numpy float array): excess spatial cross-correlation between the two tracer sets.
 
     Raises
     ------
-    ValueError
-        if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`
-    ValueError
-        if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`
+    * **ValueError**: if `k1_k2_list` is not `None` and `len(joint_cdf_list)!=len(k1_k2_list)`
+    * **ValueError**: if `k1_k2_list` is `None` and `len(joint_cdf_list)!=len(auto_cdf_list_1) or len(joint_cdf_list)!=len(auto_cdf_list_2)`
 
     Notes
     -----
@@ -554,13 +483,11 @@ def compute_mean_parallel(arr):
 
     Parameters
     ----------
-    arr : numpy.ndarray
-        Input array.
+    * **arr** (numpy.ndarray): Input array.
 
     Returns
     -------
-    mean : float
-        Mean of array elements.
+    * **mean** (float): Mean of array elements.
     """
     n = arr.shape[0]
     return np.sum(arr) / np.float32(n)
@@ -571,22 +498,14 @@ def create_spherical_shell(r_grid, R, thickns, grid):
 
     Parameters
     ----------
-    r_grid : numpy.ndarray
-        Radial distance grid.
-
-    R : float
-        Radial scale.
-
-    thickns : float
-        Shell thickness.
-
-    grid : int
-        Grid size along each axis.
+    * **r_grid** (numpy.ndarray): Radial distance grid.
+    * **R** (float): Radial scale.
+    * **thickns** (float): Shell thickness.
+    * **grid** (int): Grid size along each axis.
 
     Returns
     -------
-    W : numpy.ndarray
-        Normalized spherical shell filter.
+    * **W** (numpy.ndarray): Normalized spherical shell filter.
     """
     W = np.zeros((grid, grid, grid), dtype=np.float32)
     r_min = R - thickns / 2.0
@@ -614,16 +533,12 @@ def compute_r_grid(coords, grid):
 
     Parameters
     ----------
-    coords : numpy.ndarray
-        Coordinates array along axes.
-
-    grid : int
-        Grid size along each axis.
+    * **coords** (numpy.ndarray): Coordinates array along axes.
+    * **grid** (int): Grid size along each axis.
 
     Returns
     -------
-    r_grid : numpy.ndarray
-        3D radial distance grid array.
+    * **r_grid** (numpy.ndarray): 3D radial distance grid array.
     """
     r_grid = np.empty((grid, grid, grid), dtype=np.float32)
     # Pre-compute squares to avoid repeated computation
@@ -641,25 +556,15 @@ def make_W_k_list(bins, thickns, grid, r_grid, threads):
 
     Parameters
     ----------
-    bins : list of float
-        Radial bin scales.
-
-    thickns : float
-        Shell thickness.
-
-    grid : int
-        Grid resolution.
-
-    r_grid : numpy.ndarray
-        3D radial distance grid array.
-
-    threads : int
-        Number of FFT threads.
+    * **bins** (list of float): Radial bin scales.
+    * **thickns** (float): Shell thickness.
+    * **grid** (int): Grid resolution.
+    * **r_grid** (numpy.ndarray): 3D radial distance grid array.
+    * **threads** (int): Number of FFT threads.
 
     Returns
     -------
-    W_k_list : list of numpy.ndarray
-        List of Fourier space filters.
+    * **W_k_list** (list of numpy.ndarray): List of Fourier space filters.
     '''
     W_k_list=[]
     for R in bins:
@@ -677,19 +582,13 @@ def PoissonUniformCDFs_3D(v, n, kNN):
 
     Parameters
     ----------
-    v : float
-        volume of the region in steradians.
-
-    n : float
-        mean number density of points.
-
-    kNN : int
-        the nearest neighbor to compute the CDF for.
+    * **v** (float): volume of the region in steradians.
+    * **n** (float): mean number density of points.
+    * **kNN** (int): the nearest neighbor to compute the CDF for.
 
     Returns
     -------
-    CDF : float
-        The expected CDF value for the kNN distance.
+    * **CDF** (float): The expected CDF value for the kNN distance.
     '''
 
     mean=n*v

@@ -41,22 +41,14 @@ def Load_forecast_LSSTy1_galaxy_field(masked=False, NSIDE=512, DataPath='../kNNp
 
     Parameters
     ----------
-    masked : bool, optional, default=False
-        whether to load the masked overdensity field, by default, loads the unmasked version. Set to ``True`` to load the field masked using a realistic forecast for the LSST y1 observational footprint.
-
-    NSIDE : int, optional, default=512
-        HEALPix nside of the target map.
-
-    DataPath : str, optional, default='../kNNpy/Data'
-        path to the kNNpy Data directory.
+    * **masked** (bool, optional, default=False): whether to load the masked overdensity field, by default, loads the unmasked version. Set to ``True`` to load the field masked using a realistic forecast for the LSST y1 observational footprint.
+    * **NSIDE** (int, optional, default=512): HEALPix nside of the target map.
+    * **DataPath** (str, optional, default='../kNNpy/Data'): path to the kNNpy Data directory.
 
     Returns
     -------
-    delta_gal_masked : float ndarray
-        the HEALPix array containg the forecast LSST y1 galaxy overdensity field.
-
-    mask : int ndarray
-        only returned if ``masked=True``; the HEALPix mask defining the LSST y1 survey footprint. Pixels within the footprint have value 1, while pixels outside the footprint have value ``hp.UNSEEN``.
+    * **delta_gal_masked** (float ndarray): the HEALPix array containg the forecast LSST y1 galaxy overdensity field.
+    * **mask** (int ndarray): only returned if ``masked=True``; the HEALPix mask defining the LSST y1 survey footprint. Pixels within the footprint have value 1, while pixels outside the footprint have value ``hp.UNSEEN``.
 
     Notes
     -----
@@ -89,16 +81,12 @@ def Load_WSC_mask(NSIDE=256, DataPath='../kNNpy/Data'):
 
     Parameters
     ----------
-    NSIDE : int, optional, default=256
-        HEALPix nside of the target map.
-
-    DataPath : str, optional, default='../kNNpy/Data'
-        path to the kNNpy Data directory.
+    * **NSIDE** (int, optional, default=256): HEALPix nside of the target map.
+    * **DataPath** (str, optional, default='../kNNpy/Data'): path to the kNNpy Data directory.
 
     Returns
     -------
-    mask : int ndarray
-        the HEALPix mask defining the WISExSCOS survey footprint. Pixels within the footprint have value 1, while pixels outside the footprint have value ``hp.UNSEEN``.
+    * **mask** (int ndarray): the HEALPix mask defining the WISExSCOS survey footprint. Pixels within the footprint have value 1, while pixels outside the footprint have value ``hp.UNSEEN``.
 
     Notes
     -----
@@ -124,32 +112,17 @@ def Sample2DTracersFromField(delta_sampling, mask, N_realisations, n_tracers, se
 
     Parameters
     ----------
-    delta_sampling : float ndarray
-        HEALPix overdensity field from which tracers are to be sampled.
-
-    mask : int ndarray
-        HEALPix mask defining the survey footprint. Pixels within the footprint should have value 1, while pixels outside the footprint should have value ``hp.UNSEEN``.
-
-    N_realisations : int
-        total number of realisations to be sampled.
-
-    n_tracers : int
-        total number of tracers to be sampled.
-
-    seed : int, optional
-        random seed for reproducibility, by default None.
-
-    map_NSIDE : int, optional
-        HEALPix nside of the output number counts map, by default 64.
+    * **delta_sampling** (float ndarray): HEALPix overdensity field from which tracers are to be sampled.
+    * **mask** (int ndarray): HEALPix mask defining the survey footprint. Pixels within the footprint should have value 1, while pixels outside the footprint should have value ``hp.UNSEEN``.
+    * **N_realisations** (int): total number of realisations to be sampled.
+    * **n_tracers** (int): total number of tracers to be sampled.
+    * **seed** (int, optional): random seed for reproducibility, by default None.
+    * **map_NSIDE** (int, optional): HEALPix nside of the output number counts map, by default 64.
 
     Returns
     -------
-    
-    tracer_pos_masked_ds_arr : float ndarray
-        array of shape (``N_realisations``, ``n_tracers``, 2) containing the sampled tracer positions in radians. The last dimension contains (Dec, RA) pairs.
-
-    map : float ndarray
-        HEALPix map of the number counts of the sampled tracers, summed over all realisations.
+    * **tracer_pos_masked_ds_arr** (float ndarray): array of shape (``N_realisations``, ``n_tracers``, 2) containing the sampled tracer positions in radians. The last dimension contains (Dec, RA) pairs.
+    * **map** (float ndarray): HEALPix map of the number counts of the sampled tracers, summed over all realisations.
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -187,29 +160,16 @@ def Sample2DPoissonTracers(mask, N_realisations, n_tracers, seed=None, map_NSIDE
 
     Parameters
     ----------
-    mask : int ndarray
-        HEALPix mask defining the survey footprint. Pixels within the footprint should have value 1, while pixels outside the footprint should have value ``hp.UNSEEN``.
-
-    N_realisations : int
-        total number of realisations to be sampled.
-
-    n_tracers : int
-        total number of tracers to be sampled.
-
-    seed : int, optional
-        random seed for reproducibility, by default None.
-
-    map_NSIDE : int, optional
-        HEALPix nside of the output number counts map, by default 64.
+    * **mask** (int ndarray): HEALPix mask defining the survey footprint. Pixels within the footprint should have value 1, while pixels outside the footprint should have value ``hp.UNSEEN``.
+    * **N_realisations** (int): total number of realisations to be sampled.
+    * **n_tracers** (int): total number of tracers to be sampled.
+    * **seed** (int, optional): random seed for reproducibility, by default None.
+    * **map_NSIDE** (int, optional): HEALPix nside of the output number counts map, by default 64.
 
     Returns
     -------
-    
-    randoms_pos_masked_ds_arr : float ndarray
-        array of shape (``N_realisations``, ``n_tracers``, 2) containing the sampled tracer positions in radians. The last dimension contains (Dec, RA) pairs.
-
-    map : float ndarray
-        HEALPix map of the number counts of the sampled tracers, summed over all realisations.
+    * **randoms_pos_masked_ds_arr** (float ndarray): array of shape (``N_realisations``, ``n_tracers``, 2) containing the sampled tracer positions in radians. The last dimension contains (Dec, RA) pairs.
+    * **map** (float ndarray): HEALPix map of the number counts of the sampled tracers, summed over all realisations.
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -244,24 +204,14 @@ def Sample3DPoissonTracers(N_realisations, n_tracers, boxsize=1000, starting_see
 
     Parameters
     ----------
-    N_realisations : int
-        total number of realisations to be sampled.
-
-    n_tracers : int
-        total number of tracers to be sampled.
-
-    boxsize : float, optional
-        size of the cubic box in which the tracers are to be sampled, by default 1000.0 Mpc/h.
-
-    starting_seed : int, optional
-        random seed for reproducibility, by default 42. This is the seed set for the first realisation,
-        Henceforth, the next ith realisation has seed = starting_seed + i.
+    * **N_realisations** (int): total number of realisations to be sampled.
+    * **n_tracers** (int): total number of tracers to be sampled.
+    * **boxsize** (float, optional): size of the cubic box in which the tracers are to be sampled, by default 1000.0 Mpc/h.
+    * **starting_seed** (int, optional): random seed for reproducibility, by default 42. This is the seed set for the first realisation, Henceforth, the next $i^{\text{th}}$ realisation has seed = starting_seed + i.
 
     Returns
     -------
-    
-    randoms_pos_ds_arr : float ndarray
-        array of shape (``N_realisations``, ``n_tracers``, 3) containing the sampled tracer positions in Mpc/h.
+    * **randoms_pos_ds_arr** (float ndarray): array of shape (``N_realisations``, ``n_tracers``, 3) containing the sampled tracer positions in Mpc/h.
     '''
 
     #-----------------------------------------------------------------------------------------------
@@ -286,38 +236,19 @@ def Sample2DTracersFromQuijoteBox(sim_num, tracer_type, mask, N_realisations, n_
 
     Parameters
     ----------
-    sim_num : int
-        Quijote simulation realisation number to be used for sampling the tracers.
-
-    tracer_type : str
-        type of tracers to be sampled. Currently supports 'Galaxies' and 'Clusters'.
-
-    mask : int ndarray
-        HEALPix mask defining the survey footprint. Pixels within the footprint should have value 1, while pixels outside the footprint should have value ``hp.UNSEEN``.
-
-    N_realisations : int
-        total number of realisations to be sampled.
-
-    n_tracers : int
-        total number of tracers to be sampled. Must be less than the total number of tracers available in the given simulation box after projecting onto the virtual sky and applying the survey mask. If the observational footprint covers the entire sky, the maximum number of 'Clusters' ('Galaxies') that can be sampled is <enter limit here> (<enter limit here>). For partial sky coverage, this number might be significantly lower.
-
-    seed : int, optional
-        random seed for reproducibility, by default None.
-
-    map_NSIDE : int, optional
-        HEALPix nside of the output number counts map, by default 64.
-
-    DataPath : str, optional
-        path to the kNNpy Data directory, by default '../kNNpy/Data/'.
+    * **sim_num** (int): Quijote simulation realisation number to be used for sampling the tracers.
+    * **tracer_type** (str): type of tracers to be sampled. Currently supports 'Galaxies' and 'Clusters'.
+    * **mask** (int ndarray): HEALPix mask defining the survey footprint. Pixels within the footprint should have value 1, while pixels outside the footprint should have value ``hp.UNSEEN``.
+    * **N_realisations** (int): total number of realisations to be sampled.
+    * **n_tracers** (int): total number of tracers to be sampled. Must be less than the total number of tracers available in the given simulation box after projecting onto the virtual sky and applying the survey mask. If the observational footprint covers the entire sky, the maximum number of 'Clusters' ('Galaxies') that can be sampled is <enter limit here> (<enter limit here>). For partial sky coverage, this number might be significantly lower.
+    * **seed** (int, optional): random seed for reproducibility, by default None.
+    * **map_NSIDE** (int, optional): HEALPix nside of the output number counts map, by default 64.
+    * **DataPath** (str, optional): path to the kNNpy Data directory, by default '../kNNpy/Data/'.
 
     Returns
     -------
-    
-    tracer_pos_masked_ds_arr : float ndarray
-        array of shape (``N_realisations``, ``n_tracers``, 2) containing the sampled tracer positions in radians. The last dimension contains (Dec, RA) pairs.
-
-    map : float ndarray
-        HEALPix map of the number counts of the sampled tracers, summed over all realisations.
+    * **tracer_pos_masked_ds_arr** (float ndarray): array of shape (``N_realisations``, ``n_tracers``, 2) containing the sampled tracer positions in radians. The last dimension contains (Dec, RA) pairs.
+    * **map** (float ndarray): HEALPix map of the number counts of the sampled tracers, summed over all realisations.
 
     References
     ----------
@@ -400,28 +331,16 @@ def Sample3DTracersFromQuijoteBox(tracer_type, N_realisations, n_tracers, ptype=
     
     Parameters
     ----------
-    tracer_type : str
-        type of tracers to sample ('particles' or 'halos').
-
-    N_realisations : int
-        total number of realisations to be sampled.
-
-    n_tracers : int
-        total number of tracers to be sampled.
-
-    ptype : list of int, optional, default=[1]
-        particle type list required for the 'particles' tracer type.
-
-    DataPath : str, optional, default='../kNNpy/Data'
-        path to the kNNpy Data directory.
-
-    starting_seed : int, optional, default=42
-        random seed for reproducibility set for the first realization.
+    * **tracer_type** (str): type of tracers to sample ('particles' or 'halos').
+    * **N_realisations** (int): total number of realisations to be sampled.
+    * **n_tracers** (int): total number of tracers to be sampled.
+    * **ptype** (list of int, optional, default=[1]): particle type list required for the 'particles' tracer type.
+    * **DataPath** (str, optional, default='../kNNpy/Data'): path to the kNNpy Data directory.
+    * **starting_seed** (int, optional, default=42): random seed for reproducibility set for the first realization.
 
     Returns
     -------
-    pos_array : float ndarray
-        array of shape (``N_realisations``, ``n_tracers``, 3) containing 3D tracer positions in Mpc/h.
+    * **pos_array** (float ndarray): array of shape (``N_realisations``, ``n_tracers``, 3) containing 3D tracer positions in Mpc/h.
     '''
     np.random.seed(starting_seed)
     pos_array=[]
@@ -444,34 +363,18 @@ def make_overdensity_3D(N_realisations, grid, ptype, do_RSD=False, MAS='CIC', ax
 
     Parameters
     ----------
-    N_realisations : int
-        total number of realisations/snapshots to process.
-
-    grid : int
-        number of grid points along each axis for the 3D density field.
-
-    ptype : list of int
-        gadget particle type list to construct overdensity field.
-
-    do_RSD : bool, optional, default=False
-        whether to apply Redshift-Space Distortions (RSD).
-
-    MAS : str, optional, default='CIC'
-        Mass Assignment Scheme to use (e.g. 'NGP', 'CIC', 'TSC').
-
-    axis : int, optional, default=0
-        line-of-sight axis for RSD.
-
-    verbose : bool, optional, default=False
-        whether to print progress messages.
-
-    DataPath : str, optional, default='../kNNpy/Data'
-        path to the kNNpy Data directory.
+    * **N_realisations** (int): total number of realisations/snapshots to process.
+    * **grid** (int): number of grid points along each axis for the 3D density field.
+    * **ptype** (list of int): gadget particle type list to construct overdensity field.
+    * **do_RSD** (bool, optional, default=False): whether to apply Redshift-Space Distortions (RSD).
+    * **MAS** (str, optional, default='CIC'): Mass Assignment Scheme to use (e.g. 'NGP', 'CIC', 'TSC').
+    * **axis** (int, optional, default=0): line-of-sight axis for RSD.
+    * **verbose** (bool, optional, default=False): whether to print progress messages.
+    * **DataPath** (str, optional, default='../kNNpy/Data'): path to the kNNpy Data directory.
 
     Returns
     -------
-    overdensity_list : float ndarray
-        array of shape (``N_realisations``, ``grid``, ``grid``, ``grid``) containing 3D overdensity fields.
+    * **overdensity_list** (float ndarray): array of shape (``N_realisations``, ``grid``, ``grid``, ``grid``) containing 3D overdensity fields.
     '''
     overdensity_list=[]
     for i in range(N_realisations):

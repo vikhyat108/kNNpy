@@ -38,48 +38,25 @@ def TracerAuto3D(boxsize, kList, BinsRad, QueryPos, TracerPos, n_threads=1, Retu
     		
     Parameters
     ----------
-    boxsize : float
-        The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
-
-    kList : list of ints
-        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
-
-    BinsRad : list of numpy float array
-        list of radial distance arrays (in Mpc/h) for each nearest neighbour. The i-th element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the i-th element of `kList`.
-
-    QueryPos : numpy float array of shape (n_query, 3)
-        array of 3D locations for the query points. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    TracerPos : numpy float array of shape (n_tracer, 3)
-        array of 3D locations for the discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    n_threads : int, optional, default=1
-        number of workers to use for parallel processing. If -1 is given all CPU threads are used.
-
-    ReturnNNdist : bool, optional, default=False
-        if set to ``True``, the sorted arrays of NN distances will be returned along with the $k$NN-CDFs.
-
-    Verbose : bool, optional, default=False
-        if set to ``True``, the time taken to complete each step of the calculation will be printed.
+    * **boxsize** (float): The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
+    * **kList** (list of ints): the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    * **BinsRad** (list of numpy float array): list of radial distance arrays (in Mpc/h) for each nearest neighbour. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{\text{th}}$ element of `kList`.
+    * **QueryPos** (numpy float array of shape ``(n_query, 3)``): array of 3D locations for the query points. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **TracerPos** (numpy float array of shape ``(n_tracer, 3)``): array of 3D locations for the discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **n_threads** (int, optional, default=1): number of workers to use for parallel processing. If -1 is given all CPU threads are used.
+    * **ReturnNNdist** (bool, optional, default=False): if set to ``True``, the sorted arrays of NN distances will be returned along with the $k$NN-CDFs.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    kNN_results : tuple of lists or list of numpy float arrays
-        results of the kNN computation. If `ReturnNNdist` is ``True``, returns the tuple ``(p_gtr_k_list, vol)`` where `p_gtr_k_list` is the list of auto kNN-CDFs, and `vol` is the list of NN distances. If `ReturnNNdist` is ``False``, returns `p_gtr_k_list` only.
+    * **kNN_results** (tuple of lists or list of numpy float arrays): results of the kNN computation. If `ReturnNNdist` is ``True``, returns the tuple ``(p_gtr_k_list, vol)`` where `p_gtr_k_list` is the list of auto kNN-CDFs, and `vol` is the list of NN distances. If `ReturnNNdist` is ``False``, returns `p_gtr_k_list` only.
         
     Raises
     ------
-    ValueError
-        if the given query points array is not of the shape (n_query, 3).
-
-    ValueError
-        if x, y, or z coordinate of any of the query points is not in ``[0, boxsize)``.
-
-    ValueError
-        if x, y, or z coordinate of any of the tracer points is not in ``[0, boxsize)``.
-
-    ValueError
-        if the given tracer points array is not of the shape (n_tracer, 3).
+    * **ValueError**: if the given query points array is not of the shape (n_query, 3).
+    * **ValueError**: if x, y, or z coordinate of any of the query points is not in ``[0, boxsize)``.
+    * **ValueError**: if x, y, or z coordinate of any of the tracer points is not in ``[0, boxsize)``.
+    * **ValueError**: if the given tracer points array is not of the shape (n_tracer, 3).
 
     References
     ----------
@@ -193,57 +170,28 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
     		
     Parameters
     ----------
-    boxsize : float
-        The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
-
-    kA_kB_list : list of int tuples
-        nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details).
-
-    BinsRad : list of numpy float array
-        list of radial distance scale arrays (in Mpc/h) for each nearest neighbour combination in `kA_kB_list`. The i-th element of the list should contain a numpy array of the desired distances for the i-th nearest neighbour combination.
-
-    QueryPos : numpy float array of shape (n_query, 3)
-        array of 3D locations for the query points. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    TracerPos_A : numpy float array of shape (n_tracer, 3)
-        array of 3D locations for the first set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    TracerPos_B : numpy float array of shape (n_tracer, 3)
-        array of 3D locations for the second set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    n_threads : int, optional, default=1
-        number of workers to use for parallel processing. If -1 is given all CPU threads are used.
-
-    Verbose : bool, optional, default=False
-        if set to ``True``, the time taken to complete each step of the calculation will be printed.
+    * **boxsize** (float): The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
+    * **kA_kB_list** (list of int tuples): nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details).
+    * **BinsRad** (list of numpy float array): list of radial distance scale arrays (in Mpc/h) for each nearest neighbour combination in `kA_kB_list`. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the $i^{\text{th}}$ nearest neighbour combination.
+    * **QueryPos** (numpy float array of shape ``(n_query, 3)``): array of 3D locations for the query points. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **TracerPos_A** (numpy float array of shape ``(n_tracer, 3)``): array of 3D locations for the first set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **TracerPos_B** (numpy float array of shape ``(n_tracer, 3)``): array of 3D locations for the second set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **n_threads** (int, optional, default=1): number of workers to use for parallel processing. If -1 is given all CPU threads are used.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    p_gtr_kA_list : list of numpy float arrays
-        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The i-th element represents the $k_A^i$NN-CDF, where the i-th element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-        
-    p_gtr_kB_list : list of numpy float arrays
-        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The i-th element represents the $k_B^i$NN-CDF, where the i-th element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    
-    p_gtr_kA_kB_list : list of numpy float arrays
-        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The i-th element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the i-th element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_list** (list of numpy float arrays): list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_A^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kB_list** (list of numpy float arrays): list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_B^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_kB_list** (list of numpy float arrays): list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     Raises
     ------
-    ValueError
-        if the lengths of `BinsRad` and `kA_kB_list` do not match.
-
-    ValueError
-        if the given query points are not on a three-dimensional grid.
-
-    ValueError
-        if x, y, or z coordinates of any of the query points is not in ``[0, boxsize)``.
-
-    ValueError
-        if x, y, or z coordinates of any of the tracer points is not in ``[0, boxsize)``.
-
-    ValueError
-        if any of the given tracer points are not on a three-dimensional grid.
+    * **ValueError**: if the lengths of `BinsRad` and `kA_kB_list` do not match.
+    * **ValueError**: if the given query points are not on a three-dimensional grid.
+    * **ValueError**: if x, y, or z coordinates of any of the query points is not in ``[0, boxsize)``.
+    * **ValueError**: if x, y, or z coordinates of any of the tracer points is not in ``[0, boxsize)``.
+    * **ValueError**: if any of the given tracer points are not on a three-dimensional grid.
 
     Notes
     -----
@@ -379,19 +327,19 @@ def TracerTracerCross3D(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A, Tra
 
 def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, TracerPos_A_dict, TracerPos_B, n_threads=1, Verbose=False ):
     r'''
-    Returns the probabilities $P_{\geq k_{A_i}}$, $P_{\geq k_B}$ and $P_{\geq k_{A_i}, \geq k_B}$ for ($k_{A_i}$, $k_B$) in `kA_kB_list` for various 
+    Returns the probabilities $P_{\geq k_A^i}$, $P_{\geq k_B^i}$ and $P_{\geq k_A^i, \geq k_B^i}$ for ($k_A^i$, $k_B^i$) in `kA_kB_list` for various 
     realizations of Tracer A, while keeping the set Tracer B constant. Refer to Notes to understand why this might be useful. These quantify
-    the extent of the spatial cross-correlation between the given sets of discrete tracers, the i-th realization of `TracerPos_A`, `TracerPos_B`.
+    the extent of the spatial cross-correlation between the given sets of discrete tracers, the $i^{\text{th}}$ realization of `TracerPos_A`, `TracerPos_B`.
     We do not vary the `kA_kB_list` as a function of the realizations of Tracer A.
     	
-    1. $P_{\geq k_{A_i}}(r)$: 
-    	the $k_A$NN-CDF of the i-th realization of the first set of discrete tracers, evaluated at radial distance scale $r$
+    1. $P_{\geq k_A^i}(r)$: 
+    	the $k_A^i$NN-CDF of the $i^{\text{th}}$ realization of the first set of discrete tracers, evaluated at radial distance scale $r$
     		
-    2. $P_{\geq k_B}(r)$: 
-    	the $k_B$NN-CDF of the second set of discrete tracers, evaluated at radial distance scale $r$
+    2. $P_{\geq k_B^i}(r)$: 
+    	the $k_B^i$NN-CDF of the second set of discrete tracers, evaluated at radial distance scale $r$
     		
-    3.  $P_{\geq k_{A_i}, \geq k_B}(r)$:
-    	the joint probability of finding at least $k_A$ set A tracers and at least $k_B$ set B tracers within a sphere of radius $r$, for the i-th realization of Tracer A
+    3.  $P_{\geq k_A^i, \geq k_B^i}(r)$:
+    	the joint probability of finding at least $k_A$ set A tracers and at least $k_B$ set B tracers within a sphere of radius $r$, for the $i^{\text{th}}$ realization of Tracer A
     		
     The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quantities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this):
     	
@@ -399,60 +347,29 @@ def TracerTracerCross3D_DataVector(boxsize, kA_kB_list, BinsRad, QueryPos, Trace
     		
     Parameters
     ----------
-    boxsize : float
-        The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
-
-    kA_kB_list : list of int tuples
-        nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details).
-
-    BinsRad : list of numpy float array
-        list of radial distance scale arrays (in Mpc/h) for each nearest neighbour combination in `kA_kB_list`. The i-th element of the list should contain a numpy array of the desired distances for the i-th nearest neighbour combination.
-
-    QueryPos : numpy float array of shape (n_query, 3)
-        array of 3D locations for the query points. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    TracerPos_A_dict : dict
-        dictionary where each key corresponds to the realization index, and stores the corresponding numpy float array of shape (n_tracer, 3) containing the tracer positions for the i-th realization. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    TracerPos_B : numpy float array of shape (n_tracer, 3)
-        array of 3D locations for the second set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
-
-    n_threads : int, optional, default=1
-        number of workers to use for parallel processing. If -1 is given all CPU threads are used.
-
-    Verbose : bool, optional, default=False
-        if set to ``True``, the time taken to complete each step of the calculation will be printed.
+    * **boxsize** (float): The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
+    * **kA_kB_list** (list of int tuples): nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details).
+    * **BinsRad** (list of numpy float array): list of radial distance scale arrays (in Mpc/h) for each nearest neighbour combination in `kA_kB_list`. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the $i^{\text{th}}$ nearest neighbour combination.
+    * **QueryPos** (numpy float array of shape ``(n_query, 3)``): array of 3D locations for the query points. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **TracerPos_A_dict** (dict): dictionary where each key corresponds to the realization index, and stores the corresponding numpy float array of shape ``(n_tracer, 3)`` containing the tracer positions for the $i^{\text{th}}$ realization. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **TracerPos_B** (numpy float array of shape ``(n_tracer, 3)``): array of 3D locations for the second set of discrete tracers. The 3D locations must be on a grid. The format is (x,y,z) Cartesian coordinates. Please ensure ``0 <= x, y, z < boxsize``.
+    * **n_threads** (int, optional, default=1): number of workers to use for parallel processing. If -1 is given all CPU threads are used.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    Realizations : numpy array of arrays
-        numpy array of arrays where the i-th element corresponds to the 3D cross-correlation calculated between the i-th realization of Tracer A and Tracer B. The values correspond to a numpy array: ``[p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list]``.
+    * **Realizations** (numpy array of arrays): numpy array of arrays where the $i^{\text{th}}$ element corresponds to the 3D cross-correlation calculated between the $i^{\text{th}}$ realization of Tracer A and Tracer B. The values correspond to a numpy array: ``[p_gtr_kA_list, p_gtr_kB_list, p_gtr_kA_kB_list]``.
+    * **p_gtr_kA_list** (list of numpy float arrays): list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_A^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kB_list** (list of numpy float arrays): list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_B^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_kB_list** (list of numpy float arrays): list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
 
-    p_gtr_kA_list : list of numpy float arrays
-        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The i-th element represents the $k_A^i$NN-CDF, where the i-th element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-        
-    p_gtr_kB_list : list of numpy float arrays
-        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The i-th element represents the $k_B^i$NN-CDF, where the i-th element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    
-    p_gtr_kA_kB_list : list of numpy float arrays
-        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The i-th element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the i-th element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-        
     Raises
     ------
-    ValueError
-        if the lengths of `BinsRad` and `kA_kB_list` do not match.
-
-    ValueError
-        if the given query points are not on a three-dimensional grid.
-
-    ValueError
-        if x, y, or z coordinates of any of the query points is not in ``[0, boxsize)``.
-
-    ValueError
-        if x, y, or z coordinates of any of the tracer points is not in ``[0, boxsize)``.
-
-    ValueError
-        if any of the given tracer points are not on a three-dimensional grid.
+    * **ValueError**: if the lengths of `BinsRad` and `kA_kB_list` do not match.
+    * **ValueError**: if the given query points are not on a three-dimensional grid.
+    * **ValueError**: if x, y, or z coordinates of any of the query points is not in ``[0, boxsize)``.
+    * **ValueError**: if x, y, or z coordinates of any of the tracer points is not in ``[0, boxsize)``.
+    * **ValueError**: if any of the given tracer points are not on a three-dimensional grid.
 
     Notes
     -----
@@ -615,63 +532,30 @@ def TracerFieldCross3D(kList, RBins, BoxSize, QueryPos, TracerPos, Field3D, Fiel
 
     Parameters
     ----------
-    kList : list of int
-        List of nearest neighbours to compute. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
-
-    RBins : list of numpy float arrays
-        List of radial distance arrays (in comoving Mpc/$h$), one for each value in `kList`. The i-th element of the list should be a numpy array specifying the distances to be used for the nearest neighbour calculation corresponding to `kList[i]`.
-
-    BoxSize : float
-        The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
-
-    QueryPos : numpy float array of shape (n_query, 3)
-        Array of 3D positions (e.g., in Cartesian coordinates) used to query the nearest-neighbour distances, and also compute field's CDF.
-
-    TracerPos : numpy float array of shape (n_tracer, 3)
-        Array of 3D positions of discrete tracers, with columns representing the x, y, and z coordinates, respectively.
-    
-    Field3D : numpy float array of shape (n_grid, n_grid, n_grid)
-        A 3D numpy array representing the continuous field (for e.g., the matter overdensity field). The shape of the array should match the grid size used for smoothing.
-
-    FieldConstPercThreshold : float
-        The percentile threshold for identifying overdense regions in the continuous field. For example, ``75.0`` indicates the 75th percentile.
-
-    ReturnSmoothedFieldDict : bool, optional, default=False
-        if set to ``True``, the dictionary containing the continuous field smoothed at the provided radial bins, will be returned along with the nearest-neighbour measurements.
-    
-    n_threads : int, optional, default=1
-        number of workers to use for parallel processing. If -1 is given all CPU threads are used.
-    
-    Verbose : bool, optional, default=False
-        If True, prints timing information for each step.
+    * **kList** (list of int): List of nearest neighbours to compute. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    * **RBins** (list of numpy float arrays): List of radial distance arrays (in comoving Mpc/$h$), one for each value in `kList`. The $i^{\text{th}}$ element of the list should be a numpy array specifying the distances to be used for the nearest neighbour calculation corresponding to `kList[i]`.
+    * **BoxSize** (float): The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
+    * **QueryPos** (numpy float array of shape ``(n_query, 3)``): Array of 3D positions (e.g., in Cartesian coordinates) used to query the nearest-neighbour distances, and also compute field's CDF.
+    * **TracerPos** (numpy float array of shape ``(n_tracer, 3)``): Array of 3D positions of discrete tracers, with columns representing the x, y, and z coordinates, respectively.
+    * **Field3D** (numpy float array of shape ``(n_grid, n_grid, n_grid)``): A 3D numpy array representing the continuous field (for e.g., the matter overdensity field). The shape of the array should match the grid size used for smoothing.
+    * **FieldConstPercThreshold** (float): The percentile threshold for identifying overdense regions in the continuous field. For example, ``75.0`` indicates the 75th percentile.
+    * **ReturnSmoothedFieldDict** (bool, optional, default=False): if set to ``True``, the dictionary containing the continuous field smoothed at the provided radial bins, will be returned along with the nearest-neighbour measurements.
+    * **n_threads** (int, optional, default=1): number of workers to use for parallel processing. If -1 is given all CPU threads are used.
+    * **Verbose** (bool, optional, default=False): If True, prints timing information for each step.
 
     Returns
     -------
-    p_gtr_k_list : list of numpy float arrays
-        Auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins.
-
-    p_gtr_dt_list : list of numpy float arrays
-        Overdensity-field auto kNN-CDFs evaluated at the same scales.
-
-    p_gtr_k_dt_list : list of numpy float arrays
-        Joint CDFs of finding $\geq k$ tracers AND field value exceeding the threshold at a given scale.
-
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field smoothed at the provided radial bins, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['5']`` represents the continuous map smoothed at a scale of 5 Mpc/h.
+    * **p_gtr_k_list** (list of numpy float arrays): Auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins.
+    * **p_gtr_dt_list** (list of numpy float arrays): Overdensity-field auto kNN-CDFs evaluated at the same scales.
+    * **p_gtr_k_dt_list** (list of numpy float arrays): Joint CDFs of finding $\geq k$ tracers AND field value exceeding the threshold at a given scale.
+    * **SmoothedFieldDict** (dict): dictionary containing the continuous field smoothed at the provided radial bins, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['5']`` represents the continuous map smoothed at a scale of 5 Mpc/h.
 
     Raises
     ------
-    ValueError
-        If TracerPos are not 3D.
-
-    ValueError
-        If QueryPos are not 3D.
-
-    ValueError
-        If tracer positions are outside the specified box size.
-
-    ValueError
-        If QueryPos are outside the specified box size.
+    * **ValueError**: If TracerPos are not 3D.
+    * **ValueError**: If QueryPos are not 3D.
+    * **ValueError**: If tracer positions are outside the specified box size.
+    * **ValueError**: If QueryPos are outside the specified box size.
 
     References
     ----------
@@ -840,63 +724,30 @@ def TracerFieldCross3D_DataVector(kList, RBins, BoxSize, QueryPos, TracerPosVect
     	
     Parameters
     ----------
-    kList : list of int
-        List of nearest neighbours to compute. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
-
-    RBins : list of numpy float arrays
-        List of radial distance arrays (in comoving Mpc/$h$), one for each value in `kList`. The i-th element of the list should be a numpy array specifying the distances to be used for the nearest neighbour calculation corresponding to `kList[i]`.
-
-    BoxSize : float
-        The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
-
-    QueryPos : numpy float array of shape ``(n_query, 3)``
-        Array of 3D positions (e.g., in Cartesian coordinates) used to query the nearest-neighbour distances, and also compute field's CDF.
-    
-    TracerPosVector : numpy float array of shape ``(n_realisations, n_tracer, 3)``
-        Array of 3D positions of n_realisations of discrete tracers, with columns representing the x, y, and z coordinates, respectively.
-    
-    Field : numpy float array of shape ``(n_grid, n_grid, n_grid)``
-        A 3D numpy array representing the continuous field (for e.g., the matter overdensity field). The shape of the array should match the grid size used for smoothing.
-
-    FieldConstPercThreshold : float
-        The percentile threshold for identifying overdense regions in the continuous field. For example, ``75.0`` indicates the 75th percentile.
-
-    n_threads : int, optional
-        number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
-
-    ReturnSmoothedFieldDict : bool, optional
-        if set to ``True``, the dictionary containing the continuous field smoothed at the provided radial bins, will be returned along with the nearest-neighbour measurements, by default ``False``.
-    
-    Verbose : bool, optional
-        If True, prints timing information for each step. Default is False.
+    * **kList** (list of int): List of nearest neighbours to compute. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    * **RBins** (list of numpy float arrays): List of radial distance arrays (in comoving Mpc/$h$), one for each value in `kList`. The $i^{\text{th}}$ element of the list should be a numpy array specifying the distances to be used for the nearest neighbour calculation corresponding to `kList[i]`.
+    * **BoxSize** (float): The size of the cubic box (in comoving Mpc/h) in which the tracers and the continuous field are defined.
+    * **QueryPos** (numpy float array of shape ``(n_query, 3)``): Array of 3D positions (e.g., in Cartesian coordinates) used to query the nearest-neighbour distances, and also compute field's CDF.
+    * **TracerPosVector** (numpy float array of shape ``(n_realisations, n_tracer, 3)``): Array of 3D positions of n_realisations of discrete tracers, with columns representing the x, y, and z coordinates, respectively.
+    * **Field** (numpy float array of shape ``(n_grid, n_grid, n_grid)``): A 3D numpy array representing the continuous field (for e.g., the matter overdensity field). The shape of the array should match the grid size used for smoothing.
+    * **FieldConstPercThreshold** (float): The percentile threshold for identifying overdense regions in the continuous field. For example, ``75.0`` indicates the 75th percentile.
+    * **n_threads** (int, optional, default=1): number of workers to use for parallel processing. If -1 is given all CPU threads are used, by default 1.
+    * **ReturnSmoothedFieldDict** (bool, optional, default=False): if set to ``True``, the dictionary containing the continuous field smoothed at the provided radial bins, will be returned along with the nearest-neighbour measurements, by default ``False``.
+    * **Verbose** (bool, optional, default=False): If True, prints timing information for each step. Default is False.
 
     Returns
     -------
-    p_gtr_k_veclist: list of numpy float arrays
-        list of auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
-
-    p_gtr_dt_list: list of numpy float arrays
-        continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
-
-    p_gtr_k_dt_veclist: list of numpy float arrays
-        list of joint tracer-field nearest neighbour distributions evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
-
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field smoothed at the provided radial bins, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['5']`` represents the continuous map smoothed at a scale of 5 Mpc/h.
+    * **p_gtr_k_veclist** (list of numpy float arrays): list of auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
+    * **p_gtr_dt_list** (list of numpy float arrays): continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
+    * **p_gtr_k_dt_veclist** (list of numpy float arrays): list of joint tracer-field nearest neighbour distributions evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
+    * **SmoothedFieldDict** (dict): dictionary containing the continuous field smoothed at the provided radial bins, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['5']`` represents the continuous map smoothed at a scale of 5 Mpc/h.
 
     Raises
     ------
-    ValueError
-        If TracerPos are not on a 3dimensional grid.
-
-    ValueError
-        If QueryPos are not on a 3dimensional grid.
-
-    ValueError
-        If tracer positions are outside the specified box size.
-
-    ValueError
-        If QueryPos are outside the specified box size.
+    * **ValueError**: If TracerPos are not on a 3dimensional grid.
+    * **ValueError**: If QueryPos are not on a 3dimensional grid.
+    * **ValueError**: If tracer positions are outside the specified box size.
+    * **ValueError**: If QueryPos are outside the specified box size.
 
     References
     ----------

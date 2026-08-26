@@ -122,59 +122,47 @@
 </span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">    </span>
 </span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">    Parameters</span>
 </span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">    ----------</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">    bins : numpy array</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">        Radial bins for correlation function</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">    pos : numpy array</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">        Tracer positions of shape (N, 3), must be float32</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">    delta : numpy array</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">        Density field array of shape (ngrid, ngrid, ngrid)</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">    boxsize : float</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">        Size of simulation box</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a><span class="sd">    threads : int</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="sd">        Number of threads for FFT</span>
-</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>
-</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a><span class="sd">    W_k_list : list</span>
-</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a><span class="sd">        List of window functions in k-space</span>
-</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>
-</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="sd">    Returns</span>
-</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a><span class="sd">    -------</span>
-</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">    xi : numpy array</span>
-</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">        Cross-correlation function values</span>
-</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="c1"># Calculating the number of grid points along each axis of the field delta</span>
-</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
-</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
-</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Input array is not cubical (n, n, n).&quot;</span><span class="p">)</span>
-</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>
-</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>    <span class="c1"># Fourier Transforming the delta overdensity field once</span>
-</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>    <span class="n">delta_k</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
-</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>    
-</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>    <span class="c1"># Ensure positions are float32 to avoid repeated casting</span>
-</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>    <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>        <span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>
-</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>    <span class="c1"># Compute 2PCF by processing each smoothing scale</span>
-</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>    <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>    
-</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">W_k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">W_k_list</span><span class="p">):</span>
-</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>        <span class="c1"># Apply filter in Fourier space</span>
-</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a>        <span class="n">delta_k_smooth</span> <span class="o">=</span> <span class="n">delta_k</span> <span class="o">*</span> <span class="n">W_k</span>
-</span><span id="L-78"><a href="#L-78"><span class="linenos">78</span></a>        <span class="c1"># Transform back to real space</span>
-</span><span id="L-79"><a href="#L-79"><span class="linenos">79</span></a>        <span class="n">delta_smooth</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">delta_k_smooth</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
-</span><span id="L-80"><a href="#L-80"><span class="linenos">80</span></a>        
-</span><span id="L-81"><a href="#L-81"><span class="linenos">81</span></a>        <span class="c1"># Interpolate to particle positions</span>
-</span><span id="L-82"><a href="#L-82"><span class="linenos">82</span></a>        <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="L-83"><a href="#L-83"><span class="linenos">83</span></a>        <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">delta_smooth</span><span class="p">,</span> <span class="n">boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
-</span><span id="L-84"><a href="#L-84"><span class="linenos">84</span></a>        
-</span><span id="L-85"><a href="#L-85"><span class="linenos">85</span></a>        <span class="c1"># Average to get correlation function value (using Numba-optimized mean)</span>
-</span><span id="L-86"><a href="#L-86"><span class="linenos">86</span></a>        <span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_mean_parallel</span><span class="p">(</span><span class="n">density_interpolated</span><span class="p">)</span>
-</span><span id="L-87"><a href="#L-87"><span class="linenos">87</span></a>    
-</span><span id="L-88"><a href="#L-88"><span class="linenos">88</span></a>    <span class="k">return</span> <span class="n">xi</span>
-</span><span id="L-89"><a href="#L-89"><span class="linenos">89</span></a><span class="c1">#---------------------------------------------------------------------------------------------------</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">    * **bins** (numpy array): Radial bins for correlation function</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">    * **pos** (numpy array): Tracer positions of shape (N, 3), must be float32</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">    * **delta** (numpy array): Density field array of shape (ngrid, ngrid, ngrid)</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">    * **boxsize** (float): Size of simulation box</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">    * **threads** (int): Number of threads for FFT</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">    * **W_k_list** (list): List of window functions in k-space</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">    Returns</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a><span class="sd">    -------</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a><span class="sd">    * **xi** (numpy array): Cross-correlation function values</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="c1"># Calculating the number of grid points along each axis of the field delta</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Input array is not cubical (n, n, n).&quot;</span><span class="p">)</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>    <span class="c1"># Fourier Transforming the delta overdensity field once</span>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a>    <span class="n">delta_k</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a>    
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>    <span class="c1"># Ensure positions are float32 to avoid repeated casting</span>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a>    <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a>        <span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>    <span class="c1"># Compute 2PCF by processing each smoothing scale</span>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a>    <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a>    
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">W_k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">W_k_list</span><span class="p">):</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a>        <span class="c1"># Apply filter in Fourier space</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a>        <span class="n">delta_k_smooth</span> <span class="o">=</span> <span class="n">delta_k</span> <span class="o">*</span> <span class="n">W_k</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>        <span class="c1"># Transform back to real space</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="n">delta_smooth</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">delta_k_smooth</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
+</span><span id="L-68"><a href="#L-68"><span class="linenos">68</span></a>        
+</span><span id="L-69"><a href="#L-69"><span class="linenos">69</span></a>        <span class="c1"># Interpolate to particle positions</span>
+</span><span id="L-70"><a href="#L-70"><span class="linenos">70</span></a>        <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="L-71"><a href="#L-71"><span class="linenos">71</span></a>        <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">delta_smooth</span><span class="p">,</span> <span class="n">boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="L-72"><a href="#L-72"><span class="linenos">72</span></a>        
+</span><span id="L-73"><a href="#L-73"><span class="linenos">73</span></a>        <span class="c1"># Average to get correlation function value (using Numba-optimized mean)</span>
+</span><span id="L-74"><a href="#L-74"><span class="linenos">74</span></a>        <span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_mean_parallel</span><span class="p">(</span><span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="L-75"><a href="#L-75"><span class="linenos">75</span></a>    
+</span><span id="L-76"><a href="#L-76"><span class="linenos">76</span></a>    <span class="k">return</span> <span class="n">xi</span>
+</span><span id="L-77"><a href="#L-77"><span class="linenos">77</span></a><span class="c1">#---------------------------------------------------------------------------------------------------</span>
 </span></pre></div>
 
 
@@ -197,58 +185,46 @@
 </span><span id="CrossCorr2pt-35"><a href="#CrossCorr2pt-35"><span class="linenos">35</span></a><span class="sd">    </span>
 </span><span id="CrossCorr2pt-36"><a href="#CrossCorr2pt-36"><span class="linenos">36</span></a><span class="sd">    Parameters</span>
 </span><span id="CrossCorr2pt-37"><a href="#CrossCorr2pt-37"><span class="linenos">37</span></a><span class="sd">    ----------</span>
-</span><span id="CrossCorr2pt-38"><a href="#CrossCorr2pt-38"><span class="linenos">38</span></a><span class="sd">    bins : numpy array</span>
-</span><span id="CrossCorr2pt-39"><a href="#CrossCorr2pt-39"><span class="linenos">39</span></a><span class="sd">        Radial bins for correlation function</span>
-</span><span id="CrossCorr2pt-40"><a href="#CrossCorr2pt-40"><span class="linenos">40</span></a>
-</span><span id="CrossCorr2pt-41"><a href="#CrossCorr2pt-41"><span class="linenos">41</span></a><span class="sd">    pos : numpy array</span>
-</span><span id="CrossCorr2pt-42"><a href="#CrossCorr2pt-42"><span class="linenos">42</span></a><span class="sd">        Tracer positions of shape (N, 3), must be float32</span>
-</span><span id="CrossCorr2pt-43"><a href="#CrossCorr2pt-43"><span class="linenos">43</span></a>
-</span><span id="CrossCorr2pt-44"><a href="#CrossCorr2pt-44"><span class="linenos">44</span></a><span class="sd">    delta : numpy array</span>
-</span><span id="CrossCorr2pt-45"><a href="#CrossCorr2pt-45"><span class="linenos">45</span></a><span class="sd">        Density field array of shape (ngrid, ngrid, ngrid)</span>
-</span><span id="CrossCorr2pt-46"><a href="#CrossCorr2pt-46"><span class="linenos">46</span></a>
-</span><span id="CrossCorr2pt-47"><a href="#CrossCorr2pt-47"><span class="linenos">47</span></a><span class="sd">    boxsize : float</span>
-</span><span id="CrossCorr2pt-48"><a href="#CrossCorr2pt-48"><span class="linenos">48</span></a><span class="sd">        Size of simulation box</span>
-</span><span id="CrossCorr2pt-49"><a href="#CrossCorr2pt-49"><span class="linenos">49</span></a>
-</span><span id="CrossCorr2pt-50"><a href="#CrossCorr2pt-50"><span class="linenos">50</span></a><span class="sd">    threads : int</span>
-</span><span id="CrossCorr2pt-51"><a href="#CrossCorr2pt-51"><span class="linenos">51</span></a><span class="sd">        Number of threads for FFT</span>
-</span><span id="CrossCorr2pt-52"><a href="#CrossCorr2pt-52"><span class="linenos">52</span></a>
-</span><span id="CrossCorr2pt-53"><a href="#CrossCorr2pt-53"><span class="linenos">53</span></a><span class="sd">    W_k_list : list</span>
-</span><span id="CrossCorr2pt-54"><a href="#CrossCorr2pt-54"><span class="linenos">54</span></a><span class="sd">        List of window functions in k-space</span>
-</span><span id="CrossCorr2pt-55"><a href="#CrossCorr2pt-55"><span class="linenos">55</span></a>
-</span><span id="CrossCorr2pt-56"><a href="#CrossCorr2pt-56"><span class="linenos">56</span></a><span class="sd">    Returns</span>
-</span><span id="CrossCorr2pt-57"><a href="#CrossCorr2pt-57"><span class="linenos">57</span></a><span class="sd">    -------</span>
-</span><span id="CrossCorr2pt-58"><a href="#CrossCorr2pt-58"><span class="linenos">58</span></a><span class="sd">    xi : numpy array</span>
-</span><span id="CrossCorr2pt-59"><a href="#CrossCorr2pt-59"><span class="linenos">59</span></a><span class="sd">        Cross-correlation function values</span>
-</span><span id="CrossCorr2pt-60"><a href="#CrossCorr2pt-60"><span class="linenos">60</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="CrossCorr2pt-61"><a href="#CrossCorr2pt-61"><span class="linenos">61</span></a>    <span class="c1"># Calculating the number of grid points along each axis of the field delta</span>
-</span><span id="CrossCorr2pt-62"><a href="#CrossCorr2pt-62"><span class="linenos">62</span></a>    <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-63"><a href="#CrossCorr2pt-63"><span class="linenos">63</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
-</span><span id="CrossCorr2pt-64"><a href="#CrossCorr2pt-64"><span class="linenos">64</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Input array is not cubical (n, n, n).&quot;</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-65"><a href="#CrossCorr2pt-65"><span class="linenos">65</span></a>
-</span><span id="CrossCorr2pt-66"><a href="#CrossCorr2pt-66"><span class="linenos">66</span></a>    <span class="c1"># Fourier Transforming the delta overdensity field once</span>
-</span><span id="CrossCorr2pt-67"><a href="#CrossCorr2pt-67"><span class="linenos">67</span></a>    <span class="n">delta_k</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-68"><a href="#CrossCorr2pt-68"><span class="linenos">68</span></a>    
-</span><span id="CrossCorr2pt-69"><a href="#CrossCorr2pt-69"><span class="linenos">69</span></a>    <span class="c1"># Ensure positions are float32 to avoid repeated casting</span>
-</span><span id="CrossCorr2pt-70"><a href="#CrossCorr2pt-70"><span class="linenos">70</span></a>    <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
-</span><span id="CrossCorr2pt-71"><a href="#CrossCorr2pt-71"><span class="linenos">71</span></a>        <span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-72"><a href="#CrossCorr2pt-72"><span class="linenos">72</span></a>
-</span><span id="CrossCorr2pt-73"><a href="#CrossCorr2pt-73"><span class="linenos">73</span></a>    <span class="c1"># Compute 2PCF by processing each smoothing scale</span>
-</span><span id="CrossCorr2pt-74"><a href="#CrossCorr2pt-74"><span class="linenos">74</span></a>    <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-75"><a href="#CrossCorr2pt-75"><span class="linenos">75</span></a>    
-</span><span id="CrossCorr2pt-76"><a href="#CrossCorr2pt-76"><span class="linenos">76</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">W_k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">W_k_list</span><span class="p">):</span>
-</span><span id="CrossCorr2pt-77"><a href="#CrossCorr2pt-77"><span class="linenos">77</span></a>        <span class="c1"># Apply filter in Fourier space</span>
-</span><span id="CrossCorr2pt-78"><a href="#CrossCorr2pt-78"><span class="linenos">78</span></a>        <span class="n">delta_k_smooth</span> <span class="o">=</span> <span class="n">delta_k</span> <span class="o">*</span> <span class="n">W_k</span>
-</span><span id="CrossCorr2pt-79"><a href="#CrossCorr2pt-79"><span class="linenos">79</span></a>        <span class="c1"># Transform back to real space</span>
-</span><span id="CrossCorr2pt-80"><a href="#CrossCorr2pt-80"><span class="linenos">80</span></a>        <span class="n">delta_smooth</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">delta_k_smooth</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-81"><a href="#CrossCorr2pt-81"><span class="linenos">81</span></a>        
-</span><span id="CrossCorr2pt-82"><a href="#CrossCorr2pt-82"><span class="linenos">82</span></a>        <span class="c1"># Interpolate to particle positions</span>
-</span><span id="CrossCorr2pt-83"><a href="#CrossCorr2pt-83"><span class="linenos">83</span></a>        <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-84"><a href="#CrossCorr2pt-84"><span class="linenos">84</span></a>        <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">delta_smooth</span><span class="p">,</span> <span class="n">boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-85"><a href="#CrossCorr2pt-85"><span class="linenos">85</span></a>        
-</span><span id="CrossCorr2pt-86"><a href="#CrossCorr2pt-86"><span class="linenos">86</span></a>        <span class="c1"># Average to get correlation function value (using Numba-optimized mean)</span>
-</span><span id="CrossCorr2pt-87"><a href="#CrossCorr2pt-87"><span class="linenos">87</span></a>        <span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_mean_parallel</span><span class="p">(</span><span class="n">density_interpolated</span><span class="p">)</span>
-</span><span id="CrossCorr2pt-88"><a href="#CrossCorr2pt-88"><span class="linenos">88</span></a>    
-</span><span id="CrossCorr2pt-89"><a href="#CrossCorr2pt-89"><span class="linenos">89</span></a>    <span class="k">return</span> <span class="n">xi</span>
+</span><span id="CrossCorr2pt-38"><a href="#CrossCorr2pt-38"><span class="linenos">38</span></a><span class="sd">    * **bins** (numpy array): Radial bins for correlation function</span>
+</span><span id="CrossCorr2pt-39"><a href="#CrossCorr2pt-39"><span class="linenos">39</span></a><span class="sd">    * **pos** (numpy array): Tracer positions of shape (N, 3), must be float32</span>
+</span><span id="CrossCorr2pt-40"><a href="#CrossCorr2pt-40"><span class="linenos">40</span></a><span class="sd">    * **delta** (numpy array): Density field array of shape (ngrid, ngrid, ngrid)</span>
+</span><span id="CrossCorr2pt-41"><a href="#CrossCorr2pt-41"><span class="linenos">41</span></a><span class="sd">    * **boxsize** (float): Size of simulation box</span>
+</span><span id="CrossCorr2pt-42"><a href="#CrossCorr2pt-42"><span class="linenos">42</span></a><span class="sd">    * **threads** (int): Number of threads for FFT</span>
+</span><span id="CrossCorr2pt-43"><a href="#CrossCorr2pt-43"><span class="linenos">43</span></a><span class="sd">    * **W_k_list** (list): List of window functions in k-space</span>
+</span><span id="CrossCorr2pt-44"><a href="#CrossCorr2pt-44"><span class="linenos">44</span></a>
+</span><span id="CrossCorr2pt-45"><a href="#CrossCorr2pt-45"><span class="linenos">45</span></a><span class="sd">    Returns</span>
+</span><span id="CrossCorr2pt-46"><a href="#CrossCorr2pt-46"><span class="linenos">46</span></a><span class="sd">    -------</span>
+</span><span id="CrossCorr2pt-47"><a href="#CrossCorr2pt-47"><span class="linenos">47</span></a><span class="sd">    * **xi** (numpy array): Cross-correlation function values</span>
+</span><span id="CrossCorr2pt-48"><a href="#CrossCorr2pt-48"><span class="linenos">48</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="CrossCorr2pt-49"><a href="#CrossCorr2pt-49"><span class="linenos">49</span></a>    <span class="c1"># Calculating the number of grid points along each axis of the field delta</span>
+</span><span id="CrossCorr2pt-50"><a href="#CrossCorr2pt-50"><span class="linenos">50</span></a>    <span class="n">shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-51"><a href="#CrossCorr2pt-51"><span class="linenos">51</span></a>    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+</span><span id="CrossCorr2pt-52"><a href="#CrossCorr2pt-52"><span class="linenos">52</span></a>        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error: Input array is not cubical (n, n, n).&quot;</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-53"><a href="#CrossCorr2pt-53"><span class="linenos">53</span></a>
+</span><span id="CrossCorr2pt-54"><a href="#CrossCorr2pt-54"><span class="linenos">54</span></a>    <span class="c1"># Fourier Transforming the delta overdensity field once</span>
+</span><span id="CrossCorr2pt-55"><a href="#CrossCorr2pt-55"><span class="linenos">55</span></a>    <span class="n">delta_k</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">rfftn</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-56"><a href="#CrossCorr2pt-56"><span class="linenos">56</span></a>    
+</span><span id="CrossCorr2pt-57"><a href="#CrossCorr2pt-57"><span class="linenos">57</span></a>    <span class="c1"># Ensure positions are float32 to avoid repeated casting</span>
+</span><span id="CrossCorr2pt-58"><a href="#CrossCorr2pt-58"><span class="linenos">58</span></a>    <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">:</span>
+</span><span id="CrossCorr2pt-59"><a href="#CrossCorr2pt-59"><span class="linenos">59</span></a>        <span class="n">pos</span> <span class="o">=</span> <span class="n">pos</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-60"><a href="#CrossCorr2pt-60"><span class="linenos">60</span></a>
+</span><span id="CrossCorr2pt-61"><a href="#CrossCorr2pt-61"><span class="linenos">61</span></a>    <span class="c1"># Compute 2PCF by processing each smoothing scale</span>
+</span><span id="CrossCorr2pt-62"><a href="#CrossCorr2pt-62"><span class="linenos">62</span></a>    <span class="n">xi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bins</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-63"><a href="#CrossCorr2pt-63"><span class="linenos">63</span></a>    
+</span><span id="CrossCorr2pt-64"><a href="#CrossCorr2pt-64"><span class="linenos">64</span></a>    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">W_k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">W_k_list</span><span class="p">):</span>
+</span><span id="CrossCorr2pt-65"><a href="#CrossCorr2pt-65"><span class="linenos">65</span></a>        <span class="c1"># Apply filter in Fourier space</span>
+</span><span id="CrossCorr2pt-66"><a href="#CrossCorr2pt-66"><span class="linenos">66</span></a>        <span class="n">delta_k_smooth</span> <span class="o">=</span> <span class="n">delta_k</span> <span class="o">*</span> <span class="n">W_k</span>
+</span><span id="CrossCorr2pt-67"><a href="#CrossCorr2pt-67"><span class="linenos">67</span></a>        <span class="c1"># Transform back to real space</span>
+</span><span id="CrossCorr2pt-68"><a href="#CrossCorr2pt-68"><span class="linenos">68</span></a>        <span class="n">delta_smooth</span> <span class="o">=</span> <span class="n">pyfftw</span><span class="o">.</span><span class="n">interfaces</span><span class="o">.</span><span class="n">numpy_fft</span><span class="o">.</span><span class="n">irfftn</span><span class="p">(</span><span class="n">delta_k_smooth</span><span class="p">,</span> <span class="n">threads</span><span class="o">=</span><span class="n">threads</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-69"><a href="#CrossCorr2pt-69"><span class="linenos">69</span></a>        
+</span><span id="CrossCorr2pt-70"><a href="#CrossCorr2pt-70"><span class="linenos">70</span></a>        <span class="c1"># Interpolate to particle positions</span>
+</span><span id="CrossCorr2pt-71"><a href="#CrossCorr2pt-71"><span class="linenos">71</span></a>        <span class="n">density_interpolated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-72"><a href="#CrossCorr2pt-72"><span class="linenos">72</span></a>        <span class="n">MASL</span><span class="o">.</span><span class="n">CIC_interp</span><span class="p">(</span><span class="n">delta_smooth</span><span class="p">,</span> <span class="n">boxsize</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-73"><a href="#CrossCorr2pt-73"><span class="linenos">73</span></a>        
+</span><span id="CrossCorr2pt-74"><a href="#CrossCorr2pt-74"><span class="linenos">74</span></a>        <span class="c1"># Average to get correlation function value (using Numba-optimized mean)</span>
+</span><span id="CrossCorr2pt-75"><a href="#CrossCorr2pt-75"><span class="linenos">75</span></a>        <span class="n">xi</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_mean_parallel</span><span class="p">(</span><span class="n">density_interpolated</span><span class="p">)</span>
+</span><span id="CrossCorr2pt-76"><a href="#CrossCorr2pt-76"><span class="linenos">76</span></a>    
+</span><span id="CrossCorr2pt-77"><a href="#CrossCorr2pt-77"><span class="linenos">77</span></a>    <span class="k">return</span> <span class="n">xi</span>
 </span></pre></div>
 
 
@@ -257,28 +233,20 @@ Optimized: avoid memory copies, use in-place operations, reuse arrays.</p>
 
 <h2 id="parameters">Parameters</h2>
 
-<p>bins : numpy array
-    Radial bins for correlation function</p>
-
-<p>pos : numpy array
-    Tracer positions of shape (N, 3), must be float32</p>
-
-<p>delta : numpy array
-    Density field array of shape (ngrid, ngrid, ngrid)</p>
-
-<p>boxsize : float
-    Size of simulation box</p>
-
-<p>threads : int
-    Number of threads for FFT</p>
-
-<p>W_k_list : list
-    List of window functions in k-space</p>
+<ul>
+<li><strong>bins</strong> (numpy array): Radial bins for correlation function</li>
+<li><strong>pos</strong> (numpy array): Tracer positions of shape (N, 3), must be float32</li>
+<li><strong>delta</strong> (numpy array): Density field array of shape (ngrid, ngrid, ngrid)</li>
+<li><strong>boxsize</strong> (float): Size of simulation box</li>
+<li><strong>threads</strong> (int): Number of threads for FFT</li>
+<li><strong>W_k_list</strong> (list): List of window functions in k-space</li>
+</ul>
 
 <h2 id="returns">Returns</h2>
 
-<p>xi : numpy array
-    Cross-correlation function values</p>
+<ul>
+<li><strong>xi</strong> (numpy array): Cross-correlation function values</li>
+</ul>
 </div>
 
 
