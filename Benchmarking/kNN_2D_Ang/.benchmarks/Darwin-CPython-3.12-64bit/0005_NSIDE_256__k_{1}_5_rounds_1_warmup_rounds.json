@@ -1,0 +1,117 @@
+{
+    "machine_info": {
+        "node": "CTWH9P5GVW",
+        "processor": "arm",
+        "machine": "arm64",
+        "python_compiler": "Clang 13.0.0 (clang-1300.0.29.30)",
+        "python_implementation": "CPython",
+        "python_implementation_version": "3.12.7",
+        "python_version": "3.12.7",
+        "python_build": [
+            "v3.12.7:0b05ead877f",
+            "Sep 30 2024 23:18:00"
+        ],
+        "release": "27.0.0",
+        "system": "Darwin",
+        "cpu": {
+            "python_version": "3.12.7.final.0 (64 bit)",
+            "cpuinfo_version": [
+                9,
+                0,
+                0
+            ],
+            "cpuinfo_version_string": "9.0.0",
+            "arch": "ARM_8",
+            "bits": 64,
+            "count": 14,
+            "arch_string_raw": "arm64",
+            "brand_raw": "Apple M4 Max"
+        }
+    },
+    "commit_info": {
+        "id": "f3a620114e202541b0e774fc851fc6704567842d",
+        "time": "2026-08-23T20:58:42+10:00",
+        "author_time": "2026-08-23T20:58:42+10:00",
+        "dirty": true,
+        "project": "kNNpy",
+        "branch": "Topic-benchmarking"
+    },
+    "benchmarks": [
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[$\\\\rm N_{tracer}$ = 1e+03]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[$\\\\rm N_{tracer}$ = 1e+03]",
+            "params": {
+                "n_tracer": 1000
+            },
+            "param": "$\\\\rm N_{tracer}$ = 1e+03",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 1.5679152910015546,
+                "max": 1.6505084579985123,
+                "mean": 1.6066061250021448,
+                "stddev": 0.035639560472097064,
+                "rounds": 5,
+                "median": 1.61497233400587,
+                "iqr": 0.06164726073984639,
+                "q1": 1.5713422915068804,
+                "q3": 1.6329895522467268,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 1.5679152910015546,
+                "hd15iqr": 1.6505084579985123,
+                "ops": 0.6224300931248254,
+                "total": 8.033030625010724,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[$\\\\rm N_{tracer}$ = 1e+04]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[$\\\\rm N_{tracer}$ = 1e+04]",
+            "params": {
+                "n_tracer": 10000
+            },
+            "param": "$\\\\rm N_{tracer}$ = 1e+04",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 2.8085722910036566,
+                "max": 2.989095917000668,
+                "mean": 2.9145907666010316,
+                "stddev": 0.06730342790914103,
+                "rounds": 5,
+                "median": 2.91487637499813,
+                "iqr": 0.07587915600015549,
+                "q1": 2.8844224167514767,
+                "q3": 2.960301572751632,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 2.8085722910036566,
+                "hd15iqr": 2.989095917000668,
+                "ops": 0.34310134083289867,
+                "total": 14.572953833005158,
+                "iterations": 1
+            }
+        }
+    ],
+    "datetime": "2026-09-27T12:11:51.172831+00:00",
+    "version": "5.2.3"
+}

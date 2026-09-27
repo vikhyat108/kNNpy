@@ -17,9 +17,9 @@ def NSIDE(pytestconfig):
 def n_tracer(pytestconfig):
     return int(pytestconfig.getoption("n_tracer"))
 
-@pytest.fixture(scope="session")
-def k_List(pytestconfig):
-    return list(np.array(pytestconfig.getoption("k_List").split()).astype(int))
+# @pytest.fixture(scope="session")
+# def k_List(pytestconfig):
+#     return list(np.array(pytestconfig.getoption("k_List").split()).astype(int))
 
 @pytest.fixture(scope="session")
 def rounds(pytestconfig):

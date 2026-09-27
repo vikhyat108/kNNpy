@@ -1,0 +1,228 @@
+{
+    "machine_info": {
+        "node": "CTWH9P5GVW",
+        "processor": "arm",
+        "machine": "arm64",
+        "python_compiler": "Clang 13.0.0 (clang-1300.0.29.30)",
+        "python_implementation": "CPython",
+        "python_implementation_version": "3.12.7",
+        "python_version": "3.12.7",
+        "python_build": [
+            "v3.12.7:0b05ead877f",
+            "Sep 30 2024 23:18:00"
+        ],
+        "release": "27.0.0",
+        "system": "Darwin",
+        "cpu": {
+            "python_version": "3.12.7.final.0 (64 bit)",
+            "cpuinfo_version": [
+                9,
+                0,
+                0
+            ],
+            "cpuinfo_version_string": "9.0.0",
+            "arch": "ARM_8",
+            "bits": 64,
+            "count": 14,
+            "arch_string_raw": "arm64",
+            "brand_raw": "Apple M4 Max"
+        }
+    },
+    "commit_info": {
+        "id": "f3a620114e202541b0e774fc851fc6704567842d",
+        "time": "2026-08-23T20:58:42+10:00",
+        "author_time": "2026-08-23T20:58:42+10:00",
+        "dirty": true,
+        "project": "kNNpy",
+        "branch": "Topic-benchmarking"
+    },
+    "benchmarks": [
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[N_tracer = 1e+03]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[N_tracer = 1e+03]",
+            "params": {
+                "n_tracer": "UNSERIALIZABLE[np.int64(1000)]"
+            },
+            "param": "N_tracer = 1e+03",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 1.4931411249999655,
+                "max": 1.6017164999939268,
+                "mean": 1.5575797165976837,
+                "stddev": 0.03973752644867407,
+                "rounds": 5,
+                "median": 1.5612503750016913,
+                "iqr": 0.035637406988826115,
+                "q1": 1.5434599682521366,
+                "q3": 1.5790973752409627,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 1.4931411249999655,
+                "hd15iqr": 1.6017164999939268,
+                "ops": 0.6420217144226563,
+                "total": 7.787898582988419,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[N_tracer = 3e+03]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[N_tracer = 3e+03]",
+            "params": {
+                "n_tracer": "UNSERIALIZABLE[np.int64(3162)]"
+            },
+            "param": "N_tracer = 3e+03",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 1.5466739170078654,
+                "max": 1.6666444579896051,
+                "mean": 1.6016739415994379,
+                "stddev": 0.04623902776022877,
+                "rounds": 5,
+                "median": 1.593916875004652,
+                "iqr": 0.06739347925395123,
+                "q1": 1.5683934789958585,
+                "q3": 1.6357869582498097,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 1.5466739170078654,
+                "hd15iqr": 1.6666444579896051,
+                "ops": 0.6243467999494304,
+                "total": 8.00836970799719,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[N_tracer = 1e+04]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[N_tracer = 1e+04]",
+            "params": {
+                "n_tracer": "UNSERIALIZABLE[np.int64(10000)]"
+            },
+            "param": "N_tracer = 1e+04",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 2.8329085419973126,
+                "max": 3.0147124999930384,
+                "mean": 2.9344524918007666,
+                "stddev": 0.09141967366360566,
+                "rounds": 5,
+                "median": 2.991211625005235,
+                "iqr": 0.16557533349623554,
+                "q1": 2.8357011355037685,
+                "q3": 3.001276469000004,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 2.8329085419973126,
+                "hd15iqr": 3.0147124999930384,
+                "ops": 0.34077907302780575,
+                "total": 14.672262459003832,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[N_tracer = 3e+04]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[N_tracer = 3e+04]",
+            "params": {
+                "n_tracer": "UNSERIALIZABLE[np.int64(31622)]"
+            },
+            "param": "N_tracer = 3e+04",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 3.0989278749912046,
+                "max": 4.692663416994037,
+                "mean": 3.4303414749971126,
+                "stddev": 0.7057289693846962,
+                "rounds": 5,
+                "median": 3.1187254169926746,
+                "iqr": 0.40635832250336534,
+                "q1": 3.11129124999934,
+                "q3": 3.5176495725027053,
+                "iqr_outliers": 1,
+                "stddev_outliers": 1,
+                "outliers": "1;1",
+                "ld15iqr": 3.0989278749912046,
+                "hd15iqr": 4.692663416994037,
+                "ops": 0.29151616749782666,
+                "total": 17.151707374985563,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[N_tracer = 1e+05]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[N_tracer = 1e+05]",
+            "params": {
+                "n_tracer": "UNSERIALIZABLE[np.int64(100000)]"
+            },
+            "param": "N_tracer = 1e+05",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 3.850776417006273,
+                "max": 3.9916852910100715,
+                "mean": 3.906355591805186,
+                "stddev": 0.058042174326364514,
+                "rounds": 5,
+                "median": 3.897031041997252,
+                "iqr": 0.09145037525740918,
+                "q1": 3.856689479252964,
+                "q3": 3.948139854510373,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 3.850776417006273,
+                "hd15iqr": 3.9916852910100715,
+                "ops": 0.25599308012251,
+                "total": 19.53177795902593,
+                "iterations": 1
+            }
+        }
+    ],
+    "datetime": "2026-09-27T12:22:48.731151+00:00",
+    "version": "5.2.3"
+}

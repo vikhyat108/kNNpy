@@ -1,0 +1,191 @@
+{
+    "machine_info": {
+        "node": "CTWH9P5GVW",
+        "processor": "arm",
+        "machine": "arm64",
+        "python_compiler": "Clang 13.0.0 (clang-1300.0.29.30)",
+        "python_implementation": "CPython",
+        "python_implementation_version": "3.12.7",
+        "python_version": "3.12.7",
+        "python_build": [
+            "v3.12.7:0b05ead877f",
+            "Sep 30 2024 23:18:00"
+        ],
+        "release": "27.0.0",
+        "system": "Darwin",
+        "cpu": {
+            "python_version": "3.12.7.final.0 (64 bit)",
+            "cpuinfo_version": [
+                9,
+                0,
+                0
+            ],
+            "cpuinfo_version_string": "9.0.0",
+            "arch": "ARM_8",
+            "bits": 64,
+            "count": 14,
+            "arch_string_raw": "arm64",
+            "brand_raw": "Apple M4 Max"
+        }
+    },
+    "commit_info": {
+        "id": "f3a620114e202541b0e774fc851fc6704567842d",
+        "time": "2026-08-23T20:58:42+10:00",
+        "author_time": "2026-08-23T20:58:42+10:00",
+        "dirty": true,
+        "project": "kNNpy",
+        "branch": "Topic-benchmarking"
+    },
+    "benchmarks": [
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[NSIDE = 32]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[NSIDE = 32]",
+            "params": {
+                "NSIDE": 32
+            },
+            "param": "NSIDE = 32",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.05047641700366512,
+                "max": 0.05443908400775399,
+                "mean": 0.052339166798628864,
+                "stddev": 0.0014883325841294115,
+                "rounds": 5,
+                "median": 0.05201516598754097,
+                "iqr": 0.00198129149430315,
+                "q1": 0.05141072950209491,
+                "q3": 0.05339202099639806,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 0.05047641700366512,
+                "hd15iqr": 0.05443908400775399,
+                "ops": 19.10615054013808,
+                "total": 0.26169583399314433,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[NSIDE = 64]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[NSIDE = 64]",
+            "params": {
+                "NSIDE": 64
+            },
+            "param": "NSIDE = 64",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.19749087501259055,
+                "max": 0.19919029100856278,
+                "mean": 0.19844822480808944,
+                "stddev": 0.0008456853108044345,
+                "rounds": 5,
+                "median": 0.19891337500303052,
+                "iqr": 0.0015602917483192869,
+                "q1": 0.19754746850958327,
+                "q3": 0.19910776025790256,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 0.19749087501259055,
+                "hd15iqr": 0.19919029100856278,
+                "ops": 5.0390977342682515,
+                "total": 0.9922411240404472,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[NSIDE = 128]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[NSIDE = 128]",
+            "params": {
+                "NSIDE": 128
+            },
+            "param": "NSIDE = 128",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 0.7411799170076847,
+                "max": 0.7740179170068586,
+                "mean": 0.7545113084022887,
+                "stddev": 0.012414322274196808,
+                "rounds": 5,
+                "median": 0.7517789170087781,
+                "iqr": 0.015311594244849402,
+                "q1": 0.746336353749939,
+                "q3": 0.7616479479947884,
+                "iqr_outliers": 0,
+                "stddev_outliers": 2,
+                "outliers": "2;0",
+                "ld15iqr": 0.7411799170076847,
+                "hd15iqr": 0.7740179170068586,
+                "ops": 1.3253611826144058,
+                "total": 3.7725565420114435,
+                "iterations": 1
+            }
+        },
+        {
+            "group": "kNNpy.TracerAuto2DA",
+            "name": "test_TracerAuto2D[NSIDE = 256]",
+            "fullname": "test_kNN_2D_Ang.py::test_TracerAuto2D[NSIDE = 256]",
+            "params": {
+                "NSIDE": 256
+            },
+            "param": "NSIDE = 256",
+            "extra_info": {},
+            "options": {
+                "disable_gc": false,
+                "timer": "perf_counter",
+                "min_rounds": 5,
+                "max_time": 1.0,
+                "min_time": 5e-06,
+                "warmup": false
+            },
+            "stats": {
+                "min": 3.005342374992324,
+                "max": 3.163973000002443,
+                "mean": 3.0596049333980773,
+                "stddev": 0.06353867283524789,
+                "rounds": 5,
+                "median": 3.0314422079973156,
+                "iqr": 0.07757015626339125,
+                "q1": 3.018854500242014,
+                "q3": 3.0964246565054054,
+                "iqr_outliers": 0,
+                "stddev_outliers": 1,
+                "outliers": "1;0",
+                "ld15iqr": 3.005342374992324,
+                "hd15iqr": 3.163973000002443,
+                "ops": 0.326839582811554,
+                "total": 15.298024666990386,
+                "iterations": 1
+            }
+        }
+    ],
+    "datetime": "2026-09-27T12:01:12.309265+00:00",
+    "version": "5.2.3"
+}

@@ -31,23 +31,7 @@ def compute_TracerAuto2DA(k_List, sel_bins, query_pos, ga_pos, ReturnNNdist=Fals
     results = kNN_2D_Ang.TracerAuto2DA(k_List, sel_bins, query_pos, ga_pos, ReturnNNdist, Verbose)
     return results
 
-@pytest.mark.benchmark(group="kNNpy.TracerAuto2DA")
-# @pytest.mark.parametrize(
-#     "NSIDE", 
-#     [2**i for i in range(5, 10)],
-#     ids=lambda val: f"NSIDE = {val}"
-# )
-# @pytest.mark.parametrize(
-#     "n_tracer", 
-#     np.geomspace(1e3, 1e5, 5).astype(int),
-#     ids=lambda val: "N_tracer = {:.0f}".format(val)
-# )
-@pytest.mark.parametrize(
-    "k_List", 
-    [[1], [2], [4], [8], [16]],
-    ids=lambda val: "k = {:.0f}".format(val[0])
-)
-def test_TracerAuto2D(benchmark, NSIDE, n_tracer, k_List, rounds, warmup):
+def test_compute_TracerAuto2DA(benchmark, NSIDE, n_tracer, k_List, rounds, warmup):
 
     print(NSIDE, n_tracer, k_List, rounds, warmup)
 
