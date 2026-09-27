@@ -1,18 +1,29 @@
+r'''
+# Fisher Information Matrix Construction
+
+Routines for building Fisher Information matrices and calculating parameter constraints for cosmological forecast analysis.
+'''
+
 import numpy as np
 from getdist.gaussian_mixtures import GaussianND
 
 
 def constructingFishermatrix(cov_matrix, der_matrix, n_cov, mean, labels):
     """
-    Caluclated the Fisher information matrix given the covariance matrix and the derivative matrix. The covariance matrix is the covariance of the data, and the derivative matrix is the derivative of the data with respect to the parameters. The Fisher information matrix is given by the formula:
+    Calculated the Fisher information matrix given the covariance matrix and the derivative matrix. The covariance matrix is the covariance of the data, and the derivative matrix is the derivative of the data with respect to the parameters. The Fisher information matrix is given by the formula:
 
-    Inputs:
-    cov_matrix: The covariance matrix of the data. This should be a square matrix of shape (n, n), where n is the number of data points.
-    der_matrix: The derivative of the data with respect to the parameters. This should be a matrix of shape (m, n), where n is the number of data points and m is the number of parameters.
-    n_cov: The number of realizations the covariance matrix is estimated from.
+    Parameters
+    ----------
+    * **cov_matrix** (numpy array): The covariance matrix of the data. This should be a square matrix of shape (n, n), where n is the number of data points.
+    * **der_matrix** (numpy array): The derivative of the data with respect to the parameters. This should be a matrix of shape (m, n), where n is the number of data points and m is the number of parameters.
+    * **n_cov** (int): The number of realizations the covariance matrix is estimated from.
+    * **mean** (numpy array): Mean values for the parameters.
+    * **labels** (list of str): Names/labels of the parameters.
 
-    Returns:
-    fisher_matrix: The Fisher information matrix. This will be a square matrix of shape (m, m), where m is the number of parameters.
+    Returns
+    -------
+    * **fisher_matrix** (numpy array): The Fisher information matrix. This will be a square matrix of shape (m, m), where m is the number of parameters.
+    * **gauss** (GaussianND): N-D Gaussian object for the parameters.
     """
     # Calculating the hartlap factor
     hartlap = (n_cov - cov_matrix.shape[0] - 2) / (n_cov - 1)

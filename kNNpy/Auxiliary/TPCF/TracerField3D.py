@@ -1,6 +1,8 @@
-####################################################################################################
+r'''
+# 3D Spatial Tracer-Field Two-Point Correlation Function (2PCF)
 
-#-------------------------------  Importing the required libraries  --------------------------------
+Routines for computing two-point cross-correlation functions between 3D discrete point tracers and a continuous matter density field.
+'''
 
 from venv import logger
 
@@ -30,23 +32,18 @@ def CrossCorr2pt(bins, pos, delta, boxsize, threads, W_k_list):
     Compute 2-point cross-correlation function between tracers and density field.
     Optimized: avoid memory copies, use in-place operations, reuse arrays.
     
-    Parameters:
-    -----------
-    bins : array
-        Radial bins for correlation function
-    boxsize : float
-        Size of simulation box
-    pos : array
-        Tracer positions (N, 3), must be float32
-    delta : array
-        Density field (ngrid, ngrid, ngrid)
-    threads : int
-        Number of threads for FFT
-        
-    Returns:
-    --------
-    xi : array
-        Cross-correlation function values
+    Parameters
+    ----------
+    * **bins** (numpy array): Radial bins for correlation function
+    * **pos** (numpy array): Tracer positions of shape (N, 3), must be float32
+    * **delta** (numpy array): Density field array of shape (ngrid, ngrid, ngrid)
+    * **boxsize** (float): Size of simulation box
+    * **threads** (int): Number of threads for FFT
+    * **W_k_list** (list): List of window functions in k-space
+
+    Returns
+    -------
+    * **xi** (numpy array): Cross-correlation function values
     """
     # Calculating the number of grid points along each axis of the field delta
     shape = np.shape(delta)

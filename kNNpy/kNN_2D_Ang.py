@@ -1,3 +1,9 @@
+r'''
+# 2D Angular kNN Functions
+
+Routines for computing 2D angular kNN auto-correlations, tracer-tracer cross-correlations, and tracer-field cross-correlations.
+'''
+
 ####################################################################################################
 
 #-------------------  These libraries are required for evaluating the functions  -------------------
@@ -31,38 +37,25 @@ def TracerAuto2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, ReturnN
     		
     Parameters
     ----------
-    kList : int
-        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
-    BinsRad : list of numpy float array
-        list of angular distance arrays (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{th}$ element of `kList`.
-    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
-        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
-        array of sky locations for the discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    ReturnNNdist : bool, optional
-        if set to ``True``, the sorted arrays of NN distances will be returned along with the $k$NN-CDFs, by default ``False``.
-    Verbose : bool, optional
-        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+    * **kList** (list of int): the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    * **BinsRad** (list of numpy float array): list of angular distance arrays (in radians) for each nearest neighbour. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{\text{th}}$ element of `kList`.
+    * **MaskedQueryPosRad** (numpy float array of shape ``(n_query, 2)``): array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosRad** (numpy float array of shape ``(n_tracer, 2)``): array of sky locations for the discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **ReturnNNdist** (bool, optional, default=False): if set to ``True``, the sorted arrays of NN distances will be returned along with the $k$NN-CDFs.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    kNN_results: tuple of lists | list of numpy float arrays
-        results of the kNN computation. If `ReturnNNdist` is ``True``, returns the tuple ``(p_gtr_k_list, vol)`` where `p_gtr_k_list` is the list of auto kNN-CDFs, and `vol` is the list of NN distances. If `ReturnNNdist` is ``False``, returns `p_gtr_k_list` only
+    * **kNN_results** (tuple of lists | list of numpy float arrays): results of the kNN computation. If `ReturnNNdist` is ``True``, returns the tuple ``(p_gtr_k_list, vol)`` where `p_gtr_k_list` is the list of auto kNN-CDFs, and `vol` is the list of NN distances. If `ReturnNNdist` is ``False``, returns `p_gtr_k_list` only.
         
     Raises
     ------
-    ValueError
-        if the given query points are not on a two-dimensional grid.
-    ValueError
-        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if the given tracer points are not on a two-dimensional grid.
+    * **ValueError**: if the given query points are not on a two-dimensional grid.
+    * **ValueError**: if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if the given tracer points are not on a two-dimensional grid.
 
     Notes
     -----
@@ -164,50 +157,34 @@ def TracerTracerCross2DA(kA_kB_list, BinsRad, MaskedQueryPosRad, MaskedTracerPos
     3.  $P_{\geq k_A, \geq k_B}(\theta)$:
     	the joint probability of finding at least $k_A$ set A tracers and at least $k_B$ set B tracers within a spherical cap of radius $\theta$
     		
-    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this)
+    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quantities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this):
     	
-    $$\psi_{k_A, k_B} = P_{\geq k_A, \geq k_B}/(P_{\geq k_A} \times P_{\geq k_B})$$
+    \\[ \psi_{k_A, k_B} = \frac{P_{\geq k_A, \geq k_B}}{P_{\geq k_A} \times P_{\geq k_B}} \\]
     		
     Parameters
     ----------
-    kA_kB_list : list of int tuples
-        nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details)
-    BinsRad : list of numpy float array
-        list of angular distance scale arrays (in radians) for each nearest neighbour combination in `kA_kB_list`. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the $i^{th}$ nearest neighbour combination.
-    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
-        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosRad_A : numpy float array of shape ``(n_tracer_A, 2)``
-        array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosRad_B : numpy float array of shape ``(n_tracer_B, 2)``
-        array of sky locations for the second set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    Verbose : bool, optional
-        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+    * **kA_kB_list** (list of int tuples): nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details).
+    * **BinsRad** (list of numpy float array): list of angular distance scale arrays (in radians) for each nearest neighbour combination in `kA_kB_list`. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the $i^{\text{th}}$ nearest neighbour combination.
+    * **MaskedQueryPosRad** (numpy float array of shape ``(n_query, 2)``): array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosRad_A** (numpy float array of shape ``(n_tracer_A, 2)``): array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosRad_B** (numpy float array of shape ``(n_tracer_B, 2)``): array of sky locations for the second set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    p_gtr_kA_list: list of numpy float arrays
-        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_A^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    p_gtr_kB_list: list of numpy float arrays
-        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    p_gtr_kA_kB_list: list of numpy float arrays
-        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_list** (list of numpy float arrays): list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_A^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kB_list** (list of numpy float arrays): list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_B^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_kB_list** (list of numpy float arrays): list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     Raises
     ------
-    ValueError
-        if the lengths of `BinsRad` and `kA_kB_list` do not match.
-    ValueError
-        if the given query points are not on a two-dimensional grid.
-    ValueError
-        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if any of the given tracer points are not on a two-dimensional grid.
+    * **ValueError**: if the lengths of `BinsRad` and `kA_kB_list` do not match.
+    * **ValueError**: if the given query points are not on a two-dimensional grid.
+    * **ValueError**: if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if any of the given tracer points are not on a two-dimensional grid.
 
     See Also
     --------
@@ -344,44 +321,28 @@ def TracerTracerCross2DA_DataVector(kA_kB_list, BinsRad, MaskedQueryPosRad, Mask
     	
     Parameters
     ----------
-    kA_kB_list : list of int tuples
-        nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details)
-    BinsRad : list of numpy float array
-        list of angular distance scale arrays (in radians) for each nearest neighbour combination in `kA_kB_list`. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the $i^{th}$ nearest neighbour combination.
-    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
-        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosVectorRad_A : numpy float array of shape ``(n_realisations, n_tracer_A, 2)``
-        array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosRad_B : numpy float array of shape ``(n_tracer_B, 2)``
-        array of sky locations for the second set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    Verbose : bool, optional
-        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+    * **kA_kB_list** (list of int tuples): nearest-neighbour combinations for which the cross-correlations need to be computed (see notes for more details).
+    * **BinsRad** (list of numpy float array): list of angular distance scale arrays (in radians) for each nearest neighbour combination in `kA_kB_list`. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the $i^{\text{th}}$ nearest neighbour combination.
+    * **MaskedQueryPosRad** (numpy float array of shape ``(n_query, 2)``): array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosVectorRad_A** (numpy float array of shape ``(n_realisations, n_tracer_A, 2)``): array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosRad_B** (numpy float array of shape ``(n_tracer_B, 2)``): array of sky locations for the second set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    p_gtr_kA_veclist: list of numpy float arrays
-        list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured $k_A^i$NN-CDFs, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    p_gtr_kB_list: list of numpy float arrays
-        list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{th}$ element represents the $k_B^i$NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
-    p_gtr_kA_kB_veclist: list of numpy float arrays
-        list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{th}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{th}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_veclist** (list of numpy float arrays): list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured $k_A^i$NN-CDFs, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kB_list** (list of numpy float arrays): list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_B^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_kB_veclist** (list of numpy float arrays): list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{\text{th}}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
         
     Raises
     ------
-    ValueError
-        if the lengths of `BinsRad` and `kA_kB_list` do not match.
-    ValueError
-        if the given query points are not on a two-dimensional grid.
-    ValueError
-        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if any of the given tracer points are not on a two-dimensional grid.
+    * **ValueError**: if the lengths of `BinsRad` and `kA_kB_list` do not match.
+    * **ValueError**: if the given query points are not on a two-dimensional grid.
+    * **ValueError**: if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if any of the given tracer points are not on a two-dimensional grid.
 
     See Also
     --------
@@ -556,58 +517,38 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     3. $P_{\geq k, >{\rm dt}}(\theta)$:
     	the joint probability of finding at least 'k' tracers within a spherical cap of radius $\theta$ AND the overdensity field smoothed at angular scale $\theta$ exceeding the given density threshold (as specified by the parameter `FieldConstPercThreshold`)
     		
-    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quatities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this)
+    The excess cross-correlation (Banerjee & Abel 2023)[^1] can be computed trivially from the quantities (see the `kNNpy.HelperFunctions.kNN_excess_cross_corr()` method to do this):
     	
-    $$\psi_{k, {\rm dt}} = P_{\geq k, >{\rm dt}}/(P_{\geq k} \times P_{>{\rm dt}})$$
+    \\[ \psi_{k, {\rm dt}} = \frac{P_{\geq k, >{\rm dt}}}{P_{\geq k} \times P_{>{\rm dt}}} \\]
 
     Parameters
     ----------
-    kList : int
-        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
-    BinsRad : list of numpy float array
-        list of angular distance arrays (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{th}$ element of `kList`.
-    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
-        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosRad : numpy float array of shape ``(n_tracer, 2)``
-        array of sky locations for the discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    FieldSkymap : numpy float array
-        the healpy map of the continuous field. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
-    QueryMask : numpy float array of shape ``FieldSkymap.shape``
-        the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see kNNpy.HelperFunctions.create_query_2DA for how to compute this mask from an observational mask, and for a detailed description).
-    FieldConstPercThreshold : float
-        the percentile value for the constant percentile threshold to be used for the continuous field. For example, ``FieldConstPercThreshold = 75.0`` represents a 75th percentile threshold.
-    ReturnSmoothedDict : bool, optional
-        if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements, by default ``False``.
-    Verbose : bool, optional
-        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+    * **kList** (list of int): the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    * **BinsRad** (list of numpy float array): list of angular distance arrays (in radians) for each nearest neighbour. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{\text{th}}$ element of `kList`.
+    * **MaskedQueryPosRad** (numpy float array of shape ``(n_query, 2)``): array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosRad** (numpy float array of shape ``(n_tracer, 2)``): array of sky locations for the discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **FieldSkymap** (numpy float array): the healpy map of the continuous field. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    * **QueryMask** (numpy float array of shape FieldSkymap.shape): the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see `kNNpy.HelperFunctions_2DA.create_query_2DA()` for how to compute this mask from an observational mask, and for a detailed description).
+    * **FieldConstPercThreshold** (float): the percentile value for the constant percentile threshold to be used for the continuous field. For example, ``FieldConstPercThreshold = 75.0`` represents a 75th percentile threshold.
+    * **ReturnSmoothedDict** (bool, optional, default=False): if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    p_gtr_k_list: list of numpy float arrays
-        auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins.
-    p_gtr_dt_list: list of numpy float arrays
-        continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
-    p_gtr_k_dt_list: list of numpy float arrays
-        joint tracer-field nearest neighbour distributions evaluated at the desired distance bins.
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field masked within the observational footprint and smoothed at the provided angular distance scales, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
+    * **p_gtr_k_list** (list of numpy float arrays): auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins.
+    * **p_gtr_dt_list** (list of numpy float arrays): continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
+    * **p_gtr_k_dt_list** (list of numpy float arrays): joint tracer-field nearest neighbour distributions evaluated at the desired distance bins.
+    * **SmoothedFieldDict** (dict): dictionary containing the continuous field masked within the observational footprint and smoothed at the provided angular distance scales, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
 
     Raises
     ------
-    ValueError
-        if the given query points are not on a two-dimensional grid.
-    ValueError
-        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if the given tracer points are not on a two-dimensional grid.
-    ValueError
-        if the shape of field skymap (after masking) does not match the shape of the given query point array.
+    * **ValueError**: if the given query points are not on a two-dimensional grid.
+    * **ValueError**: if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if the given tracer points are not on a two-dimensional grid.
+    * **ValueError**: if the shape of field skymap (after masking) does not match the shape of the given query point array.
 
     See Also
     --------
@@ -619,18 +560,14 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
     
     Currently, the algorithm requires a constant percentile overdensity threshold for the continuous field and query points to be defined on a HEALPix grid. Extentions to a constant mass threshold and poisson-sampled query points on the sky may be added in the future. 
     
-    Data with associated observational footprints are supported, in which case, only tracer positions within the footprint should be provided and the field should be masked appropriately.Importantly, in this case, query points need to be within the footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). If the footprints of the tracer set and the field are different, a combined mask representing the intersection of the two footprints should be used (see the `kNNpy.HelperFunctions.create_query_2DA()` method for help with masking and creating the modified query positions).
+    Data with associated observational footprints are supported, in which case, only tracer positions within the footprint should be provided and the field should be masked appropriately.Importantly, in this case, query points need to be within the footprint and appropriately padded from the edges of the footprint (see Gupta & Banerjee (2024)[^2] for a detailed discussion). If the footprints of the tracer set and the field are different, a combined mask representing the intersection of the two footprints should be used (see the `kNNpy.HelperFunctions_2DA.create_query_2DA()` method for help with masking and creating the modified query positions).
 
     References
     ----------
-    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour   distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868
+    [^1]: Arka Banerjee, Tom Abel, Tracer-field cross-correlations with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stac3813), Volume 519, Issue 4, March 2023, Pages 4856–4868
         
     [^2]: Kaustubh Rajesh Gupta, Arka Banerjee, Spatial clustering of gravitational wave sources with k-nearest neighbour distributions, [Monthly Notices of the Royal Astronomical Society](https://doi.org/10.1093/mnras/stae1424), Volume 531, Issue 4, July 2024, Pages 4619–4639
     '''
-    
-    #-----------------------------------------------------------------------------------------------
-
-    if Verbose: total_start_time = time.perf_counter()
 
     #-----------------------------------------------------------------------------------------------
         
@@ -784,56 +721,36 @@ def TracerFieldCross2DA(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosRad, F
 def TracerFieldCross2DA_DataVector(kList, BinsRad, MaskedQueryPosRad, MaskedTracerPosVectorRad, FieldSkymap, QueryMask, FieldConstPercThreshold, ReturnSmoothedDict=False, Verbose=False):
     
     r'''
-    Returns 'data vectors' of the  the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNNpy.kNN_2D_Ang.TracerFieldCross2DA for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`MaskedTracerPosVectorRad`] and a single realisation of the given continuous overdensity field (`FieldSkymap`). Please refer to notes to understand why this might be useful.
+    Returns 'data vectors' of the probabilities $P_{\geq k}$, $P_{>{\rm dt}}$ and $P_{\geq k,>{\rm dt}}$ [refer to kNNpy.kNN_2D_Ang.TracerFieldCross2DA for definitions] for $k$ in `kList` for multiple realisations of the given discrete tracer set [`MaskedTracerPosVectorRad`] and a single realisation of the given continuous overdensity field (`FieldSkymap`). Please refer to notes to understand why this might be useful.
     	
     Parameters
     ----------
-    kList : int
-        the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
-    BinsRad : list of numpy float array
-        list of angular distance arrays (in radians) for each nearest neighbour. The $i^{th}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{th}$ element of `kList`.
-    MaskedQueryPosRad : numpy float array of shape ``(n_query, 2)``
-        array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    MaskedTracerPosVectorRad : numpy float array of shape ``(n_realisations, n_tracer, 2)``
-        array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
-    FieldSkymap : numpy float array
-        the healpy map of the continuous field. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
-    QueryMask : numpy float array of shape ``FieldSkymap.shape``
-        the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see kNNpy.HelperFunctions.create_query_2DA for how to compute this mask from an observational mask, and for a detailed description).
-    FieldConstPercThreshold : float
-        the percentile value for the constant percentile threshold to be used for the continuous field. For example, ``FieldConstPercThreshold = 75.0`` represents a 75th percentile threshold.
-    ReturnSmoothedDict : bool, optional
-        if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements, by default ``False``.
-    Verbose : bool, optional
-        if set to ``True``, the time taken to complete each step of the calculation will be printed, by default ``False``.
+    * **kList** (list of int): the list of nearest neighbours to calculate the distances to. For example, if ``kList = [1, 2, 4]``, the first, second and fourth-nearest neighbour distributions will be computed.
+    * **BinsRad** (list of numpy float array): list of angular distance arrays (in radians) for each nearest neighbour. The $i^{\text{th}}$ element of the list should contain a numpy array of the desired distances for the nearest neighbour specified by the $i^{\text{th}}$ element of `kList`.
+    * **MaskedQueryPosRad** (numpy float array of shape ``(n_query, 2)``): array of sky locations for the query points. The sky locations must be on a grid. For each query point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **MaskedTracerPosVectorRad** (numpy float array of shape ``(n_realisations, n_tracer, 2)``): array of sky locations for the first set of discrete tracers. For each data point in the array, the first (second) coordinate should be the declination (right ascension) in radians. Please ensure ``-np.pi/2 <= declination <= pi/2`` and ``0 <= right ascension <= 2*np.pi``.
+    * **FieldSkymap** (numpy float array): the healpy map of the continuous field. The map must be in ring ordering. The map shape must be `(12*NSIDE**2, )`, where ``NSIDE`` is a power of 2. The values of the masked pixels, if any, should be set to `hp.UNSEEN`.
+    * **QueryMask** (numpy float array of shape FieldSkymap.shape): the HEALPix query mask used to generate the masked query positions `MaskedQueryPosRad` (see `kNNpy.HelperFunctions_2DA.create_query_2DA()` for how to compute this mask from an observational mask, and for a detailed description).
+    * **FieldConstPercThreshold** (float): the percentile value for the constant percentile threshold to be used for the continuous field. For example, ``FieldConstPercThreshold = 75.0`` represents a 75th percentile threshold.
+    * **ReturnSmoothedDict** (bool, optional, default=False): if set to ``True``, the dictionary containing the continuous field masked within the observational footprint, and smoothed at the provided angular distance scales, will be returned along with the nearest-neighbour measurements.
+    * **Verbose** (bool, optional, default=False): if set to ``True``, the time taken to complete each step of the calculation will be printed.
 
     Returns
     -------
-    p_gtr_k_veclist: list of numpy float arrays
-        list of auto kNN-CDFs of the discrete tracers evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
-    p_gtr_dt_list: list of numpy float arrays
-        continuum version of auto kNN-CDFs for the continuous field evaluated at the desired distance bins.
-    p_gtr_k_dt_veclist: list of numpy float arrays
-        list of joint tracer-field nearest neighbour distributions evaluated at the desired distance bins. Each list member is a 2D array of shape ``(n_realisations, n_bins)``.
-    SmoothedFieldDict : dict
-        dictionary containing the continuous field masked within the observational footprint and smoothed at the provided angular distance scales, returned only if `ReturnSmoothedDict` is ``True``. For example, ``SmoothedFieldDict['0.215']`` represents the continuous map smoothed at a scale of 0.215 radians.
-
+    * **p_gtr_kA_veclist** (list of numpy float arrays): list of auto kNN-CDFs of the first set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured $k_A^i$NN-CDFs, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kB_list** (list of numpy float arrays): list of auto kNN-CDFs of the second set of discrete tracers evaluated at the desired distance bins. The $i^{\text{th}}$ element represents the $k_B^i$NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+    * **p_gtr_kA_kB_veclist** (list of numpy float arrays): list of joint tracer-tracer nearest neighbour distributions evaluated at the desired distance bins. The $i^{\text{th}}$ element is a 2D array of shape ``(n_realisations, n_bins)`` containing the measured joint {$k_A^i$, $k_B^i$}NN-CDF, where the $i^{\text{th}}$ element of `kA_kB_list` is ($k_A^i$, $k_B^i$).
+        
     Raises
     ------
-    ValueError
-        if the given query points are not on a two-dimensional grid.
-    ValueError
-        if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
-    ValueError
-        if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
-    ValueError
-        if the given tracer points are not on a two-dimensional grid.
-    ValueError
-        if the shape of field skymap (after masking) does not match the shape of the given query point array.
+    * **ValueError**: if the lengths of `BinsRad` and `kA_kB_list` do not match.
+    * **ValueError**: if the given query points are not on a two-dimensional grid.
+    * **ValueError**: if declination of any of the query points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the query points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if declination of any of the tracer points is not in ``[-np.pi/2, np.pi/2]``.
+    * **ValueError**: if right ascension of any of the tracer points is not in ``[0, 2*np.pi]``.
+    * **ValueError**: if the given tracer points are not on a two-dimensional grid.
+    * **ValueError**: if the shape of field skymap (after masking) does not match the shape of the given query point array.
 
     See Also
     --------
